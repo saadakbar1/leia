@@ -1,7 +1,7 @@
-# Leia [![Build](https://github.com/grookage/leia/actions/workflows/build.yml/badge.svg)](https://github.com/grookage/leia/actions/workflows/build.yml)
+# Leia
 
-> Do raindrops follow a certain hierarchy when they fall?
-> - by Anthony T. Hincks
+> "Would it help if I got out and pushed?"
+> - Princess Leia to Han after the Millennium Falcon stalls while trying to escape Hoth.
 
 Leia is a KV config store template, for making versioned config store handlings simple. 
 - Supports versioning of a configType
