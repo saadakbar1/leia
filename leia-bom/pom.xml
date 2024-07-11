@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.grookage.leia</groupId>
+        <artifactId>leia</artifactId>
+        <version>0.0.1-RC1</version>
+    </parent>
+
+    <artifactId>leia-bom</artifactId>
+    <packaging>pom</packaging>
+    <name>Leia BOM</name>
+
+    <description>
+        Bill of materials to make sure a consistent set of versions is used for Leia modules.
+    </description>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-models</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-dropwizard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-repository</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-aerospike</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

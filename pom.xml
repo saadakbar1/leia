@@ -1,0 +1,199 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.grookage.leia</groupId>
+  <artifactId>leia</artifactId>
+  <version>0.0.1-RC1</version>
+  <packaging>pom</packaging>
+
+  <name>Leia</name>
+  <url>https://github.com/grookage/leia</url>
+  <description>A quick easy to use versioned config store</description>
+  <inceptionYear>2024</inceptionYear>
+
+  <modules>
+    <module>leia-bom</module>
+    <module>leia-parent</module>
+    <module>leia-core</module>
+    <module>leia-repository</module>
+    <module>leia-models</module>
+    <module>leia-aerospike</module>
+    <module>leia-dropwizard</module>
+    <module>leia-server</module>
+    <module>leia-client</module>
+  </modules>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+
+  <scm>
+    <connection>scm:git:https://github.com/grookage/leia.git</connection>
+    <developerConnection>scm:git:https://github.com/grookage/leia.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/grookage/leia</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/grookage/leia/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>koushikr</id>
+      <name>Koushik Ramachandra</name>
+      <email>rkoushik.14@gmail.com</email>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>17</java.version>
+    <java.release.version>17</java.release.version>
+    <maven.compiler.version>3.8.1</maven.compiler.version>
+    <nexus.staging.plguin.version>1.6.13</nexus.staging.plguin.version>
+    <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
+    <jacoco.version>0.8.8</jacoco.version>
+    <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+    <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
+    <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <forceJavacCompilerUse>true</forceJavacCompilerUse>
+          <release>${java.release.version}</release>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <artifactId>asm</artifactId>
+            <groupId>org.ow2.asm</groupId>
+            <version>7.2</version>
+          </dependency>
+        </dependencies>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>${maven.compiler.version}</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <id>test</id>
+            <phase>test</phase>
+          </execution>
+        </executions>
+        <version>${maven.surefire.plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>3.0.3</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <id>attach-sources</id>
+          </execution>
+        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>${maven.source.plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <source>11</source>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <id>attach-javadocs</id>
+          </execution>
+        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>${maven.javadoc.plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>${nexus.staging.plguin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${maven.gpg.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <useAgent>true</useAgent>
+                  <executable>gpg2</executable>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
