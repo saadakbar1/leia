@@ -8,19 +8,17 @@
 
   <name>Leia</name>
   <url>https://github.com/grookage/leia</url>
-  <description>A quick easy to use versioned config store</description>
+  <description>Chaos-Monkey for dropwizard</description>
   <inceptionYear>2024</inceptionYear>
 
   <modules>
     <module>leia-bom</module>
     <module>leia-parent</module>
     <module>leia-core</module>
-    <module>leia-repository</module>
     <module>leia-models</module>
-    <module>leia-aerospike</module>
     <module>leia-dropwizard</module>
-    <module>leia-server</module>
-    <module>leia-client</module>
+      <module>leia-repository</module>
+      <module>leia-elastic</module>
   </modules>
 
   <distributionManagement>

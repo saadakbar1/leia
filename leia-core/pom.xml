@@ -13,9 +13,50 @@
     <artifactId>leia-core</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <reflections.version>0.10.2</reflections.version>
+        <guice.version>7.0.0</guice.version>
     </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-models</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-repository</artifactId>
+        </dependency>
+
+        <dependency>
+            <artifactId>leia-models</artifactId>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>com.grookage.leia</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>aspectjrt</artifactId>
+            <groupId>org.aspectj</groupId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
