@@ -27,8 +27,8 @@ import lombok.EqualsAndHashCode;
 public class ObjectAttribute extends SchemaAttribute {
 
     public ObjectAttribute(final String name,
-                             final boolean optional,
-                             final QualifierInfo qualifierInfo) {
+                           final boolean optional,
+                           final QualifierInfo qualifierInfo) {
         super(DataType.OBJECT, name, optional, qualifierInfo);
     }
 

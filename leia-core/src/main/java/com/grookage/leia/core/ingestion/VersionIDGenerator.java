@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core;
+package com.grookage.leia.core.ingestion;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+@FunctionalInterface
+public interface VersionIDGenerator {
+    String generateVersionId(String prefix);
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface LeiaExecutor {
 }

@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.engine;
+package com.grookage.leia.elastic.repository;
 
-import com.grookage.leia.models.schema.engine.SchemaContext;
-import com.grookage.leia.models.schema.engine.SchemaEvent;
+import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.storage.StoredSchema;
 import com.grookage.leia.repository.SchemaRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
-@Data
-@NoArgsConstructor
-@SuperBuilder
-public abstract class SchemaProcessor {
+import java.util.List;
+import java.util.Optional;
 
-    private SchemaRepository schemaRepository;
+public class ElasticRepository implements SchemaRepository {
 
-    public abstract SchemaEvent name();
+    @Override
+    public void create(StoredSchema schema) {
 
-    public abstract void process(final SchemaContext schemaContext);
+    }
 
+    @Override
+    public void update(StoredSchema schema) {
+
+    }
+
+    @Override
+    public List<StoredSchema> get(String namespace, String schemaName) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<StoredSchema> get(SchemaKey schemaKey) {
+        return Optional.empty();
+    }
 }

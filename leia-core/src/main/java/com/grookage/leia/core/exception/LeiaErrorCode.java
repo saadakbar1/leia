@@ -21,7 +21,13 @@ import lombok.Getter;
 @Getter
 public enum LeiaErrorCode {
 
-    PROCESSOR_NOT_FOUND(400);
+    PROCESSOR_NOT_FOUND(400),
+
+    VALUE_NOT_FOUND(400),
+
+    SCHEMA_ALREADY_EXISTS(400),
+
+    NO_SCHEMA_FOUND(400);
 
     final int status;
 

@@ -18,14 +18,14 @@ package com.grookage.leia.models.schema.engine;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
+import com.grookage.leia.models.utils.MapperUtils;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 @NoArgsConstructor
 public class SchemaContext {
-
     private final ContextData data = new ContextData();
 
     @JsonIgnore
@@ -36,9 +36,15 @@ public class SchemaContext {
         this.data.put(key.toUpperCase(), value);
     }
 
-    @JsonIgnore
-    public <T> Optional<T> getContext(String key, Function<Object, Optional<T>> converter) {
+    @SneakyThrows
+    public <T> Optional<T> getContext(Class<T> klass) {
+        var value = this.data.get(klass.getSimpleName().toUpperCase());
+        return Optional.ofNullable(MapperUtils.mapper().convertValue(value, klass));
+    }
+
+    @SneakyThrows
+    public Optional<String> getValue(String key) {
         var value = this.data.get(key.toUpperCase());
-        return converter.apply(value);
+        return Optional.ofNullable((String) value);
     }
 }

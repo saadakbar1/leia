@@ -16,22 +16,27 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.google.inject.Inject;
-import com.grookage.leia.core.LeiaExecutor;
-import com.grookage.leia.core.engine.SchemaProcessor;
+import com.grookage.leia.core.exception.LeiaErrorCode;
+import com.grookage.leia.core.exception.LeiaException;
+import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.ingestion.utils.SchemaUtils;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
-import com.grookage.leia.repository.SchemaRepository;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.function.Supplier;
 
 @EqualsAndHashCode(callSuper = true)
-@LeiaExecutor
 @SuperBuilder
 @Data
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@Slf4j
 public class ApproveSchemaProcessor extends SchemaProcessor {
 
     @Override
@@ -40,7 +45,25 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
     }
 
     @Override
+    @SneakyThrows
     public void process(SchemaContext context) {
-
+        final var schemaKey = context.getContext(SchemaKey.class)
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+        final var storedSchema = getSchemaRepository().get(schemaKey).orElse(null);
+        if (null == storedSchema) {
+            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
+                    schemaKey.getNamespace(),
+                    schemaKey.getVersion(),
+                    schemaKey.getSchemaName());
+            throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
+        }
+        final var userName = ContextUtils.getUser(context);
+        final var email = ContextUtils.getEmail(context);
+        storedSchema.getSchemaMeta().setUpdatedBy(userName);
+        storedSchema.getSchemaMeta().setUpdatedByEmail(email);
+        storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
+        storedSchema.setSchemaState(SchemaState.APPROVED);
+        getSchemaRepository().update(storedSchema);
+        context.addContext(SchemaDetails.class.getSimpleName(), SchemaUtils.toSchemaDetails(storedSchema));
     }
 }

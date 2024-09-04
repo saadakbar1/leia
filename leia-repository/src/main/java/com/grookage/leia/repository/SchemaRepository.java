@@ -20,21 +20,15 @@ import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.storage.StoredSchema;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 public interface SchemaRepository {
 
-    List<StoredSchema> getAllSchemas();
-
-    StoredSchema add(final StoredSchema schema);
-
-    StoredSchema update(final StoredSchema schema);
-
-    StoredSchema remove(final StoredSchema schema);
-
-    List<StoredSchema> get(final Set<SchemaKey> schemaKeys);
-
     List<StoredSchema> get(final String namespace, final String schemaName);
 
-    StoredSchema get(final SchemaKey schemaKey);
+    void create(final StoredSchema schema);
+
+    void update(final StoredSchema schema);
+
+    Optional<StoredSchema> get(final SchemaKey schemaKey);
 }

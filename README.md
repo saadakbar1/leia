@@ -3,19 +3,24 @@
 > "Would it help if I got out and pushed?"
 > - Princess Leia to Han after the Millennium Falcon stalls while trying to escape Hoth.
 
-> Nomenclature, the other foundation of botany, should provide the names as soon as the classification is made… If the names are unknown knowledge of the things also perishes… For a single genus, a single name.
+> Nomenclature, the other foundation of botany, should provide the names as soon as the classification is made… If the
+> names are unknown knowledge of the things also perishes… For a single genus, a single name.
 > - by Carl Linnaeus
 
 Leia is a governance and metadata framework aimed at meeting compliance requirements. It aims at providing
 
-- A versioned schema registry, to register various schemas with all primitive and custom data-types, bound by a maker-checker process, with customizable RBAC.
+- A versioned schema registry, to register various schemas with all primitive and custom data-types, bound by a
+  maker-checker process, with customizable RBAC.
 - Ability to dynamically create classifications, PII, TIME_SENSITIVE etc
 - A RESTful interface and a console to manage the said schemas, to allow for easier integrations
-- A client to help serialize and de-serialize the data, at production and consumption levels respectively, with a fluid interface that can work with any infrastructure component.
+- A client to help serialize and de-serialize the data, at production and consumption levels respectively, with a fluid
+  interface that can work with any infrastructure component.
 - Supports multiple types, json, avro and protobuf
 
 ## Build Instructions
+
 And
+
 - Clone the source:
 
       git clone github.com/grookage/leia

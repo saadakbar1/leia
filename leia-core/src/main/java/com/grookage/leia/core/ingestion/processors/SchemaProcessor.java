@@ -16,32 +16,24 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.google.inject.Inject;
-import com.grookage.leia.core.LeiaExecutor;
-import com.grookage.leia.core.engine.SchemaProcessor;
+import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.repository.SchemaRepository;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
-@LeiaExecutor
 @SuperBuilder
 @Data
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
-public class RemoveSchemaProcessor extends SchemaProcessor {
+@AllArgsConstructor
+public abstract class SchemaProcessor {
 
+    private final SchemaRepository schemaRepository;
+    private final VersionIDGenerator versionIDGenerator;
 
-    @Override
-    public SchemaEvent name() {
-        return SchemaEvent.REMOVE_SCHEMA;
-    }
+    public abstract SchemaEvent name();
 
-    @Override
-    public void process(SchemaContext context) {
+    public abstract void process(final SchemaContext schemaContext);
 
-    }
 }

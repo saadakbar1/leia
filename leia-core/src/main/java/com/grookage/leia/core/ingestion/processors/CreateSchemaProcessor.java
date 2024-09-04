@@ -16,22 +16,27 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.google.inject.Inject;
-import com.grookage.leia.core.LeiaExecutor;
-import com.grookage.leia.core.engine.SchemaProcessor;
+import com.grookage.leia.core.exception.LeiaErrorCode;
+import com.grookage.leia.core.exception.LeiaException;
+import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.ingestion.utils.SchemaUtils;
+import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
-import com.grookage.leia.repository.SchemaRepository;
+import com.grookage.leia.models.schema.engine.SchemaState;
+import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.function.Supplier;
 
 @EqualsAndHashCode(callSuper = true)
-@LeiaExecutor
 @SuperBuilder
 @Data
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
+@Slf4j
 public class CreateSchemaProcessor extends SchemaProcessor {
 
     @Override
@@ -40,7 +45,22 @@ public class CreateSchemaProcessor extends SchemaProcessor {
     }
 
     @Override
+    @SneakyThrows
     public void process(SchemaContext context) {
-
+        final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+        final var storedSchemas = getSchemaRepository()
+                .get(createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
+        if (!storedSchemas.isEmpty() && storedSchemas.stream()
+                .anyMatch(each -> each.getSchemaState() == SchemaState.CREATED)) {
+            log.error("There are already stored schemas present with namespace {} and schemaName {}. Please try updating them instead",
+                    createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
+            throw LeiaException.error(LeiaErrorCode.SCHEMA_ALREADY_EXISTS);
+        }
+        final var userName = ContextUtils.getUser(context);
+        final var email = ContextUtils.getEmail(context);
+        final var storedSchema = SchemaUtils.toStoredSchema(createSchemaRequest, userName, email, getVersionIDGenerator());
+        getSchemaRepository().create(storedSchema);
+        context.addContext(SchemaDetails.class.getSimpleName(), SchemaUtils.toSchemaDetails(storedSchema));
     }
 }

@@ -47,11 +47,11 @@ public class LeiaException extends RuntimeException {
                 Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
     }
 
-    public static LeiaException propagate(LeiaErrorCode errorCode, Throwable t) {
+    public static LeiaException error(LeiaErrorCode errorCode, Throwable t) {
         return new LeiaException(errorCode, t);
     }
 
-    public static LeiaException propagate(LeiaErrorCode errorCode) {
+    public static LeiaException error(LeiaErrorCode errorCode) {
         return new LeiaException(errorCode, new HashMap<>());
     }
 

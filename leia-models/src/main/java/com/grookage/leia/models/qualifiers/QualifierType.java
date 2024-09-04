@@ -20,5 +20,7 @@ public enum QualifierType {
 
     STANDARD,
     PII,
-    SHORT_LIVED
+    SHORT_LIVED,
+
+    ENCRYPTED
 }

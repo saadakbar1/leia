@@ -12,10 +12,6 @@
 
     <artifactId>leia-core</artifactId>
 
-    <properties>
-        <reflections.version>0.10.2</reflections.version>
-        <guice.version>7.0.0</guice.version>
-    </properties>
 
     <dependencies>
 
@@ -44,18 +40,6 @@
         <dependency>
             <artifactId>aspectjrt</artifactId>
             <groupId>org.aspectj</groupId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>${reflections.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.version}</version>
         </dependency>
     </dependencies>
 

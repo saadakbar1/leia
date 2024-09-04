@@ -21,14 +21,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class StoredSchemaMeta {
 
+    @NotEmpty
     private String createdBy;
+    private String createdByEmail;
     private long createdAt;
     private String updatedBy;
+    private String updatedByEmail;
     private long updatedAt;
 }

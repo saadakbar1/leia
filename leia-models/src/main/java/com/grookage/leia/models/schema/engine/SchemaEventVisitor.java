@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.dropwizard.bundle;
+package com.grookage.leia.models.schema.engine;
 
-public class LeiaConfiguration {
+public interface SchemaEventVisitor<T> {
+
+    T schemaCreate();
+
+    T schemaUpdate();
+
+    T schemaApprove();
+
+    T schemaReject();
+
 }

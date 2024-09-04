@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.ingestion.utils;
+package com.grookage.leia.models.qualifiers;
 
-import com.grookage.leia.models.schema.engine.SchemaContext;
-import com.grookage.leia.models.user.SchemaUpdater;
-import lombok.experimental.UtilityClass;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@UtilityClass
-public class IngestionUtils {
+@EqualsAndHashCode(callSuper = true)
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EncryptedQualifier extends QualifierInfo {
 
-    private static final String USER = "USER";
-    private static final String EMAIL = "EMAIL";
-
-    public static void addSchemaUpdaterContext(SchemaContext schemaContext,
-                                               SchemaUpdater schemaUpdater) {
-        schemaContext.addContext(USER, schemaUpdater.name());
-        schemaContext.addContext(EMAIL, schemaUpdater.email());
+    public EncryptedQualifier() {
+        super(QualifierType.ENCRYPTED);
     }
 }
