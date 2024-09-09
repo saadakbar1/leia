@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+public interface DataProvider<T> {
 
-    protected AbstractSchemaRepository() {
+    T getData();
 
-    }
+    void start();
 
-
+    void stop();
 }

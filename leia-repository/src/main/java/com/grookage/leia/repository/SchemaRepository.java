@@ -22,6 +22,7 @@ import com.grookage.leia.models.storage.StoredSchema;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface SchemaRepository {
@@ -34,7 +35,7 @@ public interface SchemaRepository {
 
     Optional<StoredSchema> get(final SchemaKey schemaKey);
 
-    List<SchemaDetails> getSchemaRegistry(final String namespace,
-                                          final Function<StoredSchema, SchemaDetails> mutator);
+    List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                   final Function<StoredSchema, SchemaDetails> mutator);
 
 }

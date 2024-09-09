@@ -14,13 +14,32 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.endpoint;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-    protected AbstractSchemaRepository() {
+import java.util.Optional;
 
+@AllArgsConstructor
+@Builder
+@Data
+public class SimpleEndPointProvider implements LeiaEndPointProvider {
+    private final LeiaEndPoint endPoint;
+
+    @Override
+    public Optional<LeiaEndPoint> endPoint() {
+        return Optional.of(endPoint);
     }
 
+    @Override
+    public void start() {
+        //NOOP
+    }
 
+    @Override
+    public void stop() {
+        //NOOP
+    }
 }

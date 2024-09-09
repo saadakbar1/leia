@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.retrieval;
+package com.grookage.leia.provider.endpoint;
 
-public interface SchemaService {
+import java.util.Optional;
+
+public interface LeiaEndPointProvider {
+
+    Optional<LeiaEndPoint> endPoint();
+
+    void start();
+
+    void stop();
 }

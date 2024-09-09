@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.exceptions;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+import lombok.Builder;
 
-    protected AbstractSchemaRepository() {
 
+public class RefresherException extends RuntimeException {
+
+    private final int status;
+
+    @Builder
+    private RefresherException(RefresherErrorCode errorCode) {
+        super();
+
+        this.status = errorCode.getStatus();
     }
 
+    public static RefresherException error(RefresherErrorCode errorCode) {
+        return new RefresherException(errorCode);
+    }
 
 }

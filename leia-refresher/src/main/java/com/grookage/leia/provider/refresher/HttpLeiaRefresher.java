@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.refresher;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
+import lombok.Builder;
+import lombok.Data;
 
-    protected AbstractSchemaRepository() {
+public class HttpLeiaRefresher<T> extends AbstractLeiaRefresher<T> {
 
+    @Builder
+    public HttpLeiaRefresher(LeiaHttpSupplier<T> supplier, int configRefreshTimeSeconds) {
+        super(supplier, configRefreshTimeSeconds);
     }
-
-
 }

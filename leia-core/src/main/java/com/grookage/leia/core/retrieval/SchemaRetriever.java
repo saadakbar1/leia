@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.core.retrieval;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
-
-    protected AbstractSchemaRepository() {
-
-    }
+public class SchemaRetriever {
 
 
 }

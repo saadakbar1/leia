@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.refresher;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+public interface LeiaRefresher<T> {
 
-    protected AbstractSchemaRepository() {
+    T getConfiguration();
 
-    }
-
+    void refresh();
 
 }

@@ -20,6 +20,7 @@
         <module>leia-repository</module>
         <module>leia-elastic</module>
         <module>leia-dropwizard-es</module>
+        <module>leia-refresher</module>
     </modules>
 
     <distributionManagement>

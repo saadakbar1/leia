@@ -24,6 +24,7 @@ import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaExceptionMapper;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
+import com.grookage.leia.repository.config.CacheConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.lifecycle.Managed;
@@ -41,8 +42,7 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     private SchemaIngestor<U> schemaIngestor;
     private SchemaRepository schemaRepository;
 
-    protected abstract void runPreconditions(T configuration);
-
+    protected abstract CacheConfig getCacheConfig(T configuration);
 
     protected abstract SchemaRepository getSchemaRepository(T configuration);
 
@@ -58,7 +58,6 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
     @Override
     public void run(T configuration, Environment environment) {
-        runPreconditions(configuration);
         final var schemaProcessorHub = new SchemaProcessorHub()
                 .withSchemaRepository(getSchemaRepository(configuration))
                 .withVersionIDGenerator(getVersionIDGenerator())

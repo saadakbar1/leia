@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.exceptions;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+import lombok.Getter;
 
-    protected AbstractSchemaRepository() {
+@Getter
+public enum RefresherErrorCode {
 
+
+    BAD_REQUEST(400),
+
+    INTERNAL_SERVER_ERROR(500);
+
+    final int status;
+
+    RefresherErrorCode(int status) {
+        this.status = status;
     }
-
-
 }

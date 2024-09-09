@@ -23,8 +23,8 @@ import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.elastic.repository.ElasticRepository;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
-import com.grookage.leia.repository.config.CacheConfig;
 import io.dropwizard.Configuration;
+import io.dropwizard.setup.Environment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,16 +40,6 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
 
     protected abstract ElasticConfig getElasticConfig(T configuration);
 
-    protected abstract CacheConfig getCacheConfig(T configuration);
-
-    @Override
-    protected void runPreconditions(T configuration) {
-        this.elasticConfig = getElasticConfig(configuration);
-        final var cacheConfig = getCacheConfig(configuration);
-        this.elasticSchemaRepository = new ElasticRepository(cacheConfig, elasticConfig);
-        this.elasticsearchClient = elasticSchemaRepository.getClient();
-    }
-
     @Override
     protected SchemaRepository getSchemaRepository(T configuration) {
         return elasticSchemaRepository;
@@ -57,5 +47,13 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
 
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
         return List.of(new ElasticHealthCheck(elasticConfig, elasticsearchClient));
+    }
+
+    @Override
+    public void run(T configuration, Environment environment) {
+        this.elasticConfig = getElasticConfig(configuration);
+        this.elasticSchemaRepository = new ElasticRepository(elasticConfig);
+        this.elasticsearchClient = elasticSchemaRepository.getClient();
+        super.run(configuration, environment);
     }
 }

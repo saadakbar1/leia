@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.endpoint;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+public enum EndPointScheme {
 
-    protected AbstractSchemaRepository() {
-
-    }
-
-
+    HTTPS, HTTP
 }

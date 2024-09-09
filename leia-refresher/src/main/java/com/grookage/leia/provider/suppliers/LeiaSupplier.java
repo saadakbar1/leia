@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.repository;
+package com.grookage.leia.provider.suppliers;
 
-public abstract class AbstractSchemaRepository implements SchemaRepository {
+import java.util.function.Supplier;
 
-    protected AbstractSchemaRepository() {
+public interface LeiaSupplier<T> extends Supplier<T> {
 
-    }
+    void start();
 
+    void stop();
 
 }

@@ -17,10 +17,12 @@
 package com.grookage.leia.elastic.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -36,12 +38,12 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.storage.StoredSchema;
 import com.grookage.leia.repository.AbstractSchemaRepository;
-import com.grookage.leia.repository.config.CacheConfig;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -55,13 +57,17 @@ public class ElasticRepository extends AbstractSchemaRepository {
     private static final String SCHEMA_NAME = "schemaName";
     private static final String VERSION = "version";
 
-    public ElasticRepository(CacheConfig cacheConfig,
-                             ElasticConfig elasticConfig) {
-        super(cacheConfig);
+    public ElasticRepository(ElasticConfig elasticConfig) {
+        super();
         Preconditions.checkNotNull(elasticConfig, "Elastic Config can't be null");
         this.elasticConfig = elasticConfig;
         this.client = new ElasticClientManager(elasticConfig).getElasticClient();
         this.initialize();
+    }
+
+    /* Fields and values are being lower-cased, before adding as clauses, since elasticsearch deals with lowercase only */
+    private List<FieldValue> getNormalizedValues(Set<String> terms) {
+        return terms.stream().map(FieldValue::of).toList();
     }
 
     @SneakyThrows
@@ -133,11 +139,12 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public List<SchemaDetails> getSchemaRegistry(final String namespace,
-                                                 final Function<StoredSchema, SchemaDetails> mutator) {
-        final var searchQuery = BoolQuery.of(t -> t.must(List.of(
-                TermQuery.of(p -> p.field(NAMESPACE).value(namespace))._toQuery()
-        )))._toQuery();
+    public List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                          final Function<StoredSchema, SchemaDetails> mutator) {
+        final var searchQuery = namespaces.isEmpty() ?
+                TermsQuery.of(q -> q)._toQuery() :
+                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
+                ))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)
@@ -147,6 +154,6 @@ public class ElasticRepository extends AbstractSchemaRepository {
                 StoredSchema.class
         );
         return searchResponse.hits().hits().stream()
-                .map(hit -> mutator.apply(hit.source())).collect(Collectors.toList());
+                .map(hit -> mutator.apply(hit.source())).toList();
     }
 }
