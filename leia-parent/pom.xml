@@ -35,7 +35,6 @@
         <mockito.version>4.2.0</mockito.version>
 
         <jackson.version>2.17.0</jackson.version>
-        <javax.ws.rs.version>2.3.1</javax.ws.rs.version>
 
         <dropwizard.version>2.1.10</dropwizard.version>
         <aspectjrt.version>1.9.8</aspectjrt.version>
@@ -90,11 +89,6 @@
                 <artifactId>jackson-dataformat-yaml</artifactId>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <groupId>javax.ws.rs</groupId>
-                <version>${javax.ws.rs.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>

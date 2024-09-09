@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema;
+package com.grookage.leia.dropwizard.bundle.lifecycle;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Joiner;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+public interface Lifecycle {
 
-@AllArgsConstructor
-@Builder
-@Data
-public class SchemaKey {
-    private final String namespace;
-    private final String schemaName;
-    private final String version;
+    void start();
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version);
-    }
+    void stop();
+
 }

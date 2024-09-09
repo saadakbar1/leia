@@ -19,6 +19,7 @@
         <module>leia-dropwizard</module>
         <module>leia-repository</module>
         <module>leia-elastic</module>
+        <module>leia-dropwizard-es</module>
     </modules>
 
     <distributionManagement>

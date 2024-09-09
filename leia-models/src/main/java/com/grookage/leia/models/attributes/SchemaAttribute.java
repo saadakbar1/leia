@@ -48,7 +48,7 @@ public abstract class SchemaAttribute {
 
     private DataType type;
 
-    @Pattern(regexp = "[A-Za-z0-9]*", message = "Schema name doesn't comply to the naming standard")
+    @Pattern(regexp = "[A-Za-z0-9]*", message = "Please check the attribute name format")
     private String name;
 
     private boolean optional;

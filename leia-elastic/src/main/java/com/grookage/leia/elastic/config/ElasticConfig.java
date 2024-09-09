@@ -14,44 +14,36 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.storage;
+package com.grookage.leia.elastic.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Joiner;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.schema.SchemaType;
-import com.grookage.leia.models.schema.engine.SchemaState;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.net.HostAndPort;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class StoredSchema {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ElasticConfig {
     @NotEmpty
-    private String versionId;
-    @NotNull
-    private SchemaType schemaType;
+    private String clusterName = "elasticsearch";
     @NotEmpty
-    private String namespace;
-    @NotEmpty
-    private String schemaName;
-    private String description;
-    private SchemaState schemaState;
-    @NotNull
-    private StoredSchemaMeta schemaMeta;
-    @NotEmpty
-    private Set<SchemaAttribute> attributes;
+    private List<HostAndPort> servers = List.of();
+    private int maxResultSize = 10000;
+    private int operationTimeoutMs = 10000;
+    private AuthConfig authConfig;
+    private boolean failOnYellow = false;
 
     @JsonIgnore
-    public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, versionId);
+    public String getTimeout() {
+        return String.valueOf(operationTimeoutMs).concat("ms");
     }
 }

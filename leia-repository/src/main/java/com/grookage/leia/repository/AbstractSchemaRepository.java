@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema;
+package com.grookage.leia.repository;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Joiner;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.grookage.leia.repository.config.CacheConfig;
 
-@AllArgsConstructor
-@Builder
-@Data
-public class SchemaKey {
-    private final String namespace;
-    private final String schemaName;
-    private final String version;
+public abstract class AbstractSchemaRepository implements SchemaRepository {
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version);
+    private final CacheConfig cacheConfig;
+
+    protected AbstractSchemaRepository(CacheConfig cacheConfig) {
+        this.cacheConfig = cacheConfig;
     }
+
 }

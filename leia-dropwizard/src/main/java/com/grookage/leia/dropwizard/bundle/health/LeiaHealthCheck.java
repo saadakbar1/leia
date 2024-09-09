@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema;
+package com.grookage.leia.dropwizard.bundle.health;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Joiner;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.codahale.metrics.health.HealthCheck;
 
-@AllArgsConstructor
-@Builder
-@Data
-public class SchemaKey {
-    private final String namespace;
-    private final String schemaName;
-    private final String version;
+public abstract class LeiaHealthCheck extends HealthCheck {
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version);
+    private final String name;
+
+    protected LeiaHealthCheck(String name) {
+        this.name = name;
     }
 }

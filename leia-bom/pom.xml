@@ -54,6 +54,11 @@
                 <artifactId>leia-repository</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-dropwizard-es</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

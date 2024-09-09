@@ -16,11 +16,13 @@
 
 package com.grookage.leia.repository;
 
+import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.storage.StoredSchema;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface SchemaRepository {
 
@@ -31,4 +33,8 @@ public interface SchemaRepository {
     void update(final StoredSchema schema);
 
     Optional<StoredSchema> get(final SchemaKey schemaKey);
+
+    List<SchemaDetails> getSchemaRegistry(final String namespace,
+                                          final Function<StoredSchema, SchemaDetails> mutator);
+
 }

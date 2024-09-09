@@ -19,15 +19,20 @@ package com.grookage.leia.dropwizard.bundle;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
 import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
+import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
+import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaExceptionMapper;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -36,12 +41,24 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     private SchemaIngestor<U> schemaIngestor;
     private SchemaRepository schemaRepository;
 
+    protected abstract void runPreconditions(T configuration);
+
+
     protected abstract SchemaRepository getSchemaRepository(T configuration);
 
     protected abstract VersionIDGenerator getVersionIDGenerator();
 
+    protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
+        return List.of();
+    }
+
+    protected List<Lifecycle> withLifecycleManagers(T configuration) {
+        return List.of();
+    }
+
     @Override
     public void run(T configuration, Environment environment) {
+        runPreconditions(configuration);
         final var schemaProcessorHub = new SchemaProcessorHub()
                 .withSchemaRepository(getSchemaRepository(configuration))
                 .withVersionIDGenerator(getVersionIDGenerator())
@@ -51,10 +68,24 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
                 .build();
         this.schemaRepository = getSchemaRepository(configuration);
         environment.jersey().register(new LeiaExceptionMapper());
+        withLifecycleManagers(configuration)
+                .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
+                    @Override
+                    public void start() {
+                        lifecycle.start();
+                    }
+
+                    @Override
+                    public void stop() {
+                        lifecycle.stop();
+                    }
+                }));
+        withHealthChecks(configuration)
+                .forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
     }
 
     @Override
     public void initialize(Bootstrap<?> bootstrap) {
-
+        //NOOP. Nothing to do here.
     }
 }
