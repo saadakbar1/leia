@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
+@SuppressWarnings("KotlinInternalInJava")
 public class OkHttpUtils {
 
     private static final int DEFAULT_MAX_IDLE_CONNECTIONS = 10;

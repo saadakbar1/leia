@@ -30,7 +30,7 @@ import okhttp3.RequestBody;
 
 import java.util.List;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "KotlinInternalInJava"})
 @Getter
 public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
