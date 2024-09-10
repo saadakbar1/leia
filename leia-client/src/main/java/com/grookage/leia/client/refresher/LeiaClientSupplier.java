@@ -17,15 +17,20 @@
 package com.grookage.leia.client.refresher;
 
 import com.grookage.leia.client.datasource.NamespaceDataSource;
+import com.grookage.leia.models.request.NamespaceRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.utils.MapperUtils;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 @Getter
 public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
@@ -39,11 +44,20 @@ public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
     @Override
     protected String url() {
-        return null;
+        return "/v1/schema/details/current";
     }
 
     @Override
+    @SneakyThrows
     protected Request getRequest(String url) {
-        return null;
+        final var requestBody = RequestBody.create(
+                okhttp3.MediaType.parse("application/json; charset=utf-8"),
+                MapperUtils.mapper().writeValueAsString(NamespaceRequest.builder()
+                        .namespaces(namespaceDataSource.getNamespaces())
+                        .build()));
+        return new Request.Builder()
+                .url(endPoint(url))
+                .post(requestBody)
+                .build();
     }
 }
