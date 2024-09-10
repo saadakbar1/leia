@@ -45,6 +45,7 @@ public class SchemaUtils {
                         .createdByEmail(email)
                         .createdAt(System.currentTimeMillis())
                         .build())
+                .validationType(createSchemaRequest.getValidationType())
                 .build();
     }
 
@@ -58,6 +59,8 @@ public class SchemaUtils {
                         .schemaName(storedSchema.getSchemaName())
                         .version(storedSchema.getVersionId())
                         .build())
+                .schemaType(storedSchema.getSchemaType())
+                .validationType(storedSchema.getValidationType())
                 .build();
     }
 }

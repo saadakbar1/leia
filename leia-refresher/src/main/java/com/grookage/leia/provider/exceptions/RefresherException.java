@@ -17,8 +17,10 @@
 package com.grookage.leia.provider.exceptions;
 
 import lombok.Builder;
+import lombok.Getter;
 
 
+@Getter
 public class RefresherException extends RuntimeException {
 
     private final int status;

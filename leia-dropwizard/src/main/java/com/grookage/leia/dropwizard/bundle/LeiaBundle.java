@@ -16,12 +16,18 @@
 
 package com.grookage.leia.dropwizard.bundle;
 
+import com.google.common.base.Preconditions;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
 import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
+import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
 import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaExceptionMapper;
+import com.grookage.leia.dropwizard.bundle.mapper.LeiaRefresherMapper;
+import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
+import com.grookage.leia.dropwizard.bundle.resources.IngestionResource;
+import com.grookage.leia.dropwizard.bundle.resources.SchemaResource;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
 import com.grookage.leia.repository.config.CacheConfig;
@@ -41,6 +47,9 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
     private SchemaIngestor<U> schemaIngestor;
     private SchemaRepository schemaRepository;
+    private SchemaRetriever schemaRetriever;
+
+    protected abstract SchemaUpdaterResolver<U> userResolver(T configuration);
 
     protected abstract CacheConfig getCacheConfig(T configuration);
 
@@ -58,6 +67,8 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
     @Override
     public void run(T configuration, Environment environment) {
+        final var userResolver = userResolver(configuration);
+        Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
         final var schemaProcessorHub = new SchemaProcessorHub()
                 .withSchemaRepository(getSchemaRepository(configuration))
                 .withVersionIDGenerator(getVersionIDGenerator())
@@ -66,7 +77,8 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
                 .withProcessorHub(schemaProcessorHub)
                 .build();
         this.schemaRepository = getSchemaRepository(configuration);
-        environment.jersey().register(new LeiaExceptionMapper());
+        final var cacheConfig = getCacheConfig(configuration);
+        this.schemaRetriever = new SchemaRetriever(schemaRepository, cacheConfig);
         withLifecycleManagers(configuration)
                 .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
                     @Override
@@ -81,6 +93,10 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
                 }));
         withHealthChecks(configuration)
                 .forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
+        environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver));
+        environment.jersey().register(new SchemaResource(schemaRetriever));
+        environment.jersey().register(new LeiaExceptionMapper());
+        environment.jersey().register(new LeiaRefresherMapper());
     }
 
     @Override

@@ -22,8 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 @Data
 public class SchemaKey {
     private final String namespace;
@@ -34,4 +34,22 @@ public class SchemaKey {
     public String getReferenceId() {
         return Joiner.on(".").join(namespace, schemaName, version);
     }
+
+    @Override
+    public int hashCode() {
+        return this.getReferenceId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        final var thatKey = (SchemaKey) obj;
+        return (thatKey.getReferenceId().equals(this.getReferenceId()));
+    }
+
 }

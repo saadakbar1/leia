@@ -30,4 +30,6 @@ import lombok.NoArgsConstructor;
 public class CacheConfig {
 
     private boolean enabled;
+    private int refreshCacheSeconds;
+
 }

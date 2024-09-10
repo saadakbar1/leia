@@ -36,6 +36,7 @@ import com.grookage.leia.elastic.client.ElasticClientManager;
 import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.storage.StoredSchema;
 import com.grookage.leia.repository.AbstractSchemaRepository;
 import lombok.Getter;
@@ -56,6 +57,7 @@ public class ElasticRepository extends AbstractSchemaRepository {
     private static final String NAMESPACE = "namespace";
     private static final String SCHEMA_NAME = "schemaName";
     private static final String VERSION = "version";
+    private static final String SCHEMA_STATE = "schemaState";
 
     public ElasticRepository(ElasticConfig elasticConfig) {
         super();
@@ -140,11 +142,17 @@ public class ElasticRepository extends AbstractSchemaRepository {
     @Override
     @SneakyThrows
     public List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                          final Set<SchemaState> schemaStates,
                                           final Function<StoredSchema, SchemaDetails> mutator) {
-        final var searchQuery = namespaces.isEmpty() ?
+        final var namespaceQuery = namespaces.isEmpty() ?
                 TermsQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
                 ))._toQuery();
+        final var stateQuery = schemaStates.isEmpty() ?
+                TermsQuery.of(q -> q)._toQuery() :
+                TermsQuery.of(q -> q.field(SCHEMA_STATE)
+                        .terms(t -> t.value(getNormalizedValues(schemaStates.stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, stateQuery)))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)

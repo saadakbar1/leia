@@ -28,7 +28,6 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @Builder
 public class StoredSchemaMeta {
-
     @NotEmpty
     private String createdBy;
     private String createdByEmail;

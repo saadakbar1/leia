@@ -17,6 +17,7 @@
 package com.grookage.leia.models.schema;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.storage.StoredSchemaMeta;
@@ -32,13 +33,17 @@ import java.util.Set;
 @Data
 @Builder
 public class SchemaDetails {
-
-    @NotNull
-    private final SchemaKey schemaKey;
+    private final @NotNull SchemaKey schemaKey;
     private final String description;
     private final SchemaState schemaState;
-    @NotNull
-    private final StoredSchemaMeta schemaMeta;
-    @NotEmpty
-    private final Set<SchemaAttribute> attributes;
+    private final SchemaType schemaType;
+    private final SchemaValidationType validationType;
+    private final @NotNull StoredSchemaMeta schemaMeta;
+    private final @NotEmpty Set<SchemaAttribute> attributes;
+
+    @JsonIgnore
+    public boolean match(final SchemaKey thatKey) {
+        return schemaKey.equals(thatKey);
+    }
+
 }

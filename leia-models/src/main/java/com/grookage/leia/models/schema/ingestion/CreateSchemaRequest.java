@@ -18,6 +18,7 @@ package com.grookage.leia.models.schema.ingestion;
 
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.SchemaType;
+import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class CreateSchemaRequest {
     private String schemaName;
     @NotNull
     private SchemaType schemaType;
+    private SchemaValidationType validationType = SchemaValidationType.MATCHING;
     @NotBlank
     private String namespace;
     private String description;

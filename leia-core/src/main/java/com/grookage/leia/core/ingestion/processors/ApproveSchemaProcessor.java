@@ -52,9 +52,9 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
         final var storedSchema = getSchemaRepository().get(schemaKey).orElse(null);
         if (null == storedSchema) {
             log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
-                    schemaKey.getNamespace(),
-                    schemaKey.getVersion(),
-                    schemaKey.getSchemaName());
+                    schemaKey.namespace(),
+                    schemaKey.version(),
+                    schemaKey.schemaName());
             throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
         }
         final var userName = ContextUtils.getUser(context);

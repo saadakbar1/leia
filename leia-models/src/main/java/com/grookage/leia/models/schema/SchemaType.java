@@ -17,6 +17,6 @@
 package com.grookage.leia.models.schema;
 
 public enum SchemaType {
-
     JSON
+
 }

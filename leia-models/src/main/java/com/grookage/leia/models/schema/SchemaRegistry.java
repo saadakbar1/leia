@@ -16,31 +16,39 @@
 
 package com.grookage.leia.models.schema;
 
+import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 @Data
 @Builder
 @NoArgsConstructor
 public class SchemaRegistry {
 
-    private final ConcurrentHashMap<SchemaKey, SchemaDetails> schemaRegistry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SchemaKey, SchemaDetails> schemas = new ConcurrentHashMap<>();
 
     public void add(final SchemaDetails schemaDetails) {
-        schemaRegistry.putIfAbsent(schemaDetails.getSchemaKey(), schemaDetails);
+        schemas.putIfAbsent(schemaDetails.schemaKey(), schemaDetails);
     }
 
     public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
-        return Optional.ofNullable(schemaRegistry.get(schemaKey));
+        return Optional.ofNullable(schemas.get(schemaKey));
     }
 
-    public Optional<SchemaDetails> getOrCompute(final SchemaKey schemaKey,
-                                                final Function<SchemaKey, SchemaDetails> schemaFunction) {
-        return Optional.ofNullable(schemaRegistry.computeIfAbsent(schemaKey, schemaFunction));
+    public List<SchemaDetails> getSchemaDetails(final Set<String> namespaces) {
+        return schemas.values().stream().filter(each -> namespaces.contains(each.schemaKey().namespace()) &&
+                        each.schemaState() == SchemaState.APPROVED)
+                .toList();
+    }
+
+    public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
+        return schemas.values().stream().filter(each -> namespaces.contains(each.schemaKey().namespace()))
+                .toList();
     }
 }

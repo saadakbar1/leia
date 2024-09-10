@@ -16,13 +16,13 @@
 
 package com.grookage.leia.provider.suppliers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.provider.endpoint.LeiaEndPoint;
 import com.grookage.leia.provider.endpoint.LeiaEndPointProvider;
 import com.grookage.leia.provider.endpoint.SimpleEndPointProvider;
 import com.grookage.leia.provider.exceptions.RefresherErrorCode;
 import com.grookage.leia.provider.exceptions.RefresherException;
+import com.grookage.leia.provider.marshal.Marshaller;
 import com.grookage.leia.provider.utils.OkHttpUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -35,20 +35,17 @@ import java.util.Objects;
 @Slf4j
 public abstract class LeiaHttpSupplier<T> implements LeiaSupplier<T> {
 
-    private final ObjectMapper mapper;
-    private final Class<T> configKlass;
+    private final Marshaller<T> marshaller;
     private final LeiaEndPointProvider endpointProvider;
     private final OkHttpClient okHttpClient;
 
     @SneakyThrows
     protected LeiaHttpSupplier(
             LeiaHttpConfiguration httpConfiguration,
-            ObjectMapper mapper,
-            Class<T> klass,
+            Marshaller<T> marshaller,
             String name
     ) {
-        this.configKlass = klass;
-        this.mapper = mapper;
+        this.marshaller = marshaller;
         this.endpointProvider = SimpleEndPointProvider.builder()
                 .endPoint(
                         LeiaEndPoint.builder()
@@ -85,7 +82,7 @@ public abstract class LeiaHttpSupplier<T> implements LeiaSupplier<T> {
                 throw RefresherException.error(RefresherErrorCode.BAD_REQUEST);
             }
             final var body = OkHttpUtils.bodyAsBytes(response);
-            return mapper.readValue(body, configKlass);
+            return marshaller.marshall(body);
         } catch (Exception e) {
             log.error("Error while executing API with uri: {}", url, e);
             throw RefresherException.error(RefresherErrorCode.INTERNAL_SERVER_ERROR);

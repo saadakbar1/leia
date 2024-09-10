@@ -18,6 +18,7 @@ package com.grookage.leia.repository;
 
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.storage.StoredSchema;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public interface SchemaRepository {
     Optional<StoredSchema> get(final SchemaKey schemaKey);
 
     List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                   final Set<SchemaState> schemaStates,
                                    final Function<StoredSchema, SchemaDetails> mutator);
 
 }

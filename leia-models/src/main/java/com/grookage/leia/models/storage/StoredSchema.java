@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Joiner;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.SchemaType;
+import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,8 @@ public class StoredSchema {
     private String versionId;
     @NotNull
     private SchemaType schemaType;
+    @NotNull
+    private SchemaValidationType validationType;
     @NotEmpty
     private String namespace;
     @NotEmpty

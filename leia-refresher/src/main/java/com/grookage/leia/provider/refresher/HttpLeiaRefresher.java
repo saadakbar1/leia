@@ -18,7 +18,6 @@ package com.grookage.leia.provider.refresher;
 
 import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
 import lombok.Builder;
-import lombok.Data;
 
 public class HttpLeiaRefresher<T> extends AbstractLeiaRefresher<T> {
 

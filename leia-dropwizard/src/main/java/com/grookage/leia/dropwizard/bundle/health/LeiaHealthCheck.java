@@ -17,7 +17,9 @@
 package com.grookage.leia.dropwizard.bundle.health;
 
 import com.codahale.metrics.health.HealthCheck;
+import lombok.Getter;
 
+@Getter
 public abstract class LeiaHealthCheck extends HealthCheck {
 
     private final String name;
