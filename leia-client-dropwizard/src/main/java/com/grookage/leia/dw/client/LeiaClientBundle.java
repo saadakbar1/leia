@@ -44,8 +44,6 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract boolean withProducerClient(T configuration);
 
-    protected abstract boolean withConsumerClient(T configuration);
-
     protected abstract LeiaHttpConfiguration getHttpConfiguration(T configuration);
 
     protected abstract Set<String> getPackageRoots(T configuration);
