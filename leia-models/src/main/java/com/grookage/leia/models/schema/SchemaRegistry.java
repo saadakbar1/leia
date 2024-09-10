@@ -34,7 +34,7 @@ public class SchemaRegistry {
     private final ConcurrentHashMap<SchemaKey, SchemaDetails> schemas = new ConcurrentHashMap<>();
 
     public void add(final SchemaDetails schemaDetails) {
-        schemas.putIfAbsent(schemaDetails.schemaKey(), schemaDetails);
+        schemas.putIfAbsent(schemaDetails.getSchemaKey(), schemaDetails);
     }
 
     public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
@@ -42,13 +42,13 @@ public class SchemaRegistry {
     }
 
     public List<SchemaDetails> getSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.schemaKey().namespace()) &&
-                        each.schemaState() == SchemaState.APPROVED)
+        return schemas.values().stream().filter(each -> namespaces.contains(each.getSchemaKey().getNamespace()) &&
+                        each.getSchemaState() == SchemaState.APPROVED)
                 .toList();
     }
 
     public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.schemaKey().namespace()))
+        return schemas.values().stream().filter(each -> namespaces.contains(each.getSchemaKey().getNamespace()))
                 .toList();
     }
 }

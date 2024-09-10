@@ -33,13 +33,13 @@ import java.util.Set;
 @Data
 @Builder
 public class SchemaDetails {
-    private final @NotNull SchemaKey schemaKey;
-    private final String description;
-    private final SchemaState schemaState;
-    private final SchemaType schemaType;
-    private final SchemaValidationType validationType;
-    private final @NotNull StoredSchemaMeta schemaMeta;
-    private final @NotEmpty Set<SchemaAttribute> attributes;
+    @NotNull SchemaKey schemaKey;
+    String description;
+    @NotNull SchemaState schemaState;
+    SchemaType schemaType;
+    SchemaValidationType validationType;
+    @NotNull StoredSchemaMeta schemaMeta;
+    @NotEmpty Set<SchemaAttribute> attributes;
 
     @JsonIgnore
     public boolean match(final SchemaKey thatKey) {

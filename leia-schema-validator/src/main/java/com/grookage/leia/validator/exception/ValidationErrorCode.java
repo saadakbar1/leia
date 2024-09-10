@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.client;
+package com.grookage.leia.validator.exception;
 
-import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
+import lombok.Getter;
 
-import java.util.List;
-import java.util.Set;
+@Getter
+public enum ValidationErrorCode {
 
-public interface LeiaSchemaClient {
+    NO_SCHEMA_FOUND(400);
 
-    List<SchemaDetails> getSchemaDetails();
+    final int status;
 
-    List<SchemaDetails> getSchemaDetails(final Set<String> namespaces);
-
-    boolean valid(SchemaKey schemaKey);
-
+    ValidationErrorCode(int status) {
+        this.status = status;
+    }
 }

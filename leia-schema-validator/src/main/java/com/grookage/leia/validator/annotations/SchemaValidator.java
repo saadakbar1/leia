@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.client;
+package com.grookage.leia.validator.annotations;
 
-import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.List;
-import java.util.Set;
-
-public interface LeiaSchemaClient {
-
-    List<SchemaDetails> getSchemaDetails();
-
-    List<SchemaDetails> getSchemaDetails(final Set<String> namespaces);
-
-    boolean valid(SchemaKey schemaKey);
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SchemaValidator {
 
 }

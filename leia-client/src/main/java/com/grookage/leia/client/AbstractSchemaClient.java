@@ -18,6 +18,8 @@ package com.grookage.leia.client;
 
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.validator.LeiaSchemaValidator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -31,6 +33,7 @@ import java.util.Set;
 public abstract class AbstractSchemaClient implements LeiaSchemaClient {
 
     private final LeiaClientRefresher refresher;
+    private final LeiaSchemaValidator schemaValidator;
 
     public List<SchemaDetails> getSchemaDetails() {
         return refresher.getConfiguration();
@@ -41,5 +44,8 @@ public abstract class AbstractSchemaClient implements LeiaSchemaClient {
                 .filter(each -> namespaces.contains(each.getSchemaKey().getNamespace())).toList();
     }
 
+    public boolean valid(SchemaKey schemaKey) {
+        return schemaValidator.valid(schemaKey);
+    }
 }
 

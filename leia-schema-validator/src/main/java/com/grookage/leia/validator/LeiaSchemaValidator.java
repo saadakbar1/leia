@@ -16,5 +16,14 @@
 
 package com.grookage.leia.validator;
 
+import com.grookage.leia.models.schema.SchemaKey;
+
 public interface LeiaSchemaValidator {
+
+    void start();
+
+    void stop();
+
+    boolean valid(SchemaKey schemaKey);
+
 }

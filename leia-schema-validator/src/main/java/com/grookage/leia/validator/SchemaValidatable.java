@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.client;
+package com.grookage.leia.validator;
 
-import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
+public interface SchemaValidatable {
 
-import java.util.List;
-import java.util.Set;
+    String schemaName();
 
-public interface LeiaSchemaClient {
+    String namespace();
 
-    List<SchemaDetails> getSchemaDetails();
-
-    List<SchemaDetails> getSchemaDetails(final Set<String> namespaces);
-
-    boolean valid(SchemaKey schemaKey);
+    String versionId();
 
 }
