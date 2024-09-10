@@ -27,7 +27,6 @@ import com.grookage.leia.validator.InjectableSchemaValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
 
@@ -68,7 +67,6 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         Preconditions.checkNotNull(httpConfiguration, "Http Configuration can't be null");
         final var packageRoots = getPackageRoots(configuration);
         Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
-
         final var withProducerClient = withProducerClient(configuration);
         final var configRefreshSeconds = getRefreshIntervalSeconds(configuration);
         final var clientRefresher = LeiaClientRefresher.builder()
@@ -79,17 +77,12 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .configRefreshTimeSeconds(configRefreshSeconds)
                 .build();
         final var validator = getSchemaValidator(configuration, environment, clientRefresher);
+        validator.start();
         if (withProducerClient) {
             producerClient = LeiaMessageProduceClient.builder()
                     .refresher(clientRefresher)
                     .schemaValidator(validator)
                     .build();
         }
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() {
-                validator.start();
-            }
-        });
     }
 }

@@ -25,4 +25,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SchemaValidator {
 
+    String schemaName();
+
+    String versionId();
+
+    String namespace();
+
 }

@@ -46,4 +46,7 @@ public class SchemaDetails {
         return schemaKey.equals(thatKey);
     }
 
+    public boolean hasAttribute(final String name) {
+        return attributes != null && attributes.stream().anyMatch(each -> each.getName().equalsIgnoreCase(name));
+    }
 }

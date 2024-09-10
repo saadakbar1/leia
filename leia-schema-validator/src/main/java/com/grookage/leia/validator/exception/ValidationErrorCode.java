@@ -21,7 +21,9 @@ import lombok.Getter;
 @Getter
 public enum ValidationErrorCode {
 
-    NO_SCHEMA_FOUND(400);
+    NO_SCHEMA_FOUND(400),
+
+    INVALID_SCHEMAS(412);
 
     final int status;
 

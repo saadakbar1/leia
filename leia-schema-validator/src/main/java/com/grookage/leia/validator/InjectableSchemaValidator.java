@@ -22,6 +22,7 @@ import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.annotations.SchemaValidator;
 import com.grookage.leia.validator.exception.SchemaValidationException;
 import com.grookage.leia.validator.exception.ValidationErrorCode;
+import com.grookage.leia.validator.utils.SchemaValidationUtils;
 import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class InjectableSchemaValidator implements LeiaSchemaValidator {
@@ -56,12 +58,12 @@ public class InjectableSchemaValidator implements LeiaSchemaValidator {
     }
 
     @SneakyThrows
-    private <T extends SchemaValidatable> boolean validate(final SchemaKey schemaKey, T data) {
+    private <T> boolean validate(final SchemaKey schemaKey, T data) {
         final var details = getSchemaDetails(schemaKey).orElse(null);
         if (null == details) {
             throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND);
         }
-        return true; //TODO:: Run the validator against schemaDetails here.
+        return SchemaValidationUtils.valid(details, data.getClass());
     }
 
     @Override
@@ -71,17 +73,22 @@ public class InjectableSchemaValidator implements LeiaSchemaValidator {
             final var reflections = new Reflections(handlerPackage);
             final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaValidator.class);
             annotatedClasses.forEach(annotatedClass -> {
-                if (SchemaValidatable.class.isAssignableFrom(annotatedClass)) {
-                    final var instance = (SchemaValidatable) injector.getInstance(annotatedClass);
-                    final var schemaKey = SchemaKey.builder()
-                            .schemaName(instance.schemaName())
-                            .version(instance.versionId())
-                            .namespace(instance.namespace())
-                            .build();
-                    validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, instance));
-                }
+                final var instance = injector.getInstance(annotatedClass);
+                final var annotation = instance.getClass().getAnnotation(SchemaValidator.class);
+                final var schemaKey = SchemaKey.builder()
+                        .schemaName(annotation.schemaName())
+                        .version(annotation.versionId())
+                        .namespace(annotation.namespace())
+                        .build();
+                validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, instance));
             });
         });
+        final var invalidSchemas = validationRegistry.keySet().stream()
+                .filter(key -> !validationRegistry.get(key)).collect(Collectors.toSet());
+        if (!invalidSchemas.isEmpty()) {
+            log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", invalidSchemas);
+            throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS);
+        }
     }
 
     @Override
