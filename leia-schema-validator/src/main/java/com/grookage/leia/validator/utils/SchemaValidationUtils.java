@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @UtilityClass
 @Slf4j
@@ -33,9 +34,13 @@ public class SchemaValidationUtils {
                                 final Class<?> klass) {
         final var fields = getAllFields(klass);
         final var validationType = schemaDetails.getValidationType();
-        final var allAttributesListed = fields.stream().allMatch(each -> schemaDetails.hasAttribute(each.getName()));
-        if (!allAttributesListed && validationType == SchemaValidationType.STRICT) {
-            log.debug("There seems to attributes present in the class definition that are not in the schema. [Validation Failed]");
+        final var allAttributesListed = fields.stream().filter(each -> schemaDetails.hasAttribute(each.getName()))
+                .collect(Collectors.toSet());
+        if (!allAttributesListed.isEmpty() &&
+                validationType == SchemaValidationType.STRICT) {
+            log.error("There seems to be attributes present in the class definition that are not in the schema. " +
+                            "[Validation Failed]. The extra attributes are {}",
+                    allAttributesListed);
             return false;
         }
         return schemaDetails.getAttributes().stream().allMatch(each ->
