@@ -65,8 +65,7 @@ public class SchemaValidationUtils {
         return attribute.accept(new SchemaAttributeAcceptor<>() {
             @Override
             public Boolean accept(ArrayAttribute attribute) {
-                return field.getType().isInstance(Arrays.class) ||
-                        field.getType().isInstance(Collection.class);
+                return field.getType().isInstance(Collection.class);
             }
 
             @Override
