@@ -175,22 +175,4 @@
             <version>${guava-retrying.version}</version>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <!-- The following are required for dns cache manipulator.
-        Ref: https://github.com/alibaba/java-dns-cache-manipulator#jvm-settings-for-java-16 -->
-        <profile>
-            <id>add-java-open-options-for-jdk16+</id>
-            <activation>
-                <jdk>[16,)</jdk>
-            </activation>
-            <properties>
-                <argLine>
-                    --add-opens java.base/java.net=ALL-UNNAMED
-                    --add-opens java.base/sun.net=ALL-UNNAMED
-                </argLine>
-            </properties>
-        </profile>
-    </profiles>
-
 </project>
