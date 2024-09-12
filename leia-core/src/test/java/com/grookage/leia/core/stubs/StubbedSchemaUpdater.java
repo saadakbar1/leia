@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.storage;
+package com.grookage.leia.core.stubs;
 
-import lombok.AllArgsConstructor;
+import com.grookage.leia.models.user.SchemaUpdater;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
-
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
-public class StoredSchemaMeta {
-    @NotEmpty
-    private String createdBy;
-    private String createdByEmail;
-    private long createdAt;
-    private String updatedBy;
-    private String updatedByEmail;
-    private long updatedAt;
+@Data
+public class StubbedSchemaUpdater implements SchemaUpdater {
+    @Override
+    public String name() {
+        return "name";
+    }
+
+    @Override
+    public String email() {
+        return "name@grookage.com";
+    }
 }

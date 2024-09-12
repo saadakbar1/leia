@@ -17,7 +17,6 @@
 package com.grookage.leia.core.retrieval;
 
 import com.google.common.base.Preconditions;
-import com.grookage.leia.core.ingestion.utils.SchemaUtils;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -60,8 +59,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getConfiguration().getSchemaDetails(schemaKey);
         } else {
-            final var storedSchema = schemaRepository.get(schemaKey);
-            return storedSchema.map(SchemaUtils::toSchemaDetails);
+            return schemaRepository.get(schemaKey);
         }
     }
 
@@ -69,8 +67,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getConfiguration().getSchemaDetails(namespaces);
         } else {
-            return schemaRepository.getSchemas(namespaces, Set.of(SchemaState.APPROVED),
-                    SchemaUtils::toSchemaDetails);
+            return schemaRepository.getSchemas(namespaces, Set.of(SchemaState.APPROVED));
         }
     }
 
@@ -78,8 +75,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getConfiguration().getAllSchemaDetails(namespaces);
         } else {
-            return schemaRepository.getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()),
-                    SchemaUtils::toSchemaDetails);
+            return schemaRepository.getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()));
         }
     }
 }

@@ -1,0 +1,11 @@
+{
+  "type": "ENUM",
+  "name": "testAttribute",
+  "optional": true,
+  "values": [
+    "TEST_ENUM"
+  ],
+  "qualifierInfo": {
+    "type": "PII"
+  }
+}

@@ -19,7 +19,6 @@ package com.grookage.leia.core.ingestion.processors;
 import com.grookage.leia.core.exception.LeiaErrorCode;
 import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.core.ingestion.utils.ContextUtils;
-import com.grookage.leia.core.ingestion.utils.SchemaUtils;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
@@ -49,7 +48,7 @@ public class RejectSchemaProcessor extends SchemaProcessor {
         final var schemaKey = context.getContext(SchemaKey.class)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
         final var storedSchema = getSchemaRepository().get(schemaKey).orElse(null);
-        if (null == storedSchema) {
+        if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
             log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
                     schemaKey.getNamespace(),
                     schemaKey.getVersion(),
@@ -63,6 +62,6 @@ public class RejectSchemaProcessor extends SchemaProcessor {
         storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
         storedSchema.setSchemaState(SchemaState.REJECTED);
         getSchemaRepository().update(storedSchema);
-        context.addContext(SchemaDetails.class.getSimpleName(), SchemaUtils.toSchemaDetails(storedSchema));
+        context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

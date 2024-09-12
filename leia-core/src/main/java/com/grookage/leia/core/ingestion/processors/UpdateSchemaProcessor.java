@@ -19,7 +19,6 @@ package com.grookage.leia.core.ingestion.processors;
 import com.grookage.leia.core.exception.LeiaErrorCode;
 import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.core.ingestion.utils.ContextUtils;
-import com.grookage.leia.core.ingestion.utils.SchemaUtils;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
@@ -70,6 +69,8 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
         storedSchema.getSchemaMeta().setCreatedBy(userName);
         storedSchema.getSchemaMeta().setCreatedByEmail(email);
         storedSchema.getSchemaMeta().setCreatedAt(System.currentTimeMillis());
-        context.addContext(SchemaDetails.class.getSimpleName(), SchemaUtils.toSchemaDetails(storedSchema));
+        storedSchema.setValidationType(updateSchemaRequest.getValidationType());
+        storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
+        context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

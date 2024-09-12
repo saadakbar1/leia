@@ -1,0 +1,8 @@
+{
+  "type": "ARRAY",
+  "name": "testAttribute",
+  "optional": true,
+  "qualifierInfo": {
+    "type": "PII"
+  }
+}

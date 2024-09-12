@@ -59,8 +59,8 @@ public class CreateSchemaProcessor extends SchemaProcessor {
         }
         final var userName = ContextUtils.getUser(context);
         final var email = ContextUtils.getEmail(context);
-        final var storedSchema = SchemaUtils.toStoredSchema(createSchemaRequest, userName, email, getVersionIDGenerator());
-        getSchemaRepository().create(storedSchema);
-        context.addContext(SchemaDetails.class.getSimpleName(), SchemaUtils.toSchemaDetails(storedSchema));
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, userName, email, getVersionIDGenerator());
+        getSchemaRepository().create(schemaDetails);
+        context.addContext(SchemaDetails.class.getSimpleName(), schemaDetails);
     }
 }

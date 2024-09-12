@@ -1,0 +1,28 @@
+{
+  "namespace": "testNamespace",
+  "schemaName": "testSchema",
+  "version": "V1234",
+  "validationType": "STRICT",
+  "schemaType": "JSON",
+  "attributes": [
+    {
+      "type": "ARRAY",
+      "name": "testAttribute",
+      "optional": true,
+      "qualifierInfo": {
+        "type": "PII"
+      }
+    },
+    {
+      "type": "ENUM",
+      "name": "testAttribute",
+      "optional": true,
+      "values": [
+        "TEST_ENUM"
+      ],
+      "qualifierInfo": {
+        "type": "PII"
+      }
+    }
+  ]
+}

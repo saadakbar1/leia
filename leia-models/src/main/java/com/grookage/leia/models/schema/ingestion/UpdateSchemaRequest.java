@@ -17,6 +17,8 @@
 package com.grookage.leia.models.schema.ingestion;
 
 import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.schema.SchemaType;
+import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +41,8 @@ public class UpdateSchemaRequest {
     @NotBlank
     private String version;
     private String description;
+    private SchemaValidationType validationType;
+    private SchemaType schemaType;
     @NotEmpty
     private Set<SchemaAttribute> attributes;
 }
