@@ -1,0 +1,15 @@
+{
+  "namespace": "testNamespace",
+  "schemaName": "testSchema",
+  "schemaType": "JSON",
+  "attributes": [
+    {
+      "type": "ARRAY",
+      "name": "testAttribute",
+      "optional": true,
+      "qualifierInfo": {
+        "type": "PII"
+      }
+    }
+  ]
+}

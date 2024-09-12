@@ -16,7 +16,6 @@
 
 package com.grookage.leia.core.retrieval;
 
-import com.grookage.leia.core.ingestion.utils.SchemaUtils;
 import com.grookage.leia.models.schema.SchemaRegistry;
 import com.grookage.leia.provider.suppliers.LeiaSupplier;
 import com.grookage.leia.repository.SchemaRepository;
@@ -42,7 +41,7 @@ public class RepositorySupplier implements LeiaSupplier<SchemaRegistry> {
     @Override
     public SchemaRegistry get() {
         final var schemaDetails = schemaRepository.getSchemas(
-                Set.of(), Set.of(), SchemaUtils::toSchemaDetails);
+                Set.of(), Set.of());
         final var registry = new SchemaRegistry();
         schemaDetails.forEach(registry::add);
         return registry;

@@ -20,10 +20,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class FloatAttribute extends SchemaAttribute {
 
     public FloatAttribute(final String name,

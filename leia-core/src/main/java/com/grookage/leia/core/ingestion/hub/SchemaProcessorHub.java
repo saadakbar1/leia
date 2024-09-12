@@ -23,7 +23,6 @@ import com.grookage.leia.core.ingestion.processors.*;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.engine.SchemaEventVisitor;
 import com.grookage.leia.repository.SchemaRepository;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
@@ -31,12 +30,19 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@NoArgsConstructor
 public class SchemaProcessorHub {
 
     private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
     private SchemaRepository schemaRepository;
     private VersionIDGenerator versionIDGenerator;
+
+    private SchemaProcessorHub() {
+
+    }
+
+    public static SchemaProcessorHub of() {
+        return new SchemaProcessorHub();
+    }
 
     public SchemaProcessorHub withSchemaRepository(SchemaRepository schemaRepository) {
         Preconditions.checkNotNull(schemaRepository, "Schema Repository can't be null");

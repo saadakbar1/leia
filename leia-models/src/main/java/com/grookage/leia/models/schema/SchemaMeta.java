@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema.ingestion;
+package com.grookage.leia.models.schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class RemoveSchemaRequest {
-    @NotBlank
-    private String namespace;
-    @NotBlank
-    private String version;
-    @NotBlank
-    private String schemaName;
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class SchemaMeta {
+    @NotEmpty
+    private String createdBy;
+    private String createdByEmail;
+    private long createdAt;
+    private String updatedBy;
+    private String updatedByEmail;
+    private long updatedAt;
 }

@@ -17,18 +17,22 @@
 package com.grookage.leia.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Joiner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaKey {
-    private final String namespace;
-    private final String schemaName;
-    private final String version;
+    private String namespace;
+    private String schemaName;
+    private String version;
 
     @JsonIgnore
     public String getReferenceId() {

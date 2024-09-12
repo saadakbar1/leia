@@ -37,7 +37,6 @@ import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
-import com.grookage.leia.models.storage.StoredSchema;
 import com.grookage.leia.repository.AbstractSchemaRepository;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -45,7 +44,6 @@ import lombok.SneakyThrows;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -90,7 +88,7 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public void create(StoredSchema schema) {
+    public void create(SchemaDetails schema) {
         final var createDocument = new IndexRequest.Builder<>().document(schema)
                 .index(SCHEMA_INDEX)
                 .refresh(Refresh.WaitFor)
@@ -102,7 +100,7 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public void update(StoredSchema schema) {
+    public void update(SchemaDetails schema) {
         final var updateRequest = new UpdateRequest.Builder<>()
                 .index(SCHEMA_INDEX)
                 .id(schema.getReferenceId())
@@ -110,12 +108,12 @@ public class ElasticRepository extends AbstractSchemaRepository {
                 .refresh(Refresh.WaitFor)
                 .timeout(Time.of(s -> s.time(elasticConfig.getTimeout())))
                 .build();
-        client.update(updateRequest, StoredSchema.class);
+        client.update(updateRequest, SchemaDetails.class);
     }
 
     @Override
     @SneakyThrows
-    public List<StoredSchema> get(String namespace, String schemaName) {
+    public List<SchemaDetails> get(String namespace, String schemaName) {
         final var searchQuery = BoolQuery.of(t -> t.must(List.of(
                 TermQuery.of(p -> p.field(NAMESPACE).value(namespace))._toQuery(),
                 TermQuery.of(q -> q.field(SCHEMA_NAME).value(schemaName))._toQuery()
@@ -126,7 +124,7 @@ public class ElasticRepository extends AbstractSchemaRepository {
                                 .index(List.of(SCHEMA_INDEX))
                                 .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
                                 .timeout(elasticConfig.getTimeout())),
-                StoredSchema.class
+                SchemaDetails.class
         );
         return searchResponse.hits().hits().stream()
                 .map(Hit::source).collect(Collectors.toList());
@@ -134,16 +132,15 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public Optional<StoredSchema> get(SchemaKey schemaKey) {
-        final var getResponse = client.get(GetRequest.of(request -> request.index(SCHEMA_INDEX).id(schemaKey.getReferenceId())), StoredSchema.class);
+    public Optional<SchemaDetails> get(SchemaKey schemaKey) {
+        final var getResponse = client.get(GetRequest.of(request -> request.index(SCHEMA_INDEX).id(schemaKey.getReferenceId())), SchemaDetails.class);
         return Optional.ofNullable(getResponse.source());
     }
 
     @Override
     @SneakyThrows
     public List<SchemaDetails> getSchemas(final Set<String> namespaces,
-                                          final Set<SchemaState> schemaStates,
-                                          final Function<StoredSchema, SchemaDetails> mutator) {
+                                          final Set<SchemaState> schemaStates) {
         final var namespaceQuery = namespaces.isEmpty() ?
                 TermsQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
@@ -159,9 +156,8 @@ public class ElasticRepository extends AbstractSchemaRepository {
                                 .index(List.of(SCHEMA_INDEX))
                                 .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
                                 .timeout(elasticConfig.getTimeout())),
-                StoredSchema.class
+                SchemaDetails.class
         );
-        return searchResponse.hits().hits().stream()
-                .map(hit -> mutator.apply(hit.source())).toList();
+        return searchResponse.hits().hits().stream().map(Hit::source).toList();
     }
 }

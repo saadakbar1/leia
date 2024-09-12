@@ -18,12 +18,14 @@ package com.grookage.leia.models.schema;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Joiner;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
-import com.grookage.leia.models.storage.StoredSchemaMeta;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -32,13 +34,15 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
     @NotNull SchemaKey schemaKey;
     String description;
     @NotNull SchemaState schemaState;
-    SchemaType schemaType;
-    SchemaValidationType validationType;
-    @NotNull StoredSchemaMeta schemaMeta;
+    @NotNull SchemaType schemaType;
+    SchemaValidationType validationType = SchemaValidationType.MATCHING;
+    @NotNull SchemaMeta schemaMeta;
     @NotEmpty Set<SchemaAttribute> attributes;
 
     @JsonIgnore
@@ -48,5 +52,14 @@ public class SchemaDetails {
 
     public boolean hasAttribute(final String name) {
         return attributes != null && attributes.stream().anyMatch(each -> each.getName().equalsIgnoreCase(name));
+    }
+
+    @JsonIgnore
+    public String getReferenceId() {
+        return Joiner.on(":").join(
+                schemaKey.getNamespace(),
+                schemaKey.getSchemaName(),
+                schemaKey.getVersion()
+        );
     }
 }

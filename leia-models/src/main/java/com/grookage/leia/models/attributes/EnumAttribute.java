@@ -20,15 +20,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class EnumAttribute extends SchemaAttribute {
 
-    private final Set<String> values;
+    private Set<String> values;
 
     public EnumAttribute(final String name,
                          final boolean optional,

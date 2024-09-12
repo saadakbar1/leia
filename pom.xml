@@ -23,7 +23,7 @@
 
     <name>Leia</name>
     <url>https://github.com/grookage/leia</url>
-    <description>Chaos-Monkey for dropwizard</description>
+    <description>Schema Registry</description>
     <inceptionYear>2024</inceptionYear>
 
     <modules>
@@ -42,16 +42,15 @@
     </modules>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
-
 
     <scm>
         <connection>scm:git:https://github.com/grookage/leia.git</connection>
@@ -93,6 +92,11 @@
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
+
+        <sonar.coverage.exclusions>
+            **com/grookage/leia/**
+        </sonar.coverage.exclusions>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <build>
@@ -149,6 +153,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>${maven.source.plugin.version}</version>
             </plugin>
+
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
@@ -167,9 +172,21 @@
             </plugin>
 
             <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.5.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>${nexus.staging.plguin.version}</version>
+                <version>1.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -193,25 +210,37 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven.gpg.plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
+                                <configuration>
+                                    <executable>gpg</executable>
+                                    <useAgent>true</useAgent>
+                                </configuration>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
-                                <configuration>
-                                    <useAgent>true</useAgent>
-                                    <executable>gpg2</executable>
-                                </configuration>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>${maven.gpg.plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>add-java-open-options-for-jdk16+</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <properties>
+                <argLine>
+                    --add-opens java.base/java.net=ALL-UNNAMED
+                    --add-opens java.base/sun.net=ALL-UNNAMED
+                </argLine>
+            </properties>
         </profile>
     </profiles>
 </project>
