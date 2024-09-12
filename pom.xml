@@ -23,7 +23,7 @@
 
     <name>Leia</name>
     <url>https://github.com/grookage/leia</url>
-    <description>Chaos-Monkey for dropwizard</description>
+    <description>Schema Registry</description>
     <inceptionYear>2024</inceptionYear>
 
     <modules>
