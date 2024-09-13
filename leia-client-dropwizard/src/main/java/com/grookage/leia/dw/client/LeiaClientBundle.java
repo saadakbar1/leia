@@ -23,7 +23,7 @@ import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
-import com.grookage.leia.validator.InjectableSchemaValidator;
+import com.grookage.leia.validator.StaticSchemaValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -50,12 +50,10 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
     protected abstract Injector getInjector(Environment environment);
 
     protected LeiaSchemaValidator getSchemaValidator(T configuration,
-                                                     Environment environment,
                                                      LeiaClientRefresher clientRefresher) {
-        return InjectableSchemaValidator.builder()
+        return StaticSchemaValidator.builder()
                 .supplier(clientRefresher::getConfiguration)
                 .packageRoots(getPackageRoots(configuration))
-                .injector(getInjector(environment))
                 .build();
     }
 
@@ -76,7 +74,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                         .build())
                 .configRefreshTimeSeconds(configRefreshSeconds)
                 .build();
-        final var validator = getSchemaValidator(configuration, environment, clientRefresher);
+        final var validator = getSchemaValidator(configuration, clientRefresher);
         validator.start();
         if (withProducerClient) {
             producerClient = LeiaMessageProduceClient.builder()

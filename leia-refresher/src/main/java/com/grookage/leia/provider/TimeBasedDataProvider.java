@@ -64,7 +64,6 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
 
     public void start() {
         this.executorService.scheduleWithFixedDelay(this.updater, 0L, this.delay, this.timeUnit);
-        this.update();
     }
 
     public void stop() {

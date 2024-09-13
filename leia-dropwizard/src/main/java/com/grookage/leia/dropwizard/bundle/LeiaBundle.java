@@ -69,14 +69,14 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     public void run(T configuration, Environment environment) {
         final var userResolver = userResolver(configuration);
         Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
+        this.schemaRepository = getSchemaRepository(configuration);
         final var schemaProcessorHub = SchemaProcessorHub.of()
-                .withSchemaRepository(getSchemaRepository(configuration))
+                .withSchemaRepository(schemaRepository)
                 .withVersionIDGenerator(getVersionIDGenerator())
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)
                 .build();
-        this.schemaRepository = getSchemaRepository(configuration);
         final var cacheConfig = getCacheConfig(configuration);
         this.schemaRetriever = new SchemaRetriever(schemaRepository, cacheConfig);
         withLifecycleManagers(configuration)

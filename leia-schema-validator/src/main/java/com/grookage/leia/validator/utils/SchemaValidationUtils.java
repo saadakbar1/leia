@@ -34,13 +34,13 @@ public class SchemaValidationUtils {
                                 final Class<?> klass) {
         final var fields = getAllFields(klass);
         final var validationType = schemaDetails.getValidationType();
-        final var allAttributesListed = fields.stream().filter(each -> schemaDetails.hasAttribute(each.getName()))
+        final var attributedNotListed = fields.stream().filter(each -> !schemaDetails.hasAttribute(each.getName()))
                 .collect(Collectors.toSet());
-        if (!allAttributesListed.isEmpty() &&
+        if (!attributedNotListed.isEmpty() &&
                 validationType == SchemaValidationType.STRICT) {
             log.error("There seems to be attributes present in the class definition that are not in the schema. " +
                             "[Validation Failed]. The extra attributes are {}",
-                    allAttributesListed);
+                    attributedNotListed);
             return false;
         }
         return schemaDetails.getAttributes().stream().allMatch(each ->
