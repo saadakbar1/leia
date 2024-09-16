@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC2]
+- Added tests to the core functionality to schemaValidator, refresher, client, core and models
+- Fixed the validation bug in SchemaValidationUtils. field.getType().isInstanceOf is a miss, Class.isAssignable is the correct way to check for class assignments.
+- Some minor code formatting and linting fixes
+
 ## [0.0.1-RC1]
 
 - A versioned schema registry, to register various schemas with all primitive and custom data-types, bound by a

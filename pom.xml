@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia</artifactId>
-    <version>0.0.1-RC1</version>
+    <version>0.0.1-RC2</version>
     <packaging>pom</packaging>
 
     <name>Leia</name>
@@ -179,7 +179,6 @@
                 <configuration>
                     <publishingServerId>central</publishingServerId>
                     <autoPublish>true</autoPublish>
-                    <waitUntil>published</waitUntil>
                 </configuration>
             </plugin>
 

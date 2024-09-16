@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC1</version>
+        <version>0.0.1-RC2</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
@@ -29,6 +29,7 @@
 
     <properties>
         <okhttp.version>4.10.0</okhttp.version>
+        <wiremock.version>3.3.1</wiremock.version>
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
@@ -81,6 +82,31 @@
             <version>${okhttp.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <artifactId>leia-models</artifactId>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>com.grookage.leia</groupId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

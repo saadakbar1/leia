@@ -24,6 +24,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Locale;
+
 @Builder
 @AllArgsConstructor
 @Data
@@ -36,7 +38,7 @@ public class SchemaKey {
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version);
+        return Joiner.on(".").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
     @Override

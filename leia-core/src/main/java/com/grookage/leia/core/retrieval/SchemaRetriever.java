@@ -23,6 +23,7 @@ import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.repository.SchemaRepository;
 import com.grookage.leia.repository.config.CacheConfig;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Getter
 public class SchemaRetriever {
 
     private final SchemaRepository schemaRepository;

@@ -56,11 +56,11 @@ public class LeiaHttpConfiguration {
 
     @Min(0)
     @Max(1024)
-    private int maxConcurrentRequests;
+    private int maxConcurrentRequests = 100;
 
     @Min(0)
     @Max(1024)
-    private int maxConcurrentRequestsPerHost;
+    private int maxConcurrentRequestsPerHost = 10;
 
     @Max(86400)
     @Builder.Default
@@ -74,6 +74,4 @@ public class LeiaHttpConfiguration {
     @Builder.Default
     private final int opTimeoutMs = 10000;
 
-    @Min(0L)
-    private int retryInterval;
 }

@@ -21,15 +21,13 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC1</version>
+        <version>0.0.1-RC2</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
     <artifactId>leia-core</artifactId>
 
-
     <dependencies>
-
         <dependency>
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-models</artifactId>
@@ -43,18 +41,6 @@
         <dependency>
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-refresher</artifactId>
-        </dependency>
-
-        <dependency>
-            <artifactId>leia-models</artifactId>
-            <type>test-jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-            <groupId>com.grookage.leia</groupId>
         </dependency>
 
         <dependency>
@@ -79,6 +65,25 @@
             <groupId>org.mockito</groupId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <artifactId>leia-models</artifactId>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>com.grookage.leia</groupId>
+        </dependency>
+
     </dependencies>
 
     <properties>
