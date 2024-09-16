@@ -48,13 +48,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${guice.inject.version}</version>
-        </dependency>
-
-
-        <dependency>
             <artifactId>leia-models</artifactId>
             <type>test-jar</type>
             <exclusions>

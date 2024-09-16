@@ -16,7 +16,6 @@
 
 package com.grookage.leia.validator;
 
-import com.google.inject.Injector;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.annotations.SchemaValidator;

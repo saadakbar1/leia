@@ -17,7 +17,6 @@
 package com.grookage.leia.dw.client;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Injector;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
@@ -46,8 +45,6 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
     protected abstract LeiaHttpConfiguration getHttpConfiguration(T configuration);
 
     protected abstract Set<String> getPackageRoots(T configuration);
-
-    protected abstract Injector getInjector(Environment environment);
 
     protected LeiaSchemaValidator getSchemaValidator(T configuration,
                                                      LeiaClientRefresher clientRefresher) {
