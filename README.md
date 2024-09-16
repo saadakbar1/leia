@@ -37,7 +37,7 @@ And
 <dependency>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC1</version>
+    <versio>0.0.1-RC2</version>
 </dependency>
 ```
 
