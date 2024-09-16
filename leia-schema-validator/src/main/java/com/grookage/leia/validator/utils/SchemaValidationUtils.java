@@ -67,61 +67,66 @@ public class SchemaValidationUtils {
         if (null == field) {
             return attribute.isOptional();
         }
-        return attribute.accept(new SchemaAttributeAcceptor<>() {
+        return valid(field.getType(), attribute);
+    }
+
+    public static boolean valid(Class<?> fieldType, SchemaAttribute attribute) {
+        final Class<?> assignableKlass = attribute.accept(new SchemaAttributeAcceptor<>() {
             @Override
-            public Boolean accept(ArrayAttribute attribute) {
-                return field.getType().isInstance(Collection.class);
+            public Class<?> accept(ArrayAttribute attribute) {
+                return Collection.class;
             }
 
             @Override
-            public Boolean accept(BooleanAttribute attribute) {
-                return field.getType().isInstance(Boolean.class);
+            public Class<?> accept(BooleanAttribute attribute) {
+                return Boolean.class;
             }
 
             @Override
-            public Boolean accept(ByteAttribute attribute) {
-                return field.getType().isInstance(Byte.class);
+            public Class<?> accept(ByteAttribute attribute) {
+                return Byte.class;
             }
 
             @Override
-            public Boolean accept(DoubleAttribute attribute) {
-                return field.getType().isInstance(Double.class);
+            public Class<?> accept(DoubleAttribute attribute) {
+                return Double.class;
             }
 
             @Override
-            public Boolean accept(EnumAttribute attribute) {
-                return field.getType().isInstance(Enum.class);
+            public Class<?> accept(EnumAttribute attribute) {
+                return Enum.class;
             }
 
             @Override
-            public Boolean accept(FloatAttribute attribute) {
-                return field.getType().isInstance(Float.class);
+            public Class<?> accept(FloatAttribute attribute) {
+                return Float.class;
             }
 
             @Override
-            public Boolean accept(IntegerAttribute attribute) {
-                return field.getType().isInstance(Integer.class);
+            public Class<?> accept(IntegerAttribute attribute) {
+                return Integer.class;
             }
 
             @Override
-            public Boolean accept(LongAttribute attribute) {
-                return field.getType().isInstance(Long.class);
+            public Class<?> accept(LongAttribute attribute) {
+                return Long.class;
             }
 
             @Override
-            public Boolean accept(MapAttribute attribute) {
-                return field.getType().isInstance(Map.class);
+            public Class<?> accept(MapAttribute attribute) {
+                return Map.class;
             }
 
             @Override
-            public Boolean accept(ObjectAttribute attribute) {
-                return field.getType().isInstance(Object.class);
+            public Class<?> accept(ObjectAttribute attribute) {
+                return Object.class;
             }
 
             @Override
-            public Boolean accept(StringAttribute attribute) {
-                return field.getType().isInstance(String.class);
+            public Class<?> accept(StringAttribute attribute) {
+                return String.class;
             }
         });
+        return assignableKlass.isAssignableFrom(fieldType);
     }
 }

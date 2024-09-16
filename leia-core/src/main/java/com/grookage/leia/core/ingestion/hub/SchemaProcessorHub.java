@@ -45,18 +45,18 @@ public class SchemaProcessorHub {
     }
 
     public SchemaProcessorHub withSchemaRepository(SchemaRepository schemaRepository) {
-        Preconditions.checkNotNull(schemaRepository, "Schema Repository can't be null");
         this.schemaRepository = schemaRepository;
         return this;
     }
 
     public SchemaProcessorHub withVersionIDGenerator(VersionIDGenerator versionIDGenerator) {
-        Preconditions.checkNotNull(versionIDGenerator, "Version ID Generator can't be null");
         this.versionIDGenerator = versionIDGenerator;
         return this;
     }
 
     public SchemaProcessorHub build() {
+        Preconditions.checkNotNull(schemaRepository, "Schema Repository can't be null");
+        Preconditions.checkNotNull(versionIDGenerator, "Version ID Generator can't be null");
         Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
         return this;
     }

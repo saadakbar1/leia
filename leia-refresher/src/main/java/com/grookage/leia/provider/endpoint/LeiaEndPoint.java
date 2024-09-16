@@ -16,6 +16,7 @@
 
 package com.grookage.leia.provider.endpoint;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Strings;
 import lombok.*;
 import okhttp3.HttpUrl;
@@ -28,10 +29,11 @@ import java.util.Locale;
 @Getter
 @Setter
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LeiaEndPoint {
 
     @Builder.Default
-    private EndPointScheme scheme = EndPointScheme.HTTP;
+    private EndPointScheme scheme = EndPointScheme.HTTPS;
     private String host;
     private int port;
     private String rootPathPrefix;

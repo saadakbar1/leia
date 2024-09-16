@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-bom</artifactId>
-        <version>0.0.1-RC1</version>
+        <version>0.0.1-RC2</version>
         <relativePath>../leia-bom</relativePath>
     </parent>
 
@@ -46,7 +46,6 @@
         <guava-retrying.version>2.0.0</guava-retrying.version>
 
         <http.client.version>5.2.2</http.client.version>
-        <wiremock.version>3.3.1</wiremock.version>
         <mockito.version>4.2.0</mockito.version>
 
         <jackson.version>2.17.0</jackson.version>
@@ -55,6 +54,7 @@
         <aspectjrt.version>1.9.8</aspectjrt.version>
 
         <dropwizard.version>2.1.10</dropwizard.version>
+        <awaitility.version>4.1.1</awaitility.version>
     </properties>
 
     <dependencyManagement>
@@ -132,6 +132,12 @@
                 <groupId>org.mockito</groupId>
                 <scope>test</scope>
                 <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

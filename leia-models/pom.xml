@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC1</version>
+        <version>0.0.1-RC2</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
@@ -84,6 +84,11 @@
             <groupId>org.aspectj</groupId>
         </dependency>
 
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
