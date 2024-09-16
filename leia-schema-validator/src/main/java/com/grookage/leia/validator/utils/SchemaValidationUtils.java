@@ -16,6 +16,7 @@
 
 package com.grookage.leia.validator.utils;
 
+import com.google.common.collect.Sets;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
@@ -34,17 +35,27 @@ public class SchemaValidationUtils {
                                 final Class<?> klass) {
         final var fields = getAllFields(klass);
         final var validationType = schemaDetails.getValidationType();
-        final var attributedNotListed = fields.stream().filter(each -> !schemaDetails.hasAttribute(each.getName()))
-                .collect(Collectors.toSet());
-        if (!attributedNotListed.isEmpty() &&
-                validationType == SchemaValidationType.STRICT) {
-            log.error("There seems to be attributes present in the class definition that are not in the schema. " +
-                            "[Validation Failed]. The extra attributes are {}",
-                    attributedNotListed);
-            return false;
-        }
+        if (validationType == SchemaValidationType.STRICT && !strictlyMatching(schemaDetails, fields)) return false;
         return schemaDetails.getAttributes().stream().allMatch(each ->
                 valid(each, fields));
+    }
+
+    private static boolean strictlyMatching(SchemaDetails schemaDetails, List<Field> fields) {
+        final var fieldNames = fields.stream()
+                .map(Field::getName)
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+        final var attributesListed = schemaDetails.getAttributes().stream()
+                .map(SchemaAttribute::getName)
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+        final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
+        if (mismatchedAttributes.isEmpty()) {
+            return true;
+        }
+        log.error("There seems to be a mismatch in the attributes present in the class definition and schema. " +
+                "[Validation Failed]. The attributes are {}", mismatchedAttributes);
+        return false;
     }
 
     private static List<Field> getAllFields(Class<?> type) {
