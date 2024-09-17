@@ -24,7 +24,8 @@ public enum RefresherErrorCode {
 
     BAD_REQUEST(400),
 
-    INTERNAL_SERVER_ERROR(500);
+    INTERNAL_SERVER_ERROR(500),
+    INTERNAL_ERROR(500);
 
     final int status;
 

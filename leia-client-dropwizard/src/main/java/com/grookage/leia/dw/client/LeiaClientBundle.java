@@ -63,13 +63,13 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         final var packageRoots = getPackageRoots(configuration);
         Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
         final var withProducerClient = withProducerClient(configuration);
-        final var configRefreshSeconds = getRefreshIntervalSeconds(configuration);
+        final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
         final var clientRefresher = LeiaClientRefresher.builder()
                 .supplier(LeiaClientSupplier.builder()
                         .httpConfiguration(httpConfiguration)
                         .namespaceDataSource(namespaceDataSource)
                         .build())
-                .configRefreshTimeSeconds(configRefreshSeconds)
+                .dataRefreshTimeInSeconds(dataRefreshSeconds)
                 .build();
         final var validator = getSchemaValidator(configuration, clientRefresher);
         validator.start();

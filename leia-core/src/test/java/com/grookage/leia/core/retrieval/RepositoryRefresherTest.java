@@ -21,6 +21,8 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaRegistry;
 import com.grookage.leia.models.utils.LeiaUtils;
+import com.grookage.leia.provider.exceptions.RefresherErrorCode;
+import com.grookage.leia.provider.exceptions.RefresherException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,25 @@ class RepositoryRefresherTest {
                 .version("V1234")
                 .build()).orElse(null);
         Assertions.assertNotNull(schema);
+    }
 
+    @Test
+    void testRepositoryRefresher_whenSupplierReturnNullAtStart() {
+        final var supplier = Mockito.mock(RepositorySupplier.class);
+        Mockito.doReturn(null).when(supplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class,
+                () -> new RepositoryRefresher(supplier, 5));
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
+    }
+
+    @Test
+    void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
+        final var supplier = Mockito.mock(RepositorySupplier.class);
+        Mockito.doThrow(RefresherException.error(RefresherErrorCode.INTERNAL_ERROR)).when(supplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class,
+                () -> new RepositoryRefresher(supplier, 5));
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
     }
 }

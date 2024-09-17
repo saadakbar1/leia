@@ -52,7 +52,7 @@ public class SchemaRetriever {
             supplier.start();
             this.refresher = RepositoryRefresher.builder()
                     .supplier(supplier)
-                    .configRefreshTimeSeconds(cacheConfig.getRefreshCacheSeconds())
+                    .dataRefreshTimeInSeconds(cacheConfig.getRefreshCacheSeconds())
                     .build();
         }
     }

@@ -16,6 +16,8 @@
 
 package com.grookage.leia.provider;
 
+import com.grookage.leia.provider.exceptions.RefresherErrorCode;
+import com.grookage.leia.provider.exceptions.RefresherException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,7 +66,16 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
 
     public void start() {
         this.executorService.scheduleWithFixedDelay(this.updater, this.delay, this.delay, this.timeUnit);
-        this.update();
+        try {
+            final var refresh = this.refreshData();
+            if (!refresh) {
+                log.error("[LeiaRefresher.update] Data Refresh unsuccessful with data supplier:{}", supplierName);
+                throw RefresherException.error(RefresherErrorCode.INTERNAL_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("[LeiaRefresher.update] Error while getting data from data supplier:{}", supplierName);
+            throw RefresherException.error(RefresherErrorCode.INTERNAL_ERROR);
+        }
     }
 
     public void stop() {
@@ -91,22 +102,28 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
 
         public void run() {
             try {
-                T data = dataSupplier.get();
-                if (data != null) {
-                    if (Boolean.TRUE.equals(shouldUpdate.apply(dataReference.get(), data))) {
-                        dataReference.set(data);
-                        lastUpdatedTimestamp.set(System.currentTimeMillis());
-                        log.info("[LeiaRefresher.update] Successfully Updated data reference for {}..", supplierName);
-                    } else {
-                        log.info("[LeiaRefresher.update] Failed because shouldUpdate returned false, supplierName: {}", supplierName);
-                    }
-                } else {
-                    log.warn(dataReference.get() == null ? "[LeiaRefresher.update] Data Update Unsuccessful. Default value being returned on gets for {}.." : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..", supplierName);
-                }
+                refreshData();
             } catch (Exception e) {
                 log.error("[LeiaRefresher.update] Error while getting data from data Supplier " + supplierName, e);
             }
 
+        }
+    }
+
+    private boolean refreshData() {
+        T data = dataSupplier.get();
+        if (data != null) {
+            if (Boolean.TRUE.equals(shouldUpdate.apply(dataReference.get(), data))) {
+                dataReference.set(data);
+                lastUpdatedTimestamp.set(System.currentTimeMillis());
+                log.info("[LeiaRefresher.update] Successfully Updated data reference for {}..", supplierName);
+            } else {
+                log.info("[LeiaRefresher.update] Failed because shouldUpdate returned false, supplierName: {}", supplierName);
+            }
+            return true;
+        } else {
+            log.warn(dataReference.get() == null ? "[LeiaRefresher.update] Data Update Unsuccessful. Default value being returned on gets for {}.." : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..", supplierName);
+            return false;
         }
     }
 
