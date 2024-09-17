@@ -39,10 +39,10 @@ class RepositoryRefresherTest {
                 .build();
         Mockito.when(supplier.get()).thenReturn(registry);
         final var refresher = new RepositoryRefresher(supplier, 5);
-        Assertions.assertTrue(refresher.getConfiguration().getSchemas().isEmpty());
+        Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
         registry.add(schemaDetails);
         LeiaUtils.sleepFor(6);
-        final var schemas = refresher.getConfiguration();
+        final var schemas = refresher.getData();
         final var schema = schemas.getSchemaDetails(SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")

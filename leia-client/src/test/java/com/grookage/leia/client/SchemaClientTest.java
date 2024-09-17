@@ -56,7 +56,7 @@ class SchemaClientTest {
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         Assertions.assertNotNull(schemaDetails);
         final var schemaKey = schemaDetails.getSchemaKey();
-        Mockito.when(clientRefresher.getConfiguration()).thenReturn(List.of(schemaDetails));
+        Mockito.when(clientRefresher.getData()).thenReturn(List.of(schemaDetails));
         final var details = schemaClient.getSchemaDetails();
         Assertions.assertNotNull(details);
         Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of()).isEmpty());

@@ -18,7 +18,7 @@ package com.grookage.leia.provider.refresher;
 
 public interface LeiaRefresher<T> {
 
-    T getConfiguration();
+    T getData();
 
     void refresh();
 

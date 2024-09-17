@@ -49,7 +49,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
     protected LeiaSchemaValidator getSchemaValidator(T configuration,
                                                      LeiaClientRefresher clientRefresher) {
         return StaticSchemaValidator.builder()
-                .supplier(clientRefresher::getConfiguration)
+                .supplier(clientRefresher::getData)
                 .packageRoots(getPackageRoots(configuration))
                 .build();
     }
