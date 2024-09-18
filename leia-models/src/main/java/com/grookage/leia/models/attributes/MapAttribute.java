@@ -28,10 +28,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MapAttribute extends SchemaAttribute {
 
+    private SchemaAttribute keyAttribute;
+    private SchemaAttribute valueAttribute;
+
     public MapAttribute(final String name,
                         final boolean optional,
-                        final QualifierInfo qualifierInfo) {
+                        final QualifierInfo qualifierInfo,
+                        SchemaAttribute keyAttribute,
+                        SchemaAttribute valueAttribute) {
         super(DataType.MAP, name, optional, qualifierInfo);
+        this.keyAttribute = keyAttribute;
+        this.valueAttribute = valueAttribute;
     }
 
     @Override

@@ -45,8 +45,20 @@ public class SchemaValidationException extends RuntimeException {
                 Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
     }
 
+    private SchemaValidationException(ValidationErrorCode errorCode, String message) {
+        super(message);
+
+        this.code = errorCode.name();
+        this.status = errorCode.getStatus();
+        this.context = message != null ? Map.of("message", message) : new HashMap<>();
+    }
+
     public static SchemaValidationException error(ValidationErrorCode errorCode, Throwable t) {
         return new SchemaValidationException(errorCode, t);
+    }
+
+    public static SchemaValidationException error(ValidationErrorCode errorCode, String message) {
+        return new SchemaValidationException(errorCode, message);
     }
 
     public static SchemaValidationException error(ValidationErrorCode errorCode) {

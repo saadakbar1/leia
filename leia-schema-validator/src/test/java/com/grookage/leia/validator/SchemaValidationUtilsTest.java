@@ -17,12 +17,26 @@
 package com.grookage.leia.validator;
 
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.validator.exception.ValidationErrorCode;
 import com.grookage.leia.validator.utils.SchemaValidationUtils;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -76,9 +90,6 @@ class SchemaValidationUtilsTest {
 
     @Test
     void testAllFields() {
-        final var arrayAttribute = new ArrayAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Set.class, arrayAttribute));
-
         final var booleanAttribute = new BooleanAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Boolean.class, booleanAttribute));
 
@@ -100,14 +111,17 @@ class SchemaValidationUtilsTest {
         final var longAttribute = new LongAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, longAttribute));
 
-        final var mapAttribute = new MapAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Map.class, mapAttribute));
-
-        final var objectAttribute = new ObjectAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaDetails.class, objectAttribute));
-
         final var stringAttribute = new StringAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(String.class, stringAttribute));
+
+        final var arrayAttribute = new ArrayAttribute("testAttribute", true, null, stringAttribute);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Set.class, arrayAttribute));
+
+        final var mapAttribute = new MapAttribute("testAttribute", true, null, stringAttribute, stringAttribute);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Map.class, mapAttribute));
+
+        final var objectAttribute = new ObjectAttribute("testAttribute", true, null, Set.of(stringAttribute));
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaDetails.class, objectAttribute));
 
         Assertions.assertFalse(SchemaValidationUtils.valid(Long.class, integerAttribute));
         Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, objectAttribute));

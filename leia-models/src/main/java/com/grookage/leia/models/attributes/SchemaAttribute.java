@@ -32,7 +32,6 @@ import javax.validation.constraints.Pattern;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
         @JsonSubTypes.Type(value = BooleanAttribute.class, name = "BOOLEAN"),
         @JsonSubTypes.Type(value = ByteAttribute.class, name = "BYTES"),
         @JsonSubTypes.Type(value = DoubleAttribute.class, name = "DOUBLE"),
@@ -40,9 +39,10 @@ import javax.validation.constraints.Pattern;
         @JsonSubTypes.Type(value = FloatAttribute.class, name = "FLOAT"),
         @JsonSubTypes.Type(value = IntegerAttribute.class, name = "INTEGER"),
         @JsonSubTypes.Type(value = LongAttribute.class, name = "LONG"),
+        @JsonSubTypes.Type(value = StringAttribute.class, name = "STRING"),
+        @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
         @JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
         @JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),
-        @JsonSubTypes.Type(value = StringAttribute.class, name = "STRING")
 })
 public abstract class SchemaAttribute {
 
