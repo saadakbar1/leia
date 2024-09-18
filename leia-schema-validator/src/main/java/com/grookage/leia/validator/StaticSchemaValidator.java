@@ -54,12 +54,12 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     }
 
     @SneakyThrows
-    private <T> boolean validate(final SchemaKey schemaKey, Class<?> clazz) {
+    private boolean validate(final SchemaKey schemaKey, Class<?> klass) {
         final var details = getSchemaDetails(schemaKey).orElse(null);
         if (null == details) {
             throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND);
         }
-        return SchemaValidationUtils.valid(details, clazz);
+        return SchemaValidationUtils.valid(details, klass);
     }
 
     @Override
