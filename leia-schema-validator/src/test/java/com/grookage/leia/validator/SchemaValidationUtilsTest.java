@@ -37,6 +37,20 @@ class SchemaValidationUtilsTest {
     @Getter
     static class ValidTestClass {
         private Set<String> testAttribute;
+        private TestEnum testAttribute2;
+        private String testAttribute3;
+    }
+
+    enum TestEnum {
+        TEST_ENUM
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    static class InvalidTestClass {
+        private Set<String> testAttribute;
     }
 
     @Test
@@ -48,6 +62,16 @@ class SchemaValidationUtilsTest {
         Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class));
         schemaDetails.setValidationType(SchemaValidationType.STRICT);
         Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void testInvalidMatchingSchema() {
+        final var schemaDetails = ResourceHelper
+                .getResource("validSchema.json", SchemaDetails.class);
+        schemaDetails.setValidationType(SchemaValidationType.MATCHING);
+        Assertions.assertNotNull(schemaDetails);
+        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidTestClass.class));
     }
 
     @Test

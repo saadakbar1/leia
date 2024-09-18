@@ -19,7 +19,7 @@ package com.grookage.leia.validator.utils;
 import com.google.common.collect.Sets;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaValidationType;
+import com.grookage.leia.models.schema.SchemaValidationVisitor;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,13 +34,14 @@ public class SchemaValidationUtils {
     public static boolean valid(final SchemaDetails schemaDetails,
                                 final Class<?> klass) {
         final var fields = getAllFields(klass);
-        final var validationType = schemaDetails.getValidationType();
-        if (validationType == SchemaValidationType.STRICT && !strictlyMatching(schemaDetails, fields)) return false;
+        if (!validSchema(schemaDetails, fields)) return false;
         return schemaDetails.getAttributes().stream().allMatch(each ->
-                valid(each, fields));
+                validAttribute(each, fields));
     }
 
-    private static boolean strictlyMatching(SchemaDetails schemaDetails, List<Field> fields) {
+    private static boolean validSchema(SchemaDetails schemaDetails, List<Field> fields) {
+        final var validationType = schemaDetails.getValidationType();
+
         final var fieldNames = fields.stream()
                 .map(Field::getName)
                 .map(String::toUpperCase)
@@ -49,13 +50,28 @@ public class SchemaValidationUtils {
                 .map(SchemaAttribute::getName)
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());
-        final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
-        if (mismatchedAttributes.isEmpty()) {
-            return true;
-        }
-        log.error("There seems to be a mismatch in the attributes present in the class definition and schema. " +
-                "[Validation Failed]. The attributes are {}", mismatchedAttributes);
-        return false;
+
+        return validationType.accept(new SchemaValidationVisitor<>() {
+            @Override
+            public Boolean strict() {
+                final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
+                if (!mismatchedAttributes.isEmpty()) {
+                    log.error("There seems to be a mismatch in the attributes present in the class definition and schema. " +
+                                      "[Validation Failed]. The attributes are {}", mismatchedAttributes);
+                }
+                return mismatchedAttributes.isEmpty();
+            }
+
+            @Override
+            public Boolean matching() {
+                final var attributesMissing = Sets.difference(attributesListed, fieldNames);
+                if (!attributesMissing.isEmpty()) {
+                    log.error("Some attributes are missing in the class definition" +
+                                      "[Validation Failed]. The attributes are {}", attributesMissing);
+                }
+                return attributesMissing.isEmpty();
+            }
+        });
     }
 
     private static List<Field> getAllFields(Class<?> type) {
@@ -72,11 +88,11 @@ public class SchemaValidationUtils {
                 .filter(each -> each.getName().equals(attributeName)).findFirst();
     }
 
-    private static boolean valid(final SchemaAttribute attribute,
-                                 final List<Field> fields) {
+    private static boolean validAttribute(final SchemaAttribute attribute,
+                                          final List<Field> fields) {
         final var field = getField(fields, attribute.getName()).orElse(null);
         if (null == field) {
-            return attribute.isOptional();
+            return false;
         }
         return valid(field.getType(), attribute);
     }
