@@ -69,7 +69,7 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
         final var refreshed = this.refreshData();
         if (!refreshed && initialDefaultValue == null) {
             log.error("[LeiaRefresher.update] Data Refresh unsuccessful with data supplier:{}", supplierName);
-            throw RefresherException.error(RefresherErrorCode.INTERNAL_ERROR);
+            throw RefresherException.error(RefresherErrorCode.REFRESH_FAILED);
         }
     }
 
@@ -115,8 +115,7 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
                 return true;
             } else {
                 log.warn(dataReference.get() == null
-                         ? "[LeiaRefresher.update] Data Update Unsuccessful. Default value being returned on gets for"
-                                 + " {}.."
+                         ? "[LeiaRefresher.update] Data Update Unsuccessful. Existing value will be returned for {}.."
                          : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..",
                          supplierName);
                 return false;

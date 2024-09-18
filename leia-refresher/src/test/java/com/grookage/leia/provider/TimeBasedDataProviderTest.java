@@ -19,7 +19,6 @@ package com.grookage.leia.provider;
 import com.grookage.leia.provider.exceptions.RefresherErrorCode;
 import com.grookage.leia.provider.exceptions.RefresherException;
 import com.grookage.leia.provider.stubs.TestSupplier;
-import com.grookage.leia.provider.suppliers.LeiaSupplier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -69,7 +68,7 @@ class TimeBasedDataProviderTest {
         Assertions.assertNull(timeBasedProvider.getData());
         Mockito.doReturn(null).when(testSupplier).get();
         final var exception = Assertions.assertThrows(RefresherException.class, timeBasedProvider::start);
-        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 
     @Test
@@ -84,6 +83,6 @@ class TimeBasedDataProviderTest {
         final var runtimeException = new RuntimeException("Error in fetching data from supplier");
         Mockito.doThrow(runtimeException).when(testSupplier).get();
         final var exception = Assertions.assertThrows(RefresherException.class, timeBasedProvider::start);
-        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 }

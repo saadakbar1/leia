@@ -60,16 +60,16 @@ class RepositoryRefresherTest {
         final var exception = Assertions.assertThrows(RefresherException.class,
                 () -> new RepositoryRefresher(supplier, 5));
         Assertions.assertNotNull(exception);
-        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 
     @Test
     void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
         final var supplier = Mockito.mock(RepositorySupplier.class);
-        Mockito.doThrow(RefresherException.error(RefresherErrorCode.INTERNAL_ERROR)).when(supplier).get();
+        Mockito.doThrow(RefresherException.error(RefresherErrorCode.REFRESH_FAILED)).when(supplier).get();
         final var exception = Assertions.assertThrows(RefresherException.class,
                 () -> new RepositoryRefresher(supplier, 5));
         Assertions.assertNotNull(exception);
-        Assertions.assertEquals(RefresherErrorCode.INTERNAL_ERROR.getStatus(), exception.getStatus());
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 }
