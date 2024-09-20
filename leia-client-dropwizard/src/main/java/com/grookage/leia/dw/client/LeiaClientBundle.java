@@ -69,7 +69,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                         .httpConfiguration(httpConfiguration)
                         .namespaceDataSource(namespaceDataSource)
                         .build())
-                .dataRefreshTimeInSeconds(dataRefreshSeconds)
+                .refreshTimeInSeconds(dataRefreshSeconds)
                 .build();
         final var validator = getSchemaValidator(configuration, clientRefresher);
         validator.start();

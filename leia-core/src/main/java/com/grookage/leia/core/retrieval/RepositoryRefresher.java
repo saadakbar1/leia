@@ -24,8 +24,8 @@ public class RepositoryRefresher extends AbstractLeiaRefresher<SchemaRegistry> {
 
     @Builder
     protected RepositoryRefresher(final RepositorySupplier supplier,
-                                  final int dataRefreshTimeInSeconds) {
-        super(supplier, dataRefreshTimeInSeconds);
+                                  final int refreshTimeInSeconds) {
+        super(supplier, refreshTimeInSeconds);
     }
 
 }
