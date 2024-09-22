@@ -14,7 +14,7 @@
       "type": "ARRAY",
       "name": "testAttribute",
       "optional": true,
-      "itemAttribute": {
+      "elementAttribute": {
         "type": "STRING"
       },
       "qualifierInfo": {

@@ -128,4 +128,12 @@ class SchemaValidationUtilsTest {
 
 
     }
+
+    @Test
+    void testNestedAttribute() {
+        final var stringAttribute = new StringAttribute("testAttribute", true, null);
+        final var arrayAttribute = new ArrayAttribute("testAttribute", true, null, stringAttribute);
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+                                                          ValidTestClass.class));
+    }
 }
