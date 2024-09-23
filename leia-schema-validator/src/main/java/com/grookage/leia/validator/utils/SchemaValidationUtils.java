@@ -21,7 +21,7 @@ import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.MapAttribute;
 import com.grookage.leia.models.attributes.ObjectAttribute;
 import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeAdapter;
+import com.grookage.leia.models.attributes.SchemaAttributeHandler;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
@@ -141,7 +141,7 @@ public class SchemaValidationUtils {
 
     private static boolean valid(final SchemaValidationType validationType,
                                  SchemaAttribute attribute, final Class<?> klass) {
-        return attribute.accept(new SchemaAttributeAdapter<>(
+        return attribute.accept(new SchemaAttributeHandler<>(
                 assignableCheckFunction.apply(klass)) {
             @Override
             public Boolean accept(ArrayAttribute attribute) {
@@ -168,7 +168,7 @@ public class SchemaValidationUtils {
 
     private static boolean valid(final SchemaValidationType validationType,
                                  SchemaAttribute attribute, final ParameterizedType parameterizedType) {
-        return attribute.accept(new SchemaAttributeAdapter<>(throwException) {
+        return attribute.accept(new SchemaAttributeHandler<>(throwException) {
             @Override
             public Boolean accept(ArrayAttribute attribute) {
                 if (attribute.getElementAttribute() == null) {
@@ -200,7 +200,7 @@ public class SchemaValidationUtils {
 
     private static boolean valid(final SchemaValidationType validationType,
                                  SchemaAttribute attribute, final GenericArrayType arrayType) {
-        return attribute.accept(new SchemaAttributeAdapter<>(throwException) {
+        return attribute.accept(new SchemaAttributeHandler<>(throwException) {
             @Override
             public Boolean accept(final ArrayAttribute attribute) {
                 return valid(validationType, attribute.getElementAttribute(), arrayType.getGenericComponentType());
@@ -218,6 +218,6 @@ public class SchemaValidationUtils {
     }
 
     public static boolean valid(Class<?> klass, SchemaAttribute schemaAttribute) {
-        return schemaAttribute.accept(new SchemaAttributeAdapter<>(assignableCheckFunction.apply(klass)) {});
+        return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {});
     }
 }
