@@ -3,11 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC3]
+- SchemaValidationUtils - Add support for nested attributes. Refactor to validate schema and individual attributes separately.
 - Simplified NamespaceDataSource to use a supplier instead of hierarchy for static and dynamic source
 - LeiaBundle: Fixed duplicate instantiation of schema repository
 - TimeBasedDataProvider: Fixed the initial delay of executor to prevent multiple invocation of update on startup
 - Schema Validator: Removed instance creation of schema class. It's not required for static validations.
-- SchemaValidationUtils - Fixed strict type validation
 
 ## [0.0.1-RC2]
 - Added tests to the core functionality to schemaValidator, refresher, client, core and models
