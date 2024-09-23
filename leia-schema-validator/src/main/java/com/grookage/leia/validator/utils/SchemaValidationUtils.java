@@ -120,10 +120,7 @@ public class SchemaValidationUtils {
         final var field = fields.stream()
                 .filter(each -> each.getName().equals(attribute.getName()))
                 .findFirst().orElse(null);
-        if (field == null) {
-            return false;
-        }
-        return valid(validationType, attribute, field.getGenericType());
+        return null != field && valid(validationType, attribute, field.getGenericType());
     }
 
     public static boolean valid(final SchemaValidationType validationType,
