@@ -16,26 +16,36 @@
 
 package com.grookage.leia.models.attributes;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Collection;
+import java.util.Map;
+
+@Getter
+@AllArgsConstructor
 public enum DataType {
-    INTEGER,
+    INTEGER(Integer.class),
 
-    STRING,
+    STRING(String.class),
 
-    FLOAT,
+    FLOAT(Float.class),
 
-    DOUBLE,
+    DOUBLE(Double.class),
 
-    LONG,
+    LONG(Long.class),
 
-    BOOLEAN,
+    BOOLEAN(Boolean.class),
 
-    BYTES,
+    BYTES(Byte.class),
 
-    ARRAY,
+    ARRAY(Collection.class),
 
-    OBJECT,
+    OBJECT(Object.class),
 
-    MAP,
+    MAP(Map.class),
 
-    ENUM
+    ENUM(Enum.class);
+
+    private final Class<?> assignableClass;
 }

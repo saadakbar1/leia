@@ -17,36 +17,67 @@
 package com.grookage.leia.validator.utils;
 
 import com.google.common.collect.Sets;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.SchemaAttributeHandler;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
+import com.grookage.leia.validator.exception.SchemaValidationException;
+import com.grookage.leia.validator.exception.ValidationErrorCode;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @UtilityClass
 @Slf4j
 public class SchemaValidationUtils {
+    static Function<Class<?>, Function<SchemaAttribute, Boolean>> assignableCheckFunction =
+            klass -> attribute -> attribute.getType().getAssignableClass().isAssignableFrom(klass);
+
+    static Function<SchemaAttribute, Boolean> throwException = attribute -> {
+        log.error("Attribute {} of type {} not compatible with the type provided",
+                  attribute.getName(), attribute.getType());
+        throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS);
+    };
 
     public static boolean valid(final SchemaDetails schemaDetails,
                                 final Class<?> klass) {
-        final var fields = getAllFields(klass);
-        if (!validSchema(schemaDetails, fields)) return false;
-        return schemaDetails.getAttributes().stream().allMatch(each ->
-                validAttribute(each, fields));
+        return valid(schemaDetails.getValidationType(), schemaDetails.getAttributes(), klass);
     }
 
-    private static boolean validSchema(SchemaDetails schemaDetails, List<Field> fields) {
-        final var validationType = schemaDetails.getValidationType();
+    public static boolean valid(final SchemaValidationType validationType,
+                                Set<SchemaAttribute> attributes, final Class<?> klass) {
 
+        final var fields = getAllFields(klass);
+        if (!validSchema(validationType, attributes, fields)) {
+            return false;
+        }
+        return attributes.stream().allMatch(
+                each -> validAttribute(each, fields, validationType));
+    }
+
+    private static boolean validSchema(SchemaValidationType validationType, Set<SchemaAttribute> attributes,
+                                       List<Field> fields) {
         final var fieldNames = fields.stream()
                 .map(Field::getName)
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());
-        final var attributesListed = schemaDetails.getAttributes().stream()
+        final var attributesListed = attributes.stream()
                 .map(SchemaAttribute::getName)
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());
@@ -56,8 +87,10 @@ public class SchemaValidationUtils {
             public Boolean strict() {
                 final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
                 if (!mismatchedAttributes.isEmpty()) {
-                    log.error("There seems to be a mismatch in the attributes present in the class definition and schema. " +
-                                      "[Validation Failed]. The attributes are {}", mismatchedAttributes);
+                    log.error(
+                            "There seems to be a mismatch in the attributes present in the class definition and "
+                                    + "schema. [Validation Failed : MODE STRICT]. The attributes are {}",
+                            mismatchedAttributes);
                 }
                 return mismatchedAttributes.isEmpty();
             }
@@ -67,7 +100,7 @@ public class SchemaValidationUtils {
                 final var attributesMissing = Sets.difference(attributesListed, fieldNames);
                 if (!attributesMissing.isEmpty()) {
                     log.error("Some attributes are missing in the class definition" +
-                                      "[Validation Failed]. The attributes are {}", attributesMissing);
+                                      "[Validation Failed : MODE MATCHING]. The attributes are {}", attributesMissing);
                 }
                 return attributesMissing.isEmpty();
             }
@@ -82,78 +115,109 @@ public class SchemaValidationUtils {
         return fields;
     }
 
-    private static Optional<Field> getField(final List<Field> fields,
-                                            final String attributeName) {
-        return fields.stream()
-                .filter(each -> each.getName().equals(attributeName)).findFirst();
-    }
-
     private static boolean validAttribute(final SchemaAttribute attribute,
-                                          final List<Field> fields) {
-        final var field = getField(fields, attribute.getName()).orElse(null);
-        if (null == field) {
+                                          List<Field> fields, SchemaValidationType validationType) {
+        final var field = fields.stream()
+                .filter(each -> each.getName().equals(attribute.getName()))
+                .findFirst().orElse(null);
+        if (field == null) {
             return false;
         }
-        return valid(field.getType(), attribute);
+        return valid(validationType, attribute, field.getGenericType());
     }
 
-    public static boolean valid(Class<?> fieldType, SchemaAttribute attribute) {
-        final Class<?> assignableKlass = attribute.accept(new SchemaAttributeAcceptor<>() {
+    public static boolean valid(final SchemaValidationType validationType,
+                                SchemaAttribute attribute, final Type type) {
+        if (type instanceof Class<?> klass) {
+            return valid(validationType, attribute, klass);
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            return valid(validationType, attribute, parameterizedType);
+        } else if (type instanceof GenericArrayType arrayType) {
+            return valid(validationType, attribute, arrayType);
+        } else {
+            throw SchemaValidationException.error(ValidationErrorCode.NOT_SUPPORTED);
+        }
+    }
+
+    private static boolean valid(final SchemaValidationType validationType,
+                                 SchemaAttribute attribute, final Class<?> klass) {
+        return attribute.accept(new SchemaAttributeHandler<>(
+                assignableCheckFunction.apply(klass)) {
             @Override
-            public Class<?> accept(ArrayAttribute attribute) {
-                return Collection.class;
+            public Boolean accept(ArrayAttribute attribute) {
+                if (klass.isArray()) {
+                    if (attribute.getElementAttribute() == null) {
+                        return true;
+                    }
+                    return valid(validationType, attribute.getElementAttribute(), klass.getComponentType());
+                }
+                return Collection.class.isAssignableFrom(klass) && attribute.getElementAttribute() == null;
             }
 
             @Override
-            public Class<?> accept(BooleanAttribute attribute) {
-                return Boolean.class;
+            public Boolean accept(MapAttribute attribute) {
+                return Map.class.isAssignableFrom(klass) && attribute.getKeyAttribute() == null;
             }
 
             @Override
-            public Class<?> accept(ByteAttribute attribute) {
-                return Byte.class;
-            }
-
-            @Override
-            public Class<?> accept(DoubleAttribute attribute) {
-                return Double.class;
-            }
-
-            @Override
-            public Class<?> accept(EnumAttribute attribute) {
-                return Enum.class;
-            }
-
-            @Override
-            public Class<?> accept(FloatAttribute attribute) {
-                return Float.class;
-            }
-
-            @Override
-            public Class<?> accept(IntegerAttribute attribute) {
-                return Integer.class;
-            }
-
-            @Override
-            public Class<?> accept(LongAttribute attribute) {
-                return Long.class;
-            }
-
-            @Override
-            public Class<?> accept(MapAttribute attribute) {
-                return Map.class;
-            }
-
-            @Override
-            public Class<?> accept(ObjectAttribute attribute) {
-                return Object.class;
-            }
-
-            @Override
-            public Class<?> accept(StringAttribute attribute) {
-                return String.class;
+            public Boolean accept(ObjectAttribute attribute) {
+                return valid(validationType, attribute.getNestedAttributes(), klass);
             }
         });
-        return assignableKlass.isAssignableFrom(fieldType);
+    }
+
+    private static boolean valid(final SchemaValidationType validationType,
+                                 SchemaAttribute attribute, final ParameterizedType parameterizedType) {
+        return attribute.accept(new SchemaAttributeHandler<>(throwException) {
+            @Override
+            public Boolean accept(ArrayAttribute attribute) {
+                if (attribute.getElementAttribute() == null) {
+                    return true;
+                }
+                final var rawType = (Class<?>) parameterizedType.getRawType();
+                if (!attribute.getType().getAssignableClass().isAssignableFrom(rawType)) {
+                    return false;
+                }
+                final var typeArguments = getTypeArguments(parameterizedType);
+                return valid(validationType, attribute.getElementAttribute(), typeArguments[0]);
+            }
+
+            @Override
+            public Boolean accept(MapAttribute attribute) {
+                if (attribute.getKeyAttribute() == null) {
+                    return true;
+                }
+                final var rawType = (Class<?>) parameterizedType.getRawType();
+                if (!attribute.getType().getAssignableClass().isAssignableFrom(rawType)) {
+                    return false;
+                }
+                final var typeArguments = getTypeArguments(parameterizedType);
+                return valid(validationType, attribute.getKeyAttribute(), typeArguments[0]) &&
+                        valid(validationType, attribute.getValueAttribute(), typeArguments[1]);
+            }
+        });
+    }
+
+    private static boolean valid(final SchemaValidationType validationType,
+                                 SchemaAttribute attribute, final GenericArrayType arrayType) {
+        return attribute.accept(new SchemaAttributeHandler<>(throwException) {
+            @Override
+            public Boolean accept(final ArrayAttribute attribute) {
+                return valid(validationType, attribute.getElementAttribute(), arrayType.getGenericComponentType());
+            }
+        });
+    }
+
+    private static Type[] getTypeArguments(ParameterizedType parameterizedType) {
+        Type[] typeArguments = parameterizedType.getActualTypeArguments();
+        if (typeArguments.length == 0) {
+            throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS,
+                                                  String.format("No type arguments found for %s", parameterizedType));
+        }
+        return typeArguments;
+    }
+
+    public static boolean valid(Class<?> klass, SchemaAttribute schemaAttribute) {
+        return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {});
     }
 }

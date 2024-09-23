@@ -18,8 +18,6 @@ package com.grookage.leia.models.attributes;
 
 public interface SchemaAttributeAcceptor<T> {
 
-    T accept(ArrayAttribute attribute);
-
     T accept(BooleanAttribute attribute);
 
     T accept(ByteAttribute attribute);
@@ -34,10 +32,11 @@ public interface SchemaAttributeAcceptor<T> {
 
     T accept(LongAttribute attribute);
 
+    T accept(StringAttribute attribute);
+
+    T accept(ArrayAttribute attribute);
+
     T accept(MapAttribute attribute);
 
     T accept(ObjectAttribute attribute);
-
-    T accept(StringAttribute attribute);
-
 }

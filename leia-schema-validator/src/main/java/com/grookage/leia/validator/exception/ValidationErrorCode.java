@@ -23,7 +23,8 @@ public enum ValidationErrorCode {
 
     NO_SCHEMA_FOUND(400),
 
-    INVALID_SCHEMAS(412);
+    INVALID_SCHEMAS(412),
+    NOT_SUPPORTED(501);
 
     final int status;
 
