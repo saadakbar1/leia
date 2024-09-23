@@ -66,11 +66,9 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
 
     public void start() {
         this.executorService.scheduleWithFixedDelay(this.updater, this.delay, this.delay, this.timeUnit);
-        final var refreshed = this.refreshData();
-        if (!refreshed && initialDefaultValue == null) {
-            log.error("[LeiaRefresher.update] Data Refresh unsuccessful with data supplier:{}", supplierName);
+        refreshData(()->{
             throw RefresherException.error(RefresherErrorCode.REFRESH_FAILED);
-        }
+        });
     }
 
     public void stop() {
@@ -96,11 +94,11 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
         }
 
         public void run() {
-            refreshData();
+            refreshData(() -> {});
         }
     }
 
-    private boolean refreshData() {
+    private void refreshData(Runnable failureHandler) {
         try {
             T data = dataSupplier.get();
             if (data != null) {
@@ -112,17 +110,16 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
                     log.info("[LeiaRefresher.update] Failed because shouldUpdate returned false, supplierName: {}",
                              supplierName);
                 }
-                return true;
             } else {
                 log.warn(dataReference.get() == null
                          ? "[LeiaRefresher.update] Data Update Unsuccessful. Existing value will be returned for {}.."
                          : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..",
                          supplierName);
-                return false;
+               failureHandler.run();
             }
         } catch (Exception e) {
             log.error("[LeiaRefresher.update] Error while getting data from data Supplier " + supplierName, e);
-            return false;
+            failureHandler.run();
         }
     }
 
