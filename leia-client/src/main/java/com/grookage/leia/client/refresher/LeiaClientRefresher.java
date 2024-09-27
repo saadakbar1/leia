@@ -25,8 +25,8 @@ import java.util.List;
 public class LeiaClientRefresher extends HttpLeiaRefresher<List<SchemaDetails>> {
 
     @Builder
-    public LeiaClientRefresher(LeiaClientSupplier supplier, int configRefreshTimeSeconds) {
-        super(supplier, configRefreshTimeSeconds);
+    public LeiaClientRefresher(LeiaClientSupplier supplier, int refreshTimeInSeconds) {
+        super(supplier, refreshTimeInSeconds);
     }
 
 }

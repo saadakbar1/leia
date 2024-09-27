@@ -21,6 +21,8 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaRegistry;
 import com.grookage.leia.models.utils.LeiaUtils;
+import com.grookage.leia.provider.exceptions.RefresherErrorCode;
+import com.grookage.leia.provider.exceptions.RefresherException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,16 +41,35 @@ class RepositoryRefresherTest {
                 .build();
         Mockito.when(supplier.get()).thenReturn(registry);
         final var refresher = new RepositoryRefresher(supplier, 5);
-        Assertions.assertTrue(refresher.getConfiguration().getSchemas().isEmpty());
+        Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
         registry.add(schemaDetails);
         LeiaUtils.sleepFor(6);
-        final var schemas = refresher.getConfiguration();
+        final var schemas = refresher.getData();
         final var schema = schemas.getSchemaDetails(SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
                 .build()).orElse(null);
         Assertions.assertNotNull(schema);
+    }
 
+    @Test
+    void testRepositoryRefresher_whenSupplierReturnNullAtStart() {
+        final var supplier = Mockito.mock(RepositorySupplier.class);
+        Mockito.doReturn(null).when(supplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class,
+                () -> new RepositoryRefresher(supplier, 5));
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+    }
+
+    @Test
+    void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
+        final var supplier = Mockito.mock(RepositorySupplier.class);
+        Mockito.doThrow(RefresherException.error(RefresherErrorCode.REFRESH_FAILED)).when(supplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class,
+                () -> new RepositoryRefresher(supplier, 5));
+        Assertions.assertNotNull(exception);
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 }

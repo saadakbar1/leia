@@ -22,16 +22,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class ObjectAttribute extends SchemaAttribute {
+    Set<SchemaAttribute> nestedAttributes;
 
     public ObjectAttribute(final String name,
                            final boolean optional,
-                           final QualifierInfo qualifierInfo) {
+                           final QualifierInfo qualifierInfo,
+                           Set<SchemaAttribute> nestedAttributes) {
         super(DataType.OBJECT, name, optional, qualifierInfo);
+        this.nestedAttributes = nestedAttributes;
     }
 
     @Override

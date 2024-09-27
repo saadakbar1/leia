@@ -17,13 +17,12 @@
 package com.grookage.leia.dw.client;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Injector;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
-import com.grookage.leia.validator.InjectableSchemaValidator;
+import com.grookage.leia.validator.StaticSchemaValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -47,15 +46,11 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract Set<String> getPackageRoots(T configuration);
 
-    protected abstract Injector getInjector(Environment environment);
-
     protected LeiaSchemaValidator getSchemaValidator(T configuration,
-                                                     Environment environment,
                                                      LeiaClientRefresher clientRefresher) {
-        return InjectableSchemaValidator.builder()
-                .supplier(clientRefresher::getConfiguration)
+        return StaticSchemaValidator.builder()
+                .supplier(clientRefresher::getData)
                 .packageRoots(getPackageRoots(configuration))
-                .injector(getInjector(environment))
                 .build();
     }
 
@@ -68,15 +63,15 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         final var packageRoots = getPackageRoots(configuration);
         Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
         final var withProducerClient = withProducerClient(configuration);
-        final var configRefreshSeconds = getRefreshIntervalSeconds(configuration);
+        final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
         final var clientRefresher = LeiaClientRefresher.builder()
                 .supplier(LeiaClientSupplier.builder()
                         .httpConfiguration(httpConfiguration)
                         .namespaceDataSource(namespaceDataSource)
                         .build())
-                .configRefreshTimeSeconds(configRefreshSeconds)
+                .refreshTimeInSeconds(dataRefreshSeconds)
                 .build();
-        final var validator = getSchemaValidator(configuration, environment, clientRefresher);
+        final var validator = getSchemaValidator(configuration, clientRefresher);
         validator.start();
         if (withProducerClient) {
             producerClient = LeiaMessageProduceClient.builder()

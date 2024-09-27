@@ -16,12 +16,16 @@
 
 package com.grookage.leia.provider;
 
+import com.grookage.leia.provider.exceptions.RefresherErrorCode;
+import com.grookage.leia.provider.exceptions.RefresherException;
 import com.grookage.leia.provider.stubs.TestSupplier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static org.awaitility.Awaitility.await;
 
@@ -51,5 +55,34 @@ class TimeBasedDataProviderTest {
         Assertions.assertNull(testDetails.getAttribute1());
         Assertions.assertNull(testDetails.getAttribute2());
         Assertions.assertNull(testDetails.getAttribute3());
+    }
+
+    @Test
+    void testTimeBasedProviderStart_whenSupplierReturnNull() {
+        final var testSupplier = Mockito.mock(Supplier.class);
+        final var timeBasedProvider = new TimeBasedDataProvider<>(
+                testSupplier,
+                1,
+                TimeUnit.SECONDS
+        );
+        Assertions.assertNull(timeBasedProvider.getData());
+        Mockito.doReturn(null).when(testSupplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class, timeBasedProvider::start);
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+    }
+
+    @Test
+    void testTimeBasedProviderStart_WhenSupplierThrowsException() {
+        final var testSupplier = Mockito.mock(Supplier.class);
+        final var timeBasedProvider = new TimeBasedDataProvider<>(
+                testSupplier,
+                1,
+                TimeUnit.SECONDS
+        );
+        Assertions.assertNull(timeBasedProvider.getData());
+        final var runtimeException = new RuntimeException("Error in fetching data from supplier");
+        Mockito.doThrow(runtimeException).when(testSupplier).get();
+        final var exception = Assertions.assertThrows(RefresherException.class, timeBasedProvider::start);
+        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 }

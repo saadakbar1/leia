@@ -52,14 +52,14 @@ public class SchemaRetriever {
             supplier.start();
             this.refresher = RepositoryRefresher.builder()
                     .supplier(supplier)
-                    .configRefreshTimeSeconds(cacheConfig.getRefreshCacheSeconds())
+                    .refreshTimeInSeconds(cacheConfig.getRefreshCacheSeconds())
                     .build();
         }
     }
 
     public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
-            return this.refresher.getConfiguration().getSchemaDetails(schemaKey);
+            return this.refresher.getData().getSchemaDetails(schemaKey);
         } else {
             return schemaRepository.get(schemaKey);
         }
@@ -67,7 +67,7 @@ public class SchemaRetriever {
 
     public List<SchemaDetails> getCurrentSchemaDetails(final Set<String> namespaces) {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
-            return this.refresher.getConfiguration().getSchemaDetails(namespaces);
+            return this.refresher.getData().getSchemaDetails(namespaces);
         } else {
             return schemaRepository.getSchemas(namespaces, Set.of(SchemaState.APPROVED));
         }
@@ -75,7 +75,7 @@ public class SchemaRetriever {
 
     public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
-            return this.refresher.getConfiguration().getAllSchemaDetails(namespaces);
+            return this.refresher.getData().getAllSchemaDetails(namespaces);
         } else {
             return schemaRepository.getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()));
         }

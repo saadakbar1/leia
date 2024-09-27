@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia</artifactId>
-    <version>0.0.1-RC2</version>
+    <version>0.0.1-RC3</version>
     <packaging>pom</packaging>
 
     <name>Leia</name>
@@ -157,7 +157,7 @@
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
+                    <source>${java.version}</source>
                 </configuration>
                 <executions>
                     <execution>

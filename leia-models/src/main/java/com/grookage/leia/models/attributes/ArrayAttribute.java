@@ -27,11 +27,14 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class ArrayAttribute extends SchemaAttribute {
+    private SchemaAttribute elementAttribute;
 
     public ArrayAttribute(final String name,
                           final boolean optional,
-                          final QualifierInfo qualifierInfo) {
+                          final QualifierInfo qualifierInfo,
+                          SchemaAttribute elementAttribute) {
         super(DataType.ARRAY, name, optional, qualifierInfo);
+        this.elementAttribute = elementAttribute;
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.grookage.leia.models.attributes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Preconditions;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,10 +29,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MapAttribute extends SchemaAttribute {
 
+    private SchemaAttribute keyAttribute;
+    private SchemaAttribute valueAttribute;
+
     public MapAttribute(final String name,
                         final boolean optional,
-                        final QualifierInfo qualifierInfo) {
+                        final QualifierInfo qualifierInfo,
+                        SchemaAttribute keyAttribute,
+                        SchemaAttribute valueAttribute) {
         super(DataType.MAP, name, optional, qualifierInfo);
+        Preconditions.checkArgument(keyAttribute == null || valueAttribute != null);
+        this.keyAttribute = keyAttribute;
+        this.valueAttribute = valueAttribute;
     }
 
     @Override

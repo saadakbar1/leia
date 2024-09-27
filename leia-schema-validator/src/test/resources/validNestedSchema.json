@@ -11,26 +11,30 @@
   },
   "attributes": [
     {
-      "type": "ARRAY",
-      "name": "testAttribute",
+      "type": "STRING",
+      "name": "stringAttribute",
       "optional": true,
-      "elementAttribute": {
-        "type": "STRING"
-      },
       "qualifierInfo": {
         "type": "PII"
       }
     },
     {
-      "type": "ENUM",
-      "name": "testAttribute2",
+      "type": "OBJECT",
+      "name": "nestedObjectAttribute",
       "optional": true,
-      "values": [
-        "TEST_ENUM"
-      ],
       "qualifierInfo": {
         "type": "PII"
-      }
+      },
+      "nestedAttributes": [
+        {
+          "type": "INTEGER",
+          "name": "integerAttribute",
+          "optional": true,
+          "qualifierInfo": {
+            "type": "PII"
+          }
+        }
+      ]
     }
   ]
 }

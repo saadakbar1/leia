@@ -16,7 +16,6 @@
 
 package com.grookage.leia.validator;
 
-import com.google.inject.Injector;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.annotations.SchemaValidator;
@@ -36,20 +35,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class InjectableSchemaValidator implements LeiaSchemaValidator {
+public class StaticSchemaValidator implements LeiaSchemaValidator {
 
     private final ConcurrentHashMap<SchemaKey, Boolean> validationRegistry = new ConcurrentHashMap<>();
     private final Supplier<List<SchemaDetails>> supplier;
     private final Set<String> packageRoots;
-    private final Injector injector;
 
     @Builder
-    public InjectableSchemaValidator(Supplier<List<SchemaDetails>> supplier,
-                                     Set<String> packageRoots,
-                                     Injector injector) {
+    public StaticSchemaValidator(Supplier<List<SchemaDetails>> supplier,
+                                 Set<String> packageRoots) {
         this.supplier = supplier;
         this.packageRoots = packageRoots;
-        this.injector = injector;
     }
 
     public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
@@ -58,12 +54,12 @@ public class InjectableSchemaValidator implements LeiaSchemaValidator {
     }
 
     @SneakyThrows
-    private <T> boolean validate(final SchemaKey schemaKey, T data) {
+    private boolean validate(final SchemaKey schemaKey, Class<?> klass) {
         final var details = getSchemaDetails(schemaKey).orElse(null);
         if (null == details) {
             throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND);
         }
-        return SchemaValidationUtils.valid(details, data.getClass());
+        return SchemaValidationUtils.valid(details, klass);
     }
 
     @Override
@@ -73,14 +69,13 @@ public class InjectableSchemaValidator implements LeiaSchemaValidator {
             final var reflections = new Reflections(handlerPackage);
             final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaValidator.class);
             annotatedClasses.forEach(annotatedClass -> {
-                final var instance = injector.getInstance(annotatedClass);
-                final var annotation = instance.getClass().getAnnotation(SchemaValidator.class);
+                final var annotation = annotatedClass.getAnnotation(SchemaValidator.class);
                 final var schemaKey = SchemaKey.builder()
                         .schemaName(annotation.schemaName())
                         .version(annotation.versionId())
                         .namespace(annotation.namespace())
                         .build();
-                validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, instance));
+                validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, annotatedClass));
             });
         });
         final var invalidSchemas = validationRegistry.keySet().stream()

@@ -27,10 +27,6 @@ class NamespaceDataSourceTest {
 
     @Test
     void testNamespaceDataSource() {
-        final var staticSource = new StaticNamespaceDataSource(Set.of("testNamespace"));
-        Assertions.assertNotNull(staticSource);
-        Assertions.assertNotNull(staticSource.getNamespaces());
-        Assertions.assertFalse(staticSource.getNamespaces().isEmpty());
         final var supplier = new Supplier<Set<String>>() {
 
             private static final AtomicReference<Boolean> supplierMarker = new AtomicReference<>(false);
@@ -38,21 +34,19 @@ class NamespaceDataSourceTest {
             @Override
             public Set<String> get() {
                 return supplierMarker.get() ?
-                        Set.of("testNamespace") : Set.of();
+                       Set.of("testNamespace") : Set.of();
             }
 
             public void mark() {
                 supplierMarker.set(true);
             }
         };
-        final var suppliedSource = new DynamicNamespaceDataSource(supplier);
+        final var suppliedSource = new NamespaceDataSource(supplier);
         Assertions.assertNotNull(suppliedSource.getNamespaces());
         Assertions.assertTrue(suppliedSource.getNamespaces().isEmpty());
 
         supplier.mark();
         Assertions.assertNotNull(suppliedSource.getNamespaces());
         Assertions.assertFalse(suppliedSource.getNamespaces().isEmpty());
-
-
     }
 }

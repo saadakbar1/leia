@@ -16,10 +16,17 @@
 
 package com.grookage.leia.client.datasource;
 
+import lombok.AllArgsConstructor;
+
 import java.util.Set;
+import java.util.function.Supplier;
 
-public interface NamespaceDataSource {
+@AllArgsConstructor
+public class NamespaceDataSource {
 
-    Set<String> getNamespaces();
+    private final Supplier<Set<String>> namespaceSupplier;
 
+    public Set<String> getNamespaces() {
+        return namespaceSupplier.get();
+    }
 }

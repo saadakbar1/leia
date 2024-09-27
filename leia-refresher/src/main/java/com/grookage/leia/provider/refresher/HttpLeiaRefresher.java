@@ -20,7 +20,7 @@ import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
 
 public class HttpLeiaRefresher<T> extends AbstractLeiaRefresher<T> {
 
-    public HttpLeiaRefresher(LeiaHttpSupplier<T> supplier, int configRefreshTimeSeconds) {
-        super(supplier, configRefreshTimeSeconds);
+    public HttpLeiaRefresher(LeiaHttpSupplier<T> supplier, int refreshTimeInSeconds) {
+        super(supplier, refreshTimeInSeconds);
     }
 }
