@@ -17,12 +17,15 @@
 package com.grookage.leia.es.dropwizard;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.dropwizard.bundle.LeiaBundle;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
+import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
 import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.elastic.repository.ElasticRepository;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
+import com.grookage.leia.repository.config.CacheConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
@@ -56,4 +59,5 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
         this.elasticsearchClient = elasticSchemaRepository.getClient();
         super.run(configuration, environment);
     }
+
 }

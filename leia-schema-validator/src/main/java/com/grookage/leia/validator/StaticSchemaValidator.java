@@ -18,7 +18,7 @@ package com.grookage.leia.validator;
 
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.validator.annotations.SchemaValidator;
+import com.grookage.leia.validator.annotations.SchemaValidatable;
 import com.grookage.leia.validator.exception.SchemaValidationException;
 import com.grookage.leia.validator.exception.ValidationErrorCode;
 import com.grookage.leia.validator.utils.SchemaValidationUtils;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 public class StaticSchemaValidator implements LeiaSchemaValidator {
 
     private final ConcurrentHashMap<SchemaKey, Boolean> validationRegistry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SchemaKey, Class<?>> klassRegistry = new ConcurrentHashMap<>();
     private final Supplier<List<SchemaDetails>> supplier;
     private final Set<String> packageRoots;
 
@@ -48,14 +49,10 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
         this.packageRoots = packageRoots;
     }
 
-    public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
-        return supplier.get().stream()
-                .filter(each -> each.match(schemaKey)).findFirst();
-    }
-
     @SneakyThrows
     private boolean validate(final SchemaKey schemaKey, Class<?> klass) {
-        final var details = getSchemaDetails(schemaKey).orElse(null);
+        final var details = supplier.get().stream()
+                .filter(each -> each.match(schemaKey)).findFirst().orElse(null);
         if (null == details) {
             throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND);
         }
@@ -67,14 +64,15 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
         log.info("Starting the schema validator");
         packageRoots.forEach(handlerPackage -> {
             final var reflections = new Reflections(handlerPackage);
-            final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaValidator.class);
+            final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaValidatable.class);
             annotatedClasses.forEach(annotatedClass -> {
-                final var annotation = annotatedClass.getAnnotation(SchemaValidator.class);
+                final var annotation = annotatedClass.getAnnotation(SchemaValidatable.class);
                 final var schemaKey = SchemaKey.builder()
                         .schemaName(annotation.schemaName())
                         .version(annotation.versionId())
                         .namespace(annotation.namespace())
                         .build();
+                klassRegistry.putIfAbsent(schemaKey, annotatedClass);
                 validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, annotatedClass));
             });
         });
@@ -93,6 +91,15 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
 
     @Override
     public boolean valid(SchemaKey schemaKey) {
-        return validationRegistry.get(schemaKey);
+        return validationRegistry.computeIfAbsent(schemaKey, key -> {
+            final var klass = getKlass(key).orElse(null);
+            return null == klass ? Boolean.FALSE : validate(key, klass);
+        });
     }
+
+    @Override
+    public Optional<Class<?>> getKlass(SchemaKey schemaKey) {
+        return Optional.ofNullable(klassRegistry.get(schemaKey));
+    }
+
 }

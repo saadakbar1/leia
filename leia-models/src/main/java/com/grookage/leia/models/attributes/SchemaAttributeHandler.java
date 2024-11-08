@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 @AllArgsConstructor
 public abstract class SchemaAttributeHandler<T> implements SchemaAttributeAcceptor<T> {
-    private final Function<SchemaAttribute,T> defaultHandler;
+    private final Function<SchemaAttribute, T> defaultHandler;
 
     @Override
     public T accept(BooleanAttribute attribute) {

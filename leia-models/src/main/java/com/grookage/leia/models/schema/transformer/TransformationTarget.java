@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.models.schema.transformer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grookage.leia.models.schema.SchemaKey;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
-public interface LeiaSchemaValidator {
+@Builder
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TransformationTarget {
 
-    void start();
-
-    void stop();
-
-    boolean valid(SchemaKey schemaKey);
-
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
+    @NotNull SchemaKey schemaKey;
+    @NotEmpty List<AttributeTransformer> transformers = List.of();
+    private List<String> tags = List.of();
 
 }

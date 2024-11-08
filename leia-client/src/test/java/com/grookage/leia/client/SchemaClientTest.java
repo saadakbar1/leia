@@ -16,6 +16,7 @@
 
 package com.grookage.leia.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -31,14 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 class SchemaClientTest {
-
-    static class TestableSchemaClient extends AbstractSchemaClient {
-
-        @Builder
-        public TestableSchemaClient(LeiaClientRefresher refresher, LeiaSchemaValidator schemaValidator) {
-            super(refresher, schemaValidator);
-        }
-    }
 
     @Test
     @SneakyThrows
@@ -63,5 +56,18 @@ class SchemaClientTest {
         Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of("random")).isEmpty());
         Assertions.assertFalse(schemaClient.getSchemaDetails(Set.of("testNamespace")).isEmpty());
         Assertions.assertFalse(schemaClient.valid(schemaKey));
+    }
+
+    static class TestableSchemaClient extends AbstractSchemaClient {
+
+        @Builder
+        public TestableSchemaClient(LeiaClientRefresher refresher, LeiaSchemaValidator schemaValidator) {
+            super(new ObjectMapper(), refresher, schemaValidator);
+        }
+
+        @Override
+        public void start() {
+            //Noop
+        }
     }
 }

@@ -26,12 +26,14 @@ public abstract class AbstractLeiaRefresher<T> implements LeiaRefresher<T> {
     private final TimeBasedDataProvider<T> dataProvider;
 
     protected AbstractLeiaRefresher(final LeiaSupplier<T> supplier,
-                                    final int dataRefreshInterval) {
+                                    final int dataRefreshInterval,
+                                    final boolean periodicRefresh) {
         this.dataProvider = new TimeBasedDataProvider<>(
                 supplier,
                 null,
                 dataRefreshInterval,
-                TimeUnit.SECONDS
+                TimeUnit.SECONDS,
+                periodicRefresh
         );
         this.dataProvider.start();
     }

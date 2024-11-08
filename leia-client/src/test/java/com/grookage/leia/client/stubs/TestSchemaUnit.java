@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.client.stubs;
 
-import com.grookage.leia.models.schema.SchemaKey;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
 
-public interface LeiaSchemaValidator {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class TestSchemaUnit {
 
-    void start();
-
-    void stop();
-
-    boolean valid(SchemaKey schemaKey);
-
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
-
+    @NotEmpty
+    private String registeredName;
 }

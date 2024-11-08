@@ -25,16 +25,15 @@ import org.mockito.Mockito;
 public abstract class SchemaProcessorTest {
 
     @Getter
-    private static SchemaRepository schemaRepository;
-    private static SchemaProcessor schemaProcessor;
-
-    @Getter
     private static final VersionIDGenerator generator = new VersionIDGenerator() {
         @Override
         public String generateVersionId(String prefix) {
             return "V1234";
         }
     };
+    @Getter
+    private static SchemaRepository schemaRepository;
+    private static SchemaProcessor schemaProcessor;
 
     abstract SchemaProcessor getSchemaProcessor();
 

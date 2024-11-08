@@ -35,9 +35,9 @@ import java.util.Optional;
 
 class SchemaIngestorTest {
 
+    private static final StubbedSchemaUpdater schemaUpdater = new StubbedSchemaUpdater();
     private static SchemaProcessorHub schemaProcessorHub;
     private static SchemaIngestor<StubbedSchemaUpdater> schemaIngestor;
-    private static final StubbedSchemaUpdater schemaUpdater = new StubbedSchemaUpdater();
 
     @BeforeEach
     void setup() {

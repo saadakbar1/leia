@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.validator.annotations;
 
-import com.grookage.leia.models.schema.SchemaKey;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.Optional;
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SchemaValidatable {
 
-public interface LeiaSchemaValidator {
+    String schemaName();
 
-    void start();
+    String versionId();
 
-    void stop();
-
-    boolean valid(SchemaKey schemaKey);
-
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
+    String namespace();
 
 }

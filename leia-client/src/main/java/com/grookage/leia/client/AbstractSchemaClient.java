@@ -16,6 +16,7 @@
 
 package com.grookage.leia.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -32,6 +33,7 @@ import java.util.Set;
 @Data
 public abstract class AbstractSchemaClient implements LeiaSchemaClient {
 
+    private final ObjectMapper mapper;
     private final LeiaClientRefresher refresher;
     private final LeiaSchemaValidator schemaValidator;
 
@@ -50,5 +52,7 @@ public abstract class AbstractSchemaClient implements LeiaSchemaClient {
     public boolean valid(SchemaKey schemaKey) {
         return schemaValidator.valid(schemaKey);
     }
+
+    public abstract void start();
 }
 

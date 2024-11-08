@@ -40,7 +40,7 @@ class RepositoryRefresherTest {
         final var registry = SchemaRegistry.builder()
                 .build();
         Mockito.when(supplier.get()).thenReturn(registry);
-        final var refresher = new RepositoryRefresher(supplier, 5);
+        final var refresher = new RepositoryRefresher(supplier, 5, true);
         Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
         registry.add(schemaDetails);
         LeiaUtils.sleepFor(6);
@@ -58,7 +58,7 @@ class RepositoryRefresherTest {
         final var supplier = Mockito.mock(RepositorySupplier.class);
         Mockito.doReturn(null).when(supplier).get();
         final var exception = Assertions.assertThrows(RefresherException.class,
-                () -> new RepositoryRefresher(supplier, 5));
+                () -> new RepositoryRefresher(supplier, 5, true));
         Assertions.assertNotNull(exception);
         Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
@@ -68,7 +68,7 @@ class RepositoryRefresherTest {
         final var supplier = Mockito.mock(RepositorySupplier.class);
         Mockito.doThrow(RefresherException.error(RefresherErrorCode.REFRESH_FAILED)).when(supplier).get();
         final var exception = Assertions.assertThrows(RefresherException.class,
-                () -> new RepositoryRefresher(supplier, 5));
+                () -> new RepositoryRefresher(supplier, 5, true));
         Assertions.assertNotNull(exception);
         Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }

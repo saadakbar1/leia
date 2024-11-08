@@ -17,11 +17,7 @@
 package com.grookage.leia.validator.utils;
 
 import com.google.common.collect.Sets;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeHandler;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
@@ -34,12 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,7 +42,7 @@ public class SchemaValidationUtils {
 
     static Function<SchemaAttribute, Boolean> throwException = attribute -> {
         log.error("Attribute {} of type {} not compatible with the type provided",
-                  attribute.getName(), attribute.getType());
+                attribute.getName(), attribute.getType());
         throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS);
     };
 
@@ -100,7 +91,7 @@ public class SchemaValidationUtils {
                 final var attributesMissing = Sets.difference(attributesListed, fieldNames);
                 if (!attributesMissing.isEmpty()) {
                     log.error("Some attributes are missing in the class definition" +
-                                      "[Validation Failed : MODE MATCHING]. The attributes are {}", attributesMissing);
+                            "[Validation Failed : MODE MATCHING]. The attributes are {}", attributesMissing);
                 }
                 return attributesMissing.isEmpty();
             }
@@ -209,12 +200,13 @@ public class SchemaValidationUtils {
         Type[] typeArguments = parameterizedType.getActualTypeArguments();
         if (typeArguments.length == 0) {
             throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS,
-                                                  String.format("No type arguments found for %s", parameterizedType));
+                    String.format("No type arguments found for %s", parameterizedType));
         }
         return typeArguments;
     }
 
     public static boolean valid(Class<?> klass, SchemaAttribute schemaAttribute) {
-        return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {});
+        return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
+        });
     }
 }

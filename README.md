@@ -16,10 +16,21 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 - A client to help serialize and de-serialize the data, at production and consumption levels respectively, with a fluid
   interface that can work with any infrastructure component.
 - Supports multiple types, json, avro and protobuf
+- Supports event multiplexing, multiplexing one event into different events
+
+## Maven Dependency
+
+- The bom is available at
+
+```
+<dependency>
+    <groupId>com.grookage.leia</groupId>
+    <artifactId>leia-bom</artifactId>
+    <versio>0.0.1-RC4</version>
+</dependency>
+```
 
 ## Build Instructions
-
-And
 
 - Clone the source:
 
@@ -29,16 +40,115 @@ And
 
       mvn install
 
-### Maven Dependency
+## Getting Started
 
-- The bom is available at
+### Using the schema registry
+
+#### Build your own dropwizard schema server by using the `LeiaElastic` bundle. 
 
 ```
-<dependency>
-    <groupId>com.grookage.leia</groupId>
-    <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC3</version>
-</dependency>
+      new LeiaElasticBundle<TestConfiguration, SchemaUpdater>() {
+
+             @Override
+             protected SchemaUpdaterResolver<SchemaUpdater> userResolver(TestConfiguration configuration) {
+                 return null;
+             }
+
+             @Override
+             protected CacheConfig getCacheConfig(TestConfiguration configuration) {
+                 return null;
+             }
+
+             @Override
+             protected VersionIDGenerator getVersionIDGenerator() {
+                 return null;
+             }
+
+             @Override
+             protected ElasticConfig getElasticConfig(TestConfiguration configuration) {
+                 return null;
+             }
+         }
+
+```
+  
+- **SchemaUpdater** is an RBAC governing class, please extend this SchemaUpdater to implement your own UserProfile
+- **CacheConfig** - If the schema will be always resolved from the dataStore (Elasticsearch) or from the in-memory cache with a refreshInterval to refresh the data
+- **VersionIdGenerator** - Your own version id generator, to generate a unique versionId for every document
+- **ElasticConfig** - Elasticsearch configuration to bring up the schema server
+
+#### Ingesting required schemas, backed by a maker-checker process
+
+A sample schema looks like the following
+
+```
+{
+  "namespace": "testNamespace",
+  "schemaName": "testSchema",
+  "schemaType": "JSON",
+  "attributes": [
+    {
+      "type": "ARRAY",
+      "name": "testAttribute",
+      "optional": true,
+      "qualifierInfo": {
+        "type": "PII"
+      }
+    },
+    {
+      "type": "ENUM",
+      "name": "testAttribute",
+      "optional": true,
+      "values": [
+        "TEST_ENUM"
+      ],
+      "qualifierInfo": {
+        "type": "PII"
+      }
+    }
+  ],
+  "transformationTargets": [
+    {
+      "schemaKey": {
+        "namespace": "testNamespace",
+        "schemaName": "testSchema",
+        "version": "v"
+      },
+      "transformers": [
+        {
+          "attributeName": "name",
+          "transformationPath": "$.userName"
+        }
+      ]
+    }
+  ]
+}
+```
+
+- **AttributeInfo** : There are various type of attributes you can define, please refer to the `SchemaAttribute` class.
+- **TransformationTargets** - Helps in event multiplexing, in the above example, when provided with the namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to be jsonPathRules.
+
+#### Using the LeiaClientBundle
+
+On the client side, please use the `LeiaClientBundle`
+
+```
+    new LeiaClientBundle<AppConfiguration>() {
+            @Override
+            protected NamespaceDataSource getNamespaceDataSource(AppConfiguration configuration) {
+                return new NamespaceDataSource(List.of("schemas"));
+            }
+            
+            @Override
+            protected LeiaHttpConfiguration getHttpConfiguration(AppConfiguration configuration) {
+                return null;
+            }
+
+            @Override
+            protected Set<String> getPackageRoots(AppConfiguration configuration) {
+                return Set.of("com.example.schemas");
+            }
+    }
 ```
 
 LICENSE

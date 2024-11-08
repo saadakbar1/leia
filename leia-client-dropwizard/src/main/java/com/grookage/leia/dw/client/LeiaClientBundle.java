@@ -22,8 +22,8 @@ import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
-import com.grookage.leia.validator.StaticSchemaValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
+import com.grookage.leia.validator.StaticSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Environment;
@@ -38,7 +38,13 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract NamespaceDataSource getNamespaceDataSource(T configuration);
 
-    protected abstract int getRefreshIntervalSeconds(T configuration);
+    protected int getRefreshIntervalSeconds(T configuration) {
+        return 30;
+    }
+
+    protected boolean refreshEnabled(T configuration) {
+        return false;
+    }
 
     protected abstract boolean withProducerClient(T configuration);
 
@@ -70,6 +76,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                         .namespaceDataSource(namespaceDataSource)
                         .build())
                 .refreshTimeInSeconds(dataRefreshSeconds)
+                .periodicRefresh(refreshEnabled(configuration))
                 .build();
         final var validator = getSchemaValidator(configuration, clientRefresher);
         validator.start();
@@ -77,7 +84,9 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
             producerClient = LeiaMessageProduceClient.builder()
                     .refresher(clientRefresher)
                     .schemaValidator(validator)
+                    .mapper(environment.getObjectMapper())
                     .build();
+            producerClient.start();
         }
     }
 }

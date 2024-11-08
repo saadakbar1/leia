@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.client.transformer;
 
 import com.grookage.leia.models.schema.SchemaKey;
+import com.jayway.jsonpath.JsonPath;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-public interface LeiaSchemaValidator {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class LeiaCompiledPath {
 
-    void start();
-
-    void stop();
-
-    boolean valid(SchemaKey schemaKey);
-
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
-
+    @NotEmpty
+    private SchemaKey schemaKey;
+    @NotEmpty
+    private String attributeName;
+    @NotNull
+    private JsonPath jsonPath;
 }

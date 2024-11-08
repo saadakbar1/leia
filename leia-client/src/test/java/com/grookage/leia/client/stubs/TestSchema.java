@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator.annotations;
+package com.grookage.leia.client.stubs;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SchemaValidator {
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
-    String schemaName();
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class TestSchema {
 
-    String versionId();
-
-    String namespace();
+    @NotEmpty
+    private String userName;
+    @NotEmpty
+    private List<TestSchemaUnit> schemaUnits;
 
 }

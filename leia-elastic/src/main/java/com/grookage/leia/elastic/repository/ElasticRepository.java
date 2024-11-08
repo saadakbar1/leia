@@ -48,14 +48,13 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ElasticRepository extends AbstractSchemaRepository {
-    private final ElasticsearchClient client;
-    private final ElasticConfig elasticConfig;
-
     private static final String SCHEMA_INDEX = "schema_registry";
     private static final String NAMESPACE = "namespace";
     private static final String SCHEMA_NAME = "schemaName";
     private static final String VERSION = "version";
     private static final String SCHEMA_STATE = "schemaState";
+    private final ElasticsearchClient client;
+    private final ElasticConfig elasticConfig;
 
     public ElasticRepository(ElasticConfig elasticConfig) {
         super();

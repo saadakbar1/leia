@@ -65,12 +65,15 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
         final var email = ContextUtils.getEmail(context);
         storedSchema.setDescription(updateSchemaRequest.getDescription());
         storedSchema.setAttributes(updateSchemaRequest.getAttributes());
-        getSchemaRepository().update(storedSchema);
         storedSchema.getSchemaMeta().setCreatedBy(userName);
         storedSchema.getSchemaMeta().setCreatedByEmail(email);
         storedSchema.getSchemaMeta().setCreatedAt(System.currentTimeMillis());
         storedSchema.setValidationType(updateSchemaRequest.getValidationType());
         storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
+        if (null != updateSchemaRequest.getTransformationTargets()) {
+            storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
+        }
+        getSchemaRepository().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

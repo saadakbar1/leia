@@ -42,16 +42,18 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
     private final TimeBasedDataProvider<T>.Updater updater;
     private final String supplierName;
     private final BiFunction<T, T, Boolean> shouldUpdate;
+    private boolean periodicRefresh = true;
 
-    public TimeBasedDataProvider(Supplier<T> dataSupplier, int delay, TimeUnit timeUnit) {
-        this(dataSupplier, null, delay, timeUnit);
+    public TimeBasedDataProvider(Supplier<T> dataSupplier, int delay, TimeUnit timeUnit, boolean periodicRefresh) {
+        this(dataSupplier, null, delay, timeUnit, periodicRefresh);
     }
 
-    public TimeBasedDataProvider(Supplier<T> dataSupplier, T initialDefaultValue, int delay, TimeUnit timeUnit) {
-        this(dataSupplier, initialDefaultValue, delay, timeUnit, (t1, t2) -> true);
+    public TimeBasedDataProvider(Supplier<T> dataSupplier, T initialDefaultValue, int delay, TimeUnit timeUnit, boolean periodicRefresh) {
+        this(dataSupplier, initialDefaultValue, delay, timeUnit, (t1, t2) -> true, periodicRefresh);
     }
 
-    public TimeBasedDataProvider(Supplier<T> dataSupplier, T initialDefaultValue, int delay, TimeUnit timeUnit, BiFunction<T, T, Boolean> shouldUpdate) {
+    public TimeBasedDataProvider(Supplier<T> dataSupplier, T initialDefaultValue, int delay, TimeUnit timeUnit, BiFunction<T, T, Boolean> shouldUpdate,
+                                 boolean periodicRefresh) {
         this.dataSupplier = dataSupplier;
         this.initialDefaultValue = initialDefaultValue;
         this.delay = delay;
@@ -62,11 +64,14 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
         this.updater = new Updater();
         this.lastUpdatedTimestamp = new AtomicLong(0L);
         this.shouldUpdate = shouldUpdate;
+        this.periodicRefresh = periodicRefresh;
     }
 
     public void start() {
-        this.executorService.scheduleWithFixedDelay(this.updater, this.delay, this.delay, this.timeUnit);
-        refreshData(()->{
+        if (periodicRefresh) {
+            this.executorService.scheduleWithFixedDelay(this.updater, this.delay, this.delay, this.timeUnit);
+        }
+        refreshData(() -> {
             throw RefresherException.error(RefresherErrorCode.REFRESH_FAILED);
         });
     }
@@ -88,16 +93,6 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
         this.updater.run();
     }
 
-    public class Updater implements Runnable {
-        public Updater() {
-            //NOOP
-        }
-
-        public void run() {
-            refreshData(() -> {});
-        }
-    }
-
     private void refreshData(Runnable failureHandler) {
         try {
             T data = dataSupplier.get();
@@ -108,18 +103,29 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
                     log.info("[LeiaRefresher.update] Successfully Updated data reference for {}..", supplierName);
                 } else {
                     log.info("[LeiaRefresher.update] Failed because shouldUpdate returned false, supplierName: {}",
-                             supplierName);
+                            supplierName);
                 }
             } else {
                 log.warn(dataReference.get() == null
-                         ? "[LeiaRefresher.update] Data Update Unsuccessful. Existing value will be returned for {}.."
-                         : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..",
-                         supplierName);
-               failureHandler.run();
+                                ? "[LeiaRefresher.update] Data Update Unsuccessful. Existing value will be returned for {}.."
+                                : "[LeiaRefresher.update] Data Update Unsuccessful. Skipped updating data reference for {}..",
+                        supplierName);
+                failureHandler.run();
             }
         } catch (Exception e) {
             log.error("[LeiaRefresher.update] Error while getting data from data Supplier " + supplierName, e);
             failureHandler.run();
+        }
+    }
+
+    public class Updater implements Runnable {
+        public Updater() {
+            //NOOP
+        }
+
+        public void run() {
+            refreshData(() -> {
+            });
         }
     }
 

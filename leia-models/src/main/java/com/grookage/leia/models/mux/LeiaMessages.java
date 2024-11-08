@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.models.mux;
 
-import com.grookage.leia.models.schema.SchemaKey;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface LeiaSchemaValidator {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LeiaMessages {
 
-    void start();
+    private List<LeiaMessage> messages = new ArrayList<>();
 
-    void stop();
-
-    boolean valid(SchemaKey schemaKey);
-
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
-
+    public void add(LeiaMessage leiaMessage) {
+        messages.add(leiaMessage);
+    }
 }

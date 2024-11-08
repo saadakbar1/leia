@@ -38,7 +38,8 @@ class TimeBasedDataProviderTest {
         final var timeBasedProvider = new TimeBasedDataProvider<>(
                 testSupplier,
                 1,
-                TimeUnit.SECONDS
+                TimeUnit.SECONDS,
+                true
         );
         var testDetails = timeBasedProvider.getData();
         Assertions.assertNull(testDetails);
@@ -63,7 +64,8 @@ class TimeBasedDataProviderTest {
         final var timeBasedProvider = new TimeBasedDataProvider<>(
                 testSupplier,
                 1,
-                TimeUnit.SECONDS
+                TimeUnit.SECONDS,
+                true
         );
         Assertions.assertNull(timeBasedProvider.getData());
         Mockito.doReturn(null).when(testSupplier).get();
@@ -77,7 +79,8 @@ class TimeBasedDataProviderTest {
         final var timeBasedProvider = new TimeBasedDataProvider<>(
                 testSupplier,
                 1,
-                TimeUnit.SECONDS
+                TimeUnit.SECONDS,
+                true
         );
         Assertions.assertNull(timeBasedProvider.getData());
         final var runtimeException = new RuntimeException("Error in fetching data from supplier");

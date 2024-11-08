@@ -29,5 +29,20 @@
         "type": "PII"
       }
     }
+  ],
+  "transformationTargets": [
+    {
+      "schemaKey": {
+        "namespace": "testNamespace",
+        "schemaName": "testSchema",
+        "version": "v"
+      },
+      "transformers": [
+        {
+          "attributeName": "name",
+          "transformationPath": "$.userName"
+        }
+      ]
+    }
   ]
 }

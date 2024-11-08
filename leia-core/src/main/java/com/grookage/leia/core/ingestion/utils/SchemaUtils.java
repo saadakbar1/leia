@@ -48,6 +48,7 @@ public class SchemaUtils {
                         .createdAt(System.currentTimeMillis())
                         .build())
                 .validationType(createSchemaRequest.getValidationType())
+                .transformationTargets(createSchemaRequest.getTransformationTargets())
                 .build();
     }
 }

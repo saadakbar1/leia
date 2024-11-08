@@ -19,6 +19,7 @@ package com.grookage.leia.models.schema.ingestion;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
+import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,4 +46,6 @@ public class CreateSchemaRequest {
     private String description;
     @NotEmpty
     private Set<SchemaAttribute> attributes;
+    @Builder.Default
+    private Set<TransformationTarget> transformationTargets = Set.of();
 }

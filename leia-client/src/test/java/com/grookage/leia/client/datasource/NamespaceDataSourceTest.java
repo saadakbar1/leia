@@ -34,7 +34,7 @@ class NamespaceDataSourceTest {
             @Override
             public Set<String> get() {
                 return supplierMarker.get() ?
-                       Set.of("testNamespace") : Set.of();
+                        Set.of("testNamespace") : Set.of();
             }
 
             public void mark() {
