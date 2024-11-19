@@ -26,7 +26,7 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 <dependency>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC4</version>
+    <versio>0.0.1-RC5</version>
 </dependency>
 ```
 
@@ -50,8 +50,8 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
       new LeiaElasticBundle<TestConfiguration, SchemaUpdater>() {
 
              @Override
-             protected SchemaUpdaterResolver<SchemaUpdater> userResolver(TestConfiguration configuration) {
-                 return null;
+             protected Supplier<SchemaUpdaterResolver<SchemaUpdater>> userResolver(TestConfiguration configuration) {
+                 return () -> new DefaultResolver();
              }
 
              @Override
@@ -60,8 +60,8 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
              }
 
              @Override
-             protected VersionIDGenerator getVersionIDGenerator() {
-                 return null;
+             protected Supplier<VersionIDGenerator> getVersionIDGenerator() {
+                 return () -> new DefaultVersionGenerator();
              }
 
              @Override
