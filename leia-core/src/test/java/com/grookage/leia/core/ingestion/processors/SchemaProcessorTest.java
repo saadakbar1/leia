@@ -29,14 +29,15 @@ public abstract class SchemaProcessorTest {
     @Getter
     private static final Supplier<VersionIDGenerator> generator = () -> prefix -> "V1234";
     @Getter
-    private static SchemaRepository schemaRepository;
+    private static Supplier<SchemaRepository> repositorySupplier;
     private static SchemaProcessor schemaProcessor;
 
     abstract SchemaProcessor getSchemaProcessor();
 
     @BeforeEach
     void setup() {
-        schemaRepository = Mockito.mock(SchemaRepository.class);
+        final var repository = Mockito.mock(SchemaRepository.class);
+        repositorySupplier = () -> repository;
         schemaProcessor = getSchemaProcessor();
     }
 

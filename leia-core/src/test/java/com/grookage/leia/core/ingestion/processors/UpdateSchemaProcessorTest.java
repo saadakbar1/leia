@@ -46,9 +46,9 @@ class UpdateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(getSchemaRepository().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
         schemaProcessor.process(schemaContext);
-        Mockito.verify(getSchemaRepository(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
+        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
     }
 
     @Test
@@ -63,7 +63,7 @@ class UpdateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
         schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
-        Mockito.when(getSchemaRepository().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
+        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 
@@ -71,7 +71,7 @@ class UpdateSchemaProcessorTest extends SchemaProcessorTest {
     SchemaProcessor getSchemaProcessor() {
         return UpdateSchemaProcessor.builder()
                 .versionSupplier(getGenerator())
-                .schemaRepository(getSchemaRepository())
+                .repositorySupplier(getRepositorySupplier())
                 .build();
     }
 }

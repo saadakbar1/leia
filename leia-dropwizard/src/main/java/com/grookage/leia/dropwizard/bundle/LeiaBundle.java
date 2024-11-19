@@ -48,17 +48,16 @@ import java.util.function.Supplier;
 public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdater> implements ConfiguredBundle<T> {
 
     private SchemaIngestor<U> schemaIngestor;
-    private SchemaRepository schemaRepository;
+    private Supplier<SchemaRepository> repositorySupplier;
     private SchemaRetriever schemaRetriever;
 
     protected abstract Supplier<SchemaUpdaterResolver<U>> userResolver(T configuration);
 
     protected abstract CacheConfig getCacheConfig(T configuration);
 
-    protected abstract SchemaRepository getSchemaRepository(T configuration);
+    protected abstract Supplier<SchemaRepository> getRepositorySupplier(T configuration);
 
     protected abstract Supplier<VersionIDGenerator> getVersionSupplier();
-
 
     protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
 
@@ -77,16 +76,18 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
         final var permissionResolver = getPermissionResolver(configuration);
         Preconditions.checkNotNull(permissionResolver, "Permission Resolver can't be null");
 
-        this.schemaRepository = getSchemaRepository(configuration);
+        this.repositorySupplier = getRepositorySupplier(configuration);
+        Preconditions.checkNotNull(repositorySupplier, "Schema Repository Supplier can't be null");
+
         final var schemaProcessorHub = SchemaProcessorHub.of()
-                .withSchemaRepository(schemaRepository)
+                .withRepositoryResolver(repositorySupplier)
                 .wtihVersionSupplier(getVersionSupplier())
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)
                 .build();
         final var cacheConfig = getCacheConfig(configuration);
-        this.schemaRetriever = new SchemaRetriever(schemaRepository, cacheConfig);
+        this.schemaRetriever = new SchemaRetriever(repositorySupplier, cacheConfig);
         withLifecycleManagers(configuration)
                 .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
                     @Override

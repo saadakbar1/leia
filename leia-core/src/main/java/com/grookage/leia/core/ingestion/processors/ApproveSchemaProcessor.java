@@ -48,7 +48,7 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
     public void process(SchemaContext context) {
         final var schemaKey = context.getContext(SchemaKey.class)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchema = getSchemaRepository().get(schemaKey).orElse(null);
+        final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
         if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
             log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
                     schemaKey.getNamespace(),
@@ -62,7 +62,7 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
         storedSchema.getSchemaMeta().setUpdatedByEmail(email);
         storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
         storedSchema.setSchemaState(SchemaState.APPROVED);
-        getSchemaRepository().update(storedSchema);
+        getRepositorySupplier().get().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

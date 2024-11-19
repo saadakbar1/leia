@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @NoArgsConstructor
 @Getter
@@ -41,8 +42,8 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
     protected abstract ElasticConfig getElasticConfig(T configuration);
 
     @Override
-    protected SchemaRepository getSchemaRepository(T configuration) {
-        return elasticSchemaRepository;
+    protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
+        return () -> elasticSchemaRepository;
     }
 
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {

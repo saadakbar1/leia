@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC5]
 
-- Introduced a PermissionValidator and introduced suppliers for versionGenerator, SchemaUpdater and PermissionValidator, to facilitate clients implement them via Dependency Injection
+- Introduced a PermissionValidator and introduced suppliers for versionGenerator, SchemaUpdater and PermissionValidator,
+  to facilitate clients implement them via Dependency Injection
 - Removed the unnecessary `LeiaMessages` data-model and converged to a Map Structure
 - A few linting fixes, along the way
 

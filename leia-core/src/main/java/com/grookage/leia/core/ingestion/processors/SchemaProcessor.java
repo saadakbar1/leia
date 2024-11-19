@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public abstract class SchemaProcessor {
 
-    private final SchemaRepository schemaRepository;
+    private final Supplier<SchemaRepository> repositorySupplier;
     private final Supplier<VersionIDGenerator> versionSupplier;
 
     public abstract SchemaEvent name();

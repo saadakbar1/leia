@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 public class SchemaProcessorHub {
 
     private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
-    private SchemaRepository schemaRepository;
+    private Supplier<SchemaRepository> repositorySupplier;
     private Supplier<VersionIDGenerator> versionSupplier;
 
     private SchemaProcessorHub() {
@@ -45,8 +45,8 @@ public class SchemaProcessorHub {
         return new SchemaProcessorHub();
     }
 
-    public SchemaProcessorHub withSchemaRepository(SchemaRepository schemaRepository) {
-        this.schemaRepository = schemaRepository;
+    public SchemaProcessorHub withRepositoryResolver(Supplier<SchemaRepository> repositorySupplier) {
+        this.repositorySupplier = repositorySupplier;
         return this;
     }
 
@@ -56,7 +56,7 @@ public class SchemaProcessorHub {
     }
 
     public SchemaProcessorHub build() {
-        Preconditions.checkNotNull(schemaRepository, "Schema Repository can't be null");
+        Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
         Preconditions.checkNotNull(versionSupplier, "Version ID Generator can't be null");
         Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
         return this;
@@ -67,7 +67,7 @@ public class SchemaProcessorHub {
             @Override
             public SchemaProcessor schemaCreate() {
                 return CreateSchemaProcessor.builder()
-                        .schemaRepository(schemaRepository)
+                        .repositorySupplier(repositorySupplier)
                         .versionSupplier(versionSupplier)
                         .build();
             }
@@ -75,7 +75,7 @@ public class SchemaProcessorHub {
             @Override
             public SchemaProcessor schemaUpdate() {
                 return UpdateSchemaProcessor.builder()
-                        .schemaRepository(schemaRepository)
+                        .repositorySupplier(repositorySupplier)
                         .versionSupplier(versionSupplier)
                         .build();
             }
@@ -83,7 +83,7 @@ public class SchemaProcessorHub {
             @Override
             public SchemaProcessor schemaApprove() {
                 return ApproveSchemaProcessor.builder()
-                        .schemaRepository(schemaRepository)
+                        .repositorySupplier(repositorySupplier)
                         .versionSupplier(versionSupplier)
                         .build();
             }
@@ -91,7 +91,7 @@ public class SchemaProcessorHub {
             @Override
             public SchemaProcessor schemaReject() {
                 return RejectSchemaProcessor.builder()
-                        .schemaRepository(schemaRepository)
+                        .repositorySupplier(repositorySupplier)
                         .versionSupplier(versionSupplier)
                         .build();
             }
