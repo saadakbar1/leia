@@ -2,10 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC5]
+
+- Introduced a PermissionValidator and introduced suppliers for versionGenerator, SchemaUpdater and PermissionValidator,
+  to facilitate clients implement them via Dependency Injection
+- Removed the unnecessary `LeiaMessages` data-model and converged to a Map Structure
+- A few linting fixes, along the way
+
 ## [0.0.1-RC4]
 
 - Periodic Refresh - Added support to enable/disable periodicRefresh. Default value is true
-- Event Multiplexing - Added support for event transformations. Can multiplex one event into multiple events.  
+- Event Multiplexing - Added support for event transformations. Can multiplex one event into multiple events.
 
 ## [0.0.1-RC3]
 

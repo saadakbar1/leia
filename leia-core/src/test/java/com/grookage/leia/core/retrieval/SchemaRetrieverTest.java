@@ -54,7 +54,7 @@ class SchemaRetrieverTest {
     @Test
     @SneakyThrows
     void testGetSchemaDetailsCacheDisabled() {
-        final var retriever = new SchemaRetriever(repository, null);
+        final var retriever = new SchemaRetriever(() -> repository, null);
         Assertions.assertNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
@@ -70,7 +70,7 @@ class SchemaRetrieverTest {
     @SneakyThrows
     void testGetSchemaDetailsCacheEnabled() {
         final var cacheConfig = getCacheConfig();
-        final var retriever = new SchemaRetriever(repository, cacheConfig);
+        final var retriever = new SchemaRetriever(() -> repository, cacheConfig);
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         final var schemaKey = ResourceHelper
@@ -89,7 +89,7 @@ class SchemaRetrieverTest {
     @Test
     @SneakyThrows
     void testGetCurrentSchemasNoCache() {
-        final var retriever = new SchemaRetriever(repository, null);
+        final var retriever = new SchemaRetriever(() -> repository, null);
         Assertions.assertNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
@@ -106,7 +106,7 @@ class SchemaRetrieverTest {
     @Test
     @SneakyThrows
     void testGetCurrentSchemasWithCache() {
-        final var retriever = new SchemaRetriever(repository, getCacheConfig());
+        final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
         Assertions.assertNotNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
@@ -130,7 +130,7 @@ class SchemaRetrieverTest {
     @Test
     @SneakyThrows
     void testGetAllSchemasNoCache() {
-        final var retriever = new SchemaRetriever(repository, null);
+        final var retriever = new SchemaRetriever(() -> repository, null);
         Assertions.assertNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
@@ -151,7 +151,7 @@ class SchemaRetrieverTest {
     @Test
     @SneakyThrows
     void testGetAllSchemasWithCache() {
-        final var retriever = new SchemaRetriever(repository, getCacheConfig());
+        final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
         Assertions.assertNotNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);

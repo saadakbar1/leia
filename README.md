@@ -26,7 +26,7 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 <dependency>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC4</version>
+    <versio>0.0.1-RC5</version>
 </dependency>
 ```
 
@@ -44,14 +44,14 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 
 ### Using the schema registry
 
-#### Build your own dropwizard schema server by using the `LeiaElastic` bundle. 
+#### Build your own dropwizard schema server by using the `LeiaElastic` bundle.
 
 ```
       new LeiaElasticBundle<TestConfiguration, SchemaUpdater>() {
 
              @Override
-             protected SchemaUpdaterResolver<SchemaUpdater> userResolver(TestConfiguration configuration) {
-                 return null;
+             protected Supplier<SchemaUpdaterResolver<SchemaUpdater>> userResolver(TestConfiguration configuration) {
+                 return () -> new DefaultResolver();
              }
 
              @Override
@@ -60,8 +60,8 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
              }
 
              @Override
-             protected VersionIDGenerator getVersionIDGenerator() {
-                 return null;
+             protected Supplier<VersionIDGenerator> getVersionIDGenerator() {
+                 return () -> new DefaultVersionGenerator();
              }
 
              @Override
@@ -71,9 +71,10 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
          }
 
 ```
-  
+
 - **SchemaUpdater** is an RBAC governing class, please extend this SchemaUpdater to implement your own UserProfile
-- **CacheConfig** - If the schema will be always resolved from the dataStore (Elasticsearch) or from the in-memory cache with a refreshInterval to refresh the data
+- **CacheConfig** - If the schema will be always resolved from the dataStore (Elasticsearch) or from the in-memory cache
+  with a refreshInterval to refresh the data
 - **VersionIdGenerator** - Your own version id generator, to generate a unique versionId for every document
 - **ElasticConfig** - Elasticsearch configuration to bring up the schema server
 
@@ -126,7 +127,10 @@ A sample schema looks like the following
 ```
 
 - **AttributeInfo** : There are various type of attributes you can define, please refer to the `SchemaAttribute` class.
-- **TransformationTargets** - Helps in event multiplexing, in the above example, when provided with the namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to be jsonPathRules.
+- **TransformationTargets** - Helps in event multiplexing, in the above example, when provided with the
+  namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production
+  the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to
+  be jsonPathRules.
 
 #### Using the LeiaClientBundle
 

@@ -34,4 +34,6 @@ public class StubbedSchemaUpdater implements SchemaUpdater {
     public String email() {
         return "name@grookage.com";
     }
+
+
 }

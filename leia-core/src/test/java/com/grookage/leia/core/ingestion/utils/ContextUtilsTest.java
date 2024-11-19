@@ -41,6 +41,7 @@ class ContextUtilsTest {
             public String email() {
                 return "email";
             }
+
         });
         Assertions.assertNotNull(ContextUtils.getEmail(schemaContext));
         Assertions.assertNotNull(ContextUtils.getUser(schemaContext));

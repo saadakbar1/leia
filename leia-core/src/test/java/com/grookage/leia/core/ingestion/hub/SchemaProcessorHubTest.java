@@ -35,15 +35,15 @@ class SchemaProcessorHubTest {
             }
         };
         final var hub = SchemaProcessorHub.of()
-                .withSchemaRepository(schemaRepository)
-                .withVersionIDGenerator(generator)
+                .withRepositoryResolver(() -> schemaRepository)
+                .wtihVersionSupplier(() -> generator)
                 .build();
         Assertions.assertNotNull(hub.getProcessor(SchemaEvent.CREATE_SCHEMA).orElse(null));
         Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
-                .withVersionIDGenerator(generator)
+                .wtihVersionSupplier(() -> generator)
                 .build());
         Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
-                .withSchemaRepository(schemaRepository)
+                .withRepositoryResolver(() -> schemaRepository)
                 .build());
     }
 }

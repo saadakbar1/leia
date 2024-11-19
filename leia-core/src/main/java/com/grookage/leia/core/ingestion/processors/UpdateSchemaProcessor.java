@@ -48,7 +48,8 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
     public void process(SchemaContext context) {
         final var updateSchemaRequest = context.getContext(UpdateSchemaRequest.class)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchema = getSchemaRepository()
+        final var storedSchema = getRepositorySupplier()
+                .get()
                 .get(SchemaKey.builder()
                         .version(updateSchemaRequest.getVersion())
                         .schemaName(updateSchemaRequest.getSchemaName())
@@ -73,7 +74,7 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
         if (null != updateSchemaRequest.getTransformationTargets()) {
             storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
         }
-        getSchemaRepository().update(storedSchema);
+        getRepositorySupplier().get().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

@@ -91,10 +91,9 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
 
     @Override
     public boolean valid(SchemaKey schemaKey) {
-        return validationRegistry.computeIfAbsent(schemaKey, key -> {
-            final var klass = getKlass(key).orElse(null);
-            return null == klass ? Boolean.FALSE : validate(key, klass);
-        });
+        return validationRegistry.computeIfAbsent(schemaKey,
+                key -> getKlass(key).map(aClass -> validate(key, aClass))
+                        .orElse(Boolean.FALSE));
     }
 
     @Override

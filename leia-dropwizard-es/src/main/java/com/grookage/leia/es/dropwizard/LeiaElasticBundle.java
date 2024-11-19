@@ -17,21 +17,19 @@
 package com.grookage.leia.es.dropwizard;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.dropwizard.bundle.LeiaBundle;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
-import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
 import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.elastic.repository.ElasticRepository;
 import com.grookage.leia.models.user.SchemaUpdater;
 import com.grookage.leia.repository.SchemaRepository;
-import com.grookage.leia.repository.config.CacheConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @NoArgsConstructor
 @Getter
@@ -44,8 +42,8 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
     protected abstract ElasticConfig getElasticConfig(T configuration);
 
     @Override
-    protected SchemaRepository getSchemaRepository(T configuration) {
-        return elasticSchemaRepository;
+    protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
+        return () -> elasticSchemaRepository;
     }
 
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {

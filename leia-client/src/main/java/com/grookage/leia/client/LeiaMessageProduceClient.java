@@ -17,7 +17,6 @@
 package com.grookage.leia.client;
 
 import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.models.mux.LeiaMessages;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.jayway.jsonpath.DocumentContext;
@@ -33,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -80,18 +80,17 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 Optional.ofNullable(compiledPaths.get(schemaKey).get(attributeName)) : Optional.empty();
     }
 
-    @SneakyThrows
-    public LeiaMessages getMessages(SchemaKey schemaKey, byte[] sourceMessage) {
+    private Map<SchemaKey, LeiaMessage> getMessages(SchemaKey schemaKey, byte[] sourceMessage) {
+        final var messages = new HashMap<SchemaKey, LeiaMessage>();
+        messages.put(schemaKey, LeiaMessage.builder()
+                .schemaKey(schemaKey)
+                .message(sourceMessage)
+                .build()
+        );
         final var sourceSchemaDetails = super.getSchemaDetails()
                 .stream().filter(each -> each.getSchemaKey().equals(schemaKey))
                 .findFirst().orElse(null);
-        final var messages = new LeiaMessages();
-        messages.add(
-                LeiaMessage.builder()
-                        .schemaKey(schemaKey)
-                        .message(sourceMessage)
-                        .build()
-        );
+
         final var transformationTargets = null == sourceSchemaDetails ? null :
                 sourceSchemaDetails.getTransformationTargets();
         if (null == transformationTargets) {
@@ -99,8 +98,15 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         }
         final var documentContext = JsonPath.parse(new String(sourceMessage));
         transformationTargets.forEach(transformationTarget ->
-                createMessage(documentContext, transformationTarget).ifPresent(messages::add));
+                createMessage(documentContext, transformationTarget).ifPresent(message ->
+                        messages.put(message.getSchemaKey(), message)));
         return messages;
+    }
+
+    public void processMessages(final SchemaKey schemaKey,
+                                final byte[] sourceMessage,
+                                final UnaryOperator<Map<SchemaKey, LeiaMessage>> messageHandler) {
+        messageHandler.apply(getMessages(schemaKey, sourceMessage));
     }
 
     @Override

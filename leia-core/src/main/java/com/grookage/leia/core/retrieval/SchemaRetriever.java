@@ -30,25 +30,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
 public class SchemaRetriever {
 
-    private final SchemaRepository schemaRepository;
+    private final Supplier<SchemaRepository> repositorySupplier;
     private final CacheConfig cacheConfig;
     private RepositoryRefresher refresher;
 
     @Builder
-    public SchemaRetriever(final SchemaRepository schemaRepository,
+    public SchemaRetriever(final Supplier<SchemaRepository> repositorySupplier,
                            final CacheConfig cacheConfig) {
-        Preconditions.checkNotNull(schemaRepository, "Schema Repository can't be null");
-        this.schemaRepository = schemaRepository;
+        Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
+        this.repositorySupplier = repositorySupplier;
         this.cacheConfig = cacheConfig;
 
         if (null != cacheConfig && cacheConfig.isEnabled()) {
-            final var supplier = new RepositorySupplier(schemaRepository);
+            final var supplier = new RepositorySupplier(repositorySupplier);
             supplier.start();
             this.refresher = RepositoryRefresher.builder()
                     .supplier(supplier)
@@ -62,7 +63,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getData().getSchemaDetails(schemaKey);
         } else {
-            return schemaRepository.get(schemaKey);
+            return repositorySupplier.get().get(schemaKey);
         }
     }
 
@@ -70,7 +71,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getData().getSchemaDetails(namespaces);
         } else {
-            return schemaRepository.getSchemas(namespaces, Set.of(SchemaState.APPROVED));
+            return repositorySupplier.get().getSchemas(namespaces, Set.of(SchemaState.APPROVED));
         }
     }
 
@@ -78,7 +79,7 @@ public class SchemaRetriever {
         if (null != cacheConfig && cacheConfig.isEnabled()) {
             return this.refresher.getData().getAllSchemaDetails(namespaces);
         } else {
-            return schemaRepository.getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()));
+            return repositorySupplier.get().getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()));
         }
     }
 }

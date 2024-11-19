@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -45,6 +46,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @AllArgsConstructor
+@PermitAll
 public class SchemaResource {
 
     private final SchemaRetriever schemaRetriever;

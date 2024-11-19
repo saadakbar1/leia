@@ -40,7 +40,7 @@ class SchemaUtilsTest {
             }
         };
         final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, "testUser",
-                "testEmail", generator
+                "testEmail", () -> generator
         );
         Assertions.assertNotNull(schemaDetails);
         final var schemaKey = schemaDetails.getSchemaKey();

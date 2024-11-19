@@ -19,6 +19,7 @@ package com.grookage.leia.dropwizard.bundle.resources;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
+import com.grookage.leia.dropwizard.bundle.permissions.PermissionValidator;
 import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
 import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -31,12 +32,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.util.function.Supplier;
 
 @Singleton
 @Getter
@@ -46,10 +49,12 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @AllArgsConstructor
+@PermitAll
 public class IngestionResource<U extends SchemaUpdater> {
 
     private final SchemaIngestor<U> schemaIngestor;
-    private final SchemaUpdaterResolver<U> updaterResolver;
+    private final Supplier<SchemaUpdaterResolver<U>> updaterResolver;
+    private final Supplier<PermissionValidator<U>> permissionValidatorSupplier;
 
     @PUT
     @Timed
@@ -57,7 +62,8 @@ public class IngestionResource<U extends SchemaUpdater> {
     @Path("/add")
     public GenericResponse<SchemaDetails> addSchema(@Context HttpHeaders headers,
                                                     @Valid final CreateSchemaRequest schemaRequest) {
-        final var updater = updaterResolver.resolve(headers);
+        final var updater = updaterResolver.get().resolve(headers);
+        permissionValidatorSupplier.get().validateSchemaCreation(headers, updater, schemaRequest);
         return GenericResponse.<SchemaDetails>builder()
                 .success(true)
                 .data(schemaIngestor.add(updater, schemaRequest))
@@ -70,7 +76,8 @@ public class IngestionResource<U extends SchemaUpdater> {
     @Path("/update")
     public GenericResponse<SchemaDetails> updateSchema(@Context HttpHeaders headers,
                                                        @Valid final UpdateSchemaRequest schemaRequest) {
-        final var updater = updaterResolver.resolve(headers);
+        final var updater = updaterResolver.get().resolve(headers);
+        permissionValidatorSupplier.get().validationSchemaModification(headers, updater, schemaRequest);
         return GenericResponse.<SchemaDetails>builder()
                 .success(true)
                 .data(schemaIngestor.update(updater, schemaRequest))
@@ -83,7 +90,8 @@ public class IngestionResource<U extends SchemaUpdater> {
     @Path("/approve")
     public GenericResponse<SchemaDetails> approveSchema(@Context HttpHeaders headers,
                                                         @Valid final SchemaKey schemaKey) {
-        final var updater = updaterResolver.resolve(headers);
+        final var updater = updaterResolver.get().resolve(headers);
+        permissionValidatorSupplier.get().validateSchemaApproval(headers, updater, schemaKey);
         return GenericResponse.<SchemaDetails>builder()
                 .success(true)
                 .data(schemaIngestor.approve(updater, schemaKey))
@@ -96,7 +104,8 @@ public class IngestionResource<U extends SchemaUpdater> {
     @Path("/reject")
     public GenericResponse<SchemaDetails> rejectSchema(@Context HttpHeaders headers,
                                                        @Valid final SchemaKey schemaKey) {
-        final var updater = updaterResolver.resolve(headers);
+        final var updater = updaterResolver.get().resolve(headers);
+        permissionValidatorSupplier.get().validateSchemaRejection(headers, updater, schemaKey);
         return GenericResponse.<SchemaDetails>builder()
                 .success(true)
                 .data(schemaIngestor.reject(updater, schemaKey))

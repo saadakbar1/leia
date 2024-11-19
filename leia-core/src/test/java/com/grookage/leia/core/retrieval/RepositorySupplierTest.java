@@ -36,7 +36,7 @@ class RepositorySupplierTest {
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         final var repository = Mockito.mock(SchemaRepository.class);
-        final var supplier = new RepositorySupplier(repository);
+        final var supplier = new RepositorySupplier(() -> repository);
         Mockito.when(repository.getSchemas(Set.of(), Set.of()))
                 .thenReturn(List.of(schemaDetails));
         final var registry = supplier.get();

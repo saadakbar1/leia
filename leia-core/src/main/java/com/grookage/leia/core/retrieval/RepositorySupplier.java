@@ -22,11 +22,12 @@ import com.grookage.leia.repository.SchemaRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 public class RepositorySupplier implements LeiaSupplier<SchemaRegistry> {
 
-    private final SchemaRepository schemaRepository;
+    private final Supplier<SchemaRepository> rSupplier;
 
     @Override
     public void start() {
@@ -40,7 +41,7 @@ public class RepositorySupplier implements LeiaSupplier<SchemaRegistry> {
 
     @Override
     public SchemaRegistry get() {
-        final var schemaDetails = schemaRepository.getSchemas(
+        final var schemaDetails = rSupplier.get().getSchemas(
                 Set.of(), Set.of());
         final var registry = new SchemaRegistry();
         schemaDetails.forEach(registry::add);

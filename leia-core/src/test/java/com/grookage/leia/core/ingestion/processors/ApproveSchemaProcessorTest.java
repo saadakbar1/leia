@@ -33,8 +33,8 @@ class ApproveSchemaProcessorTest extends SchemaProcessorTest {
     @Override
     SchemaProcessor getSchemaProcessor() {
         return ApproveSchemaProcessor.builder()
-                .schemaRepository(getSchemaRepository())
-                .versionIDGenerator(getGenerator())
+                .repositorySupplier(getRepositorySupplier())
+                .versionSupplier(getGenerator())
                 .build();
     }
 
@@ -44,7 +44,7 @@ class ApproveSchemaProcessorTest extends SchemaProcessorTest {
         final var schemaContext = new SchemaContext();
         final var schemaProcessor = getSchemaProcessor();
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-        Mockito.when(getSchemaRepository().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
+        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 
@@ -61,7 +61,7 @@ class ApproveSchemaProcessorTest extends SchemaProcessorTest {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         final var schemaProcessor = getSchemaProcessor();
-        Mockito.when(getSchemaRepository().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 
@@ -79,9 +79,9 @@ class ApproveSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
         final var schemaProcessor = getSchemaProcessor();
-        Mockito.when(getSchemaRepository().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
         schemaProcessor.process(schemaContext);
         Assertions.assertEquals(SchemaState.APPROVED, schemaDetails.getSchemaState());
-        Mockito.verify(getSchemaRepository(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
+        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
     }
 }

@@ -49,7 +49,8 @@ public class CreateSchemaProcessor extends SchemaProcessor {
     public void process(SchemaContext context) {
         final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchemas = getSchemaRepository()
+        final var storedSchemas = getRepositorySupplier()
+                .get()
                 .get(createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
         if (!storedSchemas.isEmpty() && storedSchemas.stream()
                 .anyMatch(each -> each.getSchemaState() == SchemaState.CREATED)) {
@@ -59,8 +60,8 @@ public class CreateSchemaProcessor extends SchemaProcessor {
         }
         final var userName = ContextUtils.getUser(context);
         final var email = ContextUtils.getEmail(context);
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, userName, email, getVersionIDGenerator());
-        getSchemaRepository().create(schemaDetails);
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, userName, email, getVersionSupplier());
+        getRepositorySupplier().get().create(schemaDetails);
         context.addContext(SchemaDetails.class.getSimpleName(), schemaDetails);
     }
 }

@@ -24,13 +24,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+import java.util.function.Supplier;
+
 @SuperBuilder
 @Data
 @AllArgsConstructor
 public abstract class SchemaProcessor {
 
-    private final SchemaRepository schemaRepository;
-    private final VersionIDGenerator versionIDGenerator;
+    private final Supplier<SchemaRepository> repositorySupplier;
+    private final Supplier<VersionIDGenerator> versionSupplier;
 
     public abstract SchemaEvent name();
 
