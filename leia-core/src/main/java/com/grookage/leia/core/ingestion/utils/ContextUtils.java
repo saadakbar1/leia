@@ -48,5 +48,4 @@ public class ContextUtils {
         return schemaContext.getValue(EMAIL)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
     }
-
 }

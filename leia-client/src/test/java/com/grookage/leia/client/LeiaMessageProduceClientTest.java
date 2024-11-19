@@ -70,8 +70,10 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        final var messages = schemaClient.getMessages(sourceSchema, mapper.writeValueAsBytes(testSchema));
-        Assertions.assertFalse(messages.getMessages().isEmpty());
-        Assertions.assertEquals(2, messages.getMessages().size());
+        schemaClient.processMessages(sourceSchema, mapper.writeValueAsBytes(testSchema), messages -> {
+            Assertions.assertFalse(messages.isEmpty());
+            Assertions.assertEquals(2, messages.size());
+            return messages;
+        });
     }
 }

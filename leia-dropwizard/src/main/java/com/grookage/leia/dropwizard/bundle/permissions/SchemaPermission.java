@@ -14,25 +14,11 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.mux;
+package com.grookage.leia.dropwizard.bundle.permissions;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public enum SchemaPermission {
 
-import java.util.ArrayList;
-import java.util.List;
+    S_WRITE,
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class LeiaMessages {
-
-    private List<LeiaMessage> messages = new ArrayList<>();
-
-    public void add(LeiaMessage leiaMessage) {
-        messages.add(leiaMessage);
-    }
+    S_ADMIN
 }

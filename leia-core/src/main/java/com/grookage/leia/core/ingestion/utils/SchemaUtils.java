@@ -24,18 +24,20 @@ import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
 
+import java.util.function.Supplier;
+
 @UtilityClass
 public class SchemaUtils {
 
     public SchemaDetails toSchemaDetails(final CreateSchemaRequest createSchemaRequest,
                                          final String userName,
                                          final String email,
-                                         final VersionIDGenerator versionIDGenerator) {
+                                         final Supplier<VersionIDGenerator> versionSupplier) {
         return SchemaDetails.builder()
                 .schemaKey(SchemaKey.builder()
                         .namespace(createSchemaRequest.getNamespace())
                         .schemaName(createSchemaRequest.getSchemaName())
-                        .version(versionIDGenerator.generateVersionId("V"))
+                        .version(versionSupplier.get().generateVersionId("V"))
                         .build()
                 )
                 .schemaState(SchemaState.CREATED)

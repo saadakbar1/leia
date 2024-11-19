@@ -52,7 +52,11 @@ public class TimeBasedDataProvider<T> implements DataProvider<T> {
         this(dataSupplier, initialDefaultValue, delay, timeUnit, (t1, t2) -> true, periodicRefresh);
     }
 
-    public TimeBasedDataProvider(Supplier<T> dataSupplier, T initialDefaultValue, int delay, TimeUnit timeUnit, BiFunction<T, T, Boolean> shouldUpdate,
+    public TimeBasedDataProvider(Supplier<T> dataSupplier,
+                                 T initialDefaultValue,
+                                 int delay,
+                                 TimeUnit timeUnit,
+                                 BiFunction<T, T, Boolean> shouldUpdate,
                                  boolean periodicRefresh) {
         this.dataSupplier = dataSupplier;
         this.initialDefaultValue = initialDefaultValue;

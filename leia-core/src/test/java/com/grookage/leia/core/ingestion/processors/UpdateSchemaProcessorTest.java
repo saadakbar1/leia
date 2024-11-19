@@ -70,7 +70,7 @@ class UpdateSchemaProcessorTest extends SchemaProcessorTest {
     @Override
     SchemaProcessor getSchemaProcessor() {
         return UpdateSchemaProcessor.builder()
-                .versionIDGenerator(getGenerator())
+                .versionSupplier(getGenerator())
                 .schemaRepository(getSchemaRepository())
                 .build();
     }

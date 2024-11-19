@@ -33,7 +33,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
     @Override
     SchemaProcessor getSchemaProcessor() {
         return CreateSchemaProcessor.builder()
-                .versionIDGenerator(getGenerator())
+                .versionSupplier(getGenerator())
                 .schemaRepository(getSchemaRepository())
                 .build();
     }

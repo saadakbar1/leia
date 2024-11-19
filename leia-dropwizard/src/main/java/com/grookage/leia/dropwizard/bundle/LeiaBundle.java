@@ -25,6 +25,7 @@ import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
 import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaExceptionMapper;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaRefresherMapper;
+import com.grookage.leia.dropwizard.bundle.permissions.PermissionValidator;
 import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
 import com.grookage.leia.dropwizard.bundle.resources.IngestionResource;
 import com.grookage.leia.dropwizard.bundle.resources.SchemaResource;
@@ -40,6 +41,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @NoArgsConstructor
 @Getter
@@ -49,13 +51,16 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     private SchemaRepository schemaRepository;
     private SchemaRetriever schemaRetriever;
 
-    protected abstract SchemaUpdaterResolver<U> userResolver(T configuration);
+    protected abstract Supplier<SchemaUpdaterResolver<U>> userResolver(T configuration);
 
     protected abstract CacheConfig getCacheConfig(T configuration);
 
     protected abstract SchemaRepository getSchemaRepository(T configuration);
 
-    protected abstract VersionIDGenerator getVersionIDGenerator();
+    protected abstract Supplier<VersionIDGenerator> getVersionSupplier();
+
+
+    protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
 
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
         return List.of();
@@ -69,10 +74,13 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     public void run(T configuration, Environment environment) {
         final var userResolver = userResolver(configuration);
         Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
+        final var permissionResolver = getPermissionResolver(configuration);
+        Preconditions.checkNotNull(permissionResolver, "Permission Resolver can't be null");
+
         this.schemaRepository = getSchemaRepository(configuration);
         final var schemaProcessorHub = SchemaProcessorHub.of()
                 .withSchemaRepository(schemaRepository)
-                .withVersionIDGenerator(getVersionIDGenerator())
+                .wtihVersionSupplier(getVersionSupplier())
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)
@@ -93,7 +101,7 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
                 }));
         withHealthChecks(configuration)
                 .forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
-        environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver));
+        environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver, permissionResolver));
         environment.jersey().register(new SchemaResource(schemaRetriever));
         environment.jersey().register(new LeiaExceptionMapper());
         environment.jersey().register(new LeiaRefresherMapper());

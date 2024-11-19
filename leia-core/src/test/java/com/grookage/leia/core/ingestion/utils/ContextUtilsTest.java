@@ -41,6 +41,11 @@ class ContextUtilsTest {
             public String email() {
                 return "email";
             }
+
+            @Override
+            public String namespace() {
+                return "namespace";
+            }
         });
         Assertions.assertNotNull(ContextUtils.getEmail(schemaContext));
         Assertions.assertNotNull(ContextUtils.getUser(schemaContext));

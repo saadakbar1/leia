@@ -23,4 +23,6 @@ public interface SchemaUpdater {
 
     String email();
 
+    String namespace();
+
 }

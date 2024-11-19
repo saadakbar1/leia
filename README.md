@@ -44,7 +44,7 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 
 ### Using the schema registry
 
-#### Build your own dropwizard schema server by using the `LeiaElastic` bundle. 
+#### Build your own dropwizard schema server by using the `LeiaElastic` bundle.
 
 ```
       new LeiaElasticBundle<TestConfiguration, SchemaUpdater>() {
@@ -71,9 +71,10 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
          }
 
 ```
-  
+
 - **SchemaUpdater** is an RBAC governing class, please extend this SchemaUpdater to implement your own UserProfile
-- **CacheConfig** - If the schema will be always resolved from the dataStore (Elasticsearch) or from the in-memory cache with a refreshInterval to refresh the data
+- **CacheConfig** - If the schema will be always resolved from the dataStore (Elasticsearch) or from the in-memory cache
+  with a refreshInterval to refresh the data
 - **VersionIdGenerator** - Your own version id generator, to generate a unique versionId for every document
 - **ElasticConfig** - Elasticsearch configuration to bring up the schema server
 
@@ -126,7 +127,10 @@ A sample schema looks like the following
 ```
 
 - **AttributeInfo** : There are various type of attributes you can define, please refer to the `SchemaAttribute` class.
-- **TransformationTargets** - Helps in event multiplexing, in the above example, when provided with the namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to be jsonPathRules.
+- **TransformationTargets** - Helps in event multiplexing, in the above example, when provided with the
+  namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production
+  the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to
+  be jsonPathRules.
 
 #### Using the LeiaClientBundle
 

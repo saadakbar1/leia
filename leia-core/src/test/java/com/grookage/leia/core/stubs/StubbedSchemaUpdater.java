@@ -34,4 +34,10 @@ public class StubbedSchemaUpdater implements SchemaUpdater {
     public String email() {
         return "name@grookage.com";
     }
+
+    @Override
+    public String namespace() {
+        return "grookage";
+    }
+
 }

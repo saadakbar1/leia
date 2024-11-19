@@ -24,6 +24,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Supplier;
+
 class SchemaUtilsTest {
 
     @Test
@@ -40,7 +42,7 @@ class SchemaUtilsTest {
             }
         };
         final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, "testUser",
-                "testEmail", generator
+                "testEmail", () -> generator
         );
         Assertions.assertNotNull(schemaDetails);
         final var schemaKey = schemaDetails.getSchemaKey();
