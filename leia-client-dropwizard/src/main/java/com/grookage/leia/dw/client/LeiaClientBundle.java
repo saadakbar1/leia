@@ -30,6 +30,7 @@ import io.dropwizard.setup.Environment;
 import lombok.Getter;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Getter
 public abstract class LeiaClientBundle<T extends Configuration> implements ConfiguredBundle<T> {
@@ -52,6 +53,10 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract Set<String> getPackageRoots(T configuration);
 
+    protected Supplier<String> getAuthHeaderSupplier(T configuration) {
+        return () -> null;
+    }
+
     protected LeiaSchemaValidator getSchemaValidator(T configuration,
                                                      LeiaClientRefresher clientRefresher) {
         return StaticSchemaValidator.builder()
@@ -72,10 +77,13 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
 
         final var clientRefresher = LeiaClientRefresher.builder()
-                .supplier(LeiaClientSupplier.builder()
-                        .httpConfiguration(httpConfiguration)
-                        .namespaceDataSource(namespaceDataSource)
-                        .build())
+                .supplier(
+                        LeiaClientSupplier.builder()
+                                .httpConfiguration(httpConfiguration)
+                                .namespaceDataSource(namespaceDataSource)
+                                .authHeaderSupplier(getAuthHeaderSupplier(configuration))
+                                .build()
+                )
                 .refreshTimeInSeconds(dataRefreshSeconds)
                 .periodicRefresh(refreshEnabled(configuration))
                 .build();
