@@ -16,6 +16,8 @@
 
 package com.grookage.leia.client.refresher;
 
+import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.models.request.NamespaceRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -29,17 +31,22 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @SuppressWarnings({"deprecation", "KotlinInternalInJava"})
 @Getter
 public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
     private final NamespaceDataSource namespaceDataSource;
+    private final Supplier<String> authHeaderSupplier;
 
     @Builder
-    public LeiaClientSupplier(LeiaHttpConfiguration httpConfiguration, NamespaceDataSource namespaceDataSource) {
+    public LeiaClientSupplier(LeiaHttpConfiguration httpConfiguration,
+                              NamespaceDataSource namespaceDataSource,
+                              Supplier<String> authHeaderSupplier) {
         super(httpConfiguration, LeiaClientMarshaller.getInstance(), "getClientNamespaces");
         this.namespaceDataSource = namespaceDataSource;
+        this.authHeaderSupplier = authHeaderSupplier;
     }
 
     @Override
@@ -55,9 +62,13 @@ public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
                 MapperUtils.mapper().writeValueAsString(NamespaceRequest.builder()
                         .namespaces(namespaceDataSource.getNamespaces())
                         .build()));
-        return new Request.Builder()
+        final var requestBuilder = new Request.Builder()
                 .url(endPoint(url))
-                .post(requestBody)
-                .build();
+                .post(requestBody);
+        final var suppliedHeader = authHeaderSupplier.get();
+        if (!Strings.isNullOrEmpty(suppliedHeader)) {
+            requestBuilder.addHeader(HttpHeaders.AUTHORIZATION, suppliedHeader);
+        }
+        return requestBuilder.build();
     }
 }

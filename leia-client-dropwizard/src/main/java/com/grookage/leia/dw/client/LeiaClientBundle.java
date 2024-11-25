@@ -70,6 +70,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
         final var withProducerClient = withProducerClient(configuration);
         final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
+
         final var clientRefresher = LeiaClientRefresher.builder()
                 .supplier(LeiaClientSupplier.builder()
                         .httpConfiguration(httpConfiguration)

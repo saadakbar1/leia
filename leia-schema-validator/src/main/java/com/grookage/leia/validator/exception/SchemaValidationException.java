@@ -17,10 +17,12 @@
 package com.grookage.leia.validator.exception;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class SchemaValidationException extends RuntimeException {
 
     private final int status;
