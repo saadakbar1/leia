@@ -21,6 +21,7 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch.core.GetRequest;
@@ -141,11 +142,11 @@ public class ElasticRepository extends AbstractSchemaRepository {
     public List<SchemaDetails> getSchemas(final Set<String> namespaces,
                                           final Set<SchemaState> schemaStates) {
         final var namespaceQuery = namespaces.isEmpty() ?
-                TermsQuery.of(q -> q)._toQuery() :
+                MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
                 ))._toQuery();
         final var stateQuery = schemaStates.isEmpty() ?
-                TermsQuery.of(q -> q)._toQuery() :
+                MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(SCHEMA_STATE)
                         .terms(t -> t.value(getNormalizedValues(schemaStates.stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
         final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, stateQuery)))._toQuery();
