@@ -26,6 +26,7 @@ import com.grookage.leia.validator.LeiaSchemaValidator;
 import com.grookage.leia.validator.StaticSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
 
@@ -70,6 +71,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
         final var withProducerClient = withProducerClient(configuration);
         final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
+
         final var clientRefresher = LeiaClientRefresher.builder()
                 .supplier(LeiaClientSupplier.builder()
                         .httpConfiguration(httpConfiguration)
