@@ -19,6 +19,7 @@ package com.grookage.leia.models.qualifiers;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.grookage.leia.models.qualifiers.annotations.Qualifier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,5 +38,23 @@ import lombok.NoArgsConstructor;
 public abstract class QualifierInfo {
 
     private QualifierType type;
+
+    public static QualifierInfo toQualifierInfo(Qualifier qualifier) {
+        if (qualifier == null) {
+            return new StandardQualifier();
+        }
+
+        final var type = qualifier.type();
+        final var ttlInSecs = qualifier.ttlSeconds();
+        if (type == QualifierType.SHORT_LIVED) {
+            return new ShortLivedQualifier(ttlInSecs);
+        } else if (type == QualifierType.PII) {
+            return new PIIQualifier();
+        } else if (type == QualifierType.ENCRYPTED) {
+            return new EncryptedQualifier();
+        } else {
+            return new StandardQualifier();
+        }
+    }
 
 }

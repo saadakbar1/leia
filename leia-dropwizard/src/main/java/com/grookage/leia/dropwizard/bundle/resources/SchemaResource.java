@@ -18,7 +18,11 @@ package com.grookage.leia.dropwizard.bundle.resources;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.grookage.leia.core.exception.LeiaErrorCode;
+import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
+import com.grookage.leia.core.utils.ValidationUtils;
 import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.request.NamespaceRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -76,6 +80,26 @@ public class SchemaResource {
     @Path("/details/all")
     public List<SchemaDetails> getAllSchemaDetails(@Valid final NamespaceRequest namespaceRequest) {
         return schemaRetriever.getAllSchemaDetails(namespaceRequest.getNamespaces());
+    }
+
+    @POST
+    @Timed
+    @ExceptionMetered
+    @Path("/details/validate")
+    public GenericResponse<List<String>> validateSchema(@Valid SchemaKey schemaKey,
+                                                        @Valid JsonNode jsonNode) {
+        final var schemaDetails = schemaRetriever.getSchemaDetails(schemaKey)
+                .orElseThrow(() -> LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND));
+        final var validationErrors = ValidationUtils.validate(jsonNode, schemaDetails.getValidationType(), schemaDetails.getAttributes());
+        if (validationErrors.isEmpty()) {
+            return GenericResponse.<List<String>>builder()
+                    .success(true)
+                    .build();
+        }
+        return GenericResponse.<List<String>>builder()
+                .data(validationErrors)
+                .build();
+
     }
 
 }

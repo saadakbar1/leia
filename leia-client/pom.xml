@@ -29,6 +29,7 @@
     <artifactId>leia-client</artifactId>
 
     <properties>
+        <lang3.version>3.11</lang3.version>
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
@@ -51,6 +52,12 @@
         <dependency>
             <artifactId>lombok</artifactId>
             <groupId>org.projectlombok</groupId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${lang3.version}</version>
         </dependency>
 
         <dependency>

@@ -23,6 +23,7 @@ import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.validator.exception.ValidationErrorCode;
 import com.grookage.leia.validator.utils.SchemaValidationUtils;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.ClassUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -227,5 +228,13 @@ class SchemaValidationUtilsTest {
 
     static class GenericArrayTestClass {
         List<String>[] arrayAttribute;
+    }
+
+    @Test
+    void testIsAssignableFrom() {
+        Class<?> primitive = long.class;
+        final var dataType = DataType.LONG;
+        Assertions.assertTrue(primitive.isPrimitive());
+        Assertions.assertTrue(ClassUtils.isAssignable(primitive, dataType.getAssignableClass()));
     }
 }

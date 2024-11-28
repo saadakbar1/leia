@@ -33,6 +33,7 @@
         <maven.deploy.skip>false</maven.deploy.skip>
         <reflections.version>0.9.9</reflections.version>
         <guice.inject.version>7.0.0</guice.inject.version>
+        <lang3.version>3.11</lang3.version>
     </properties>
 
     <dependencies>
@@ -45,6 +46,11 @@
             <artifactId>reflections</artifactId>
             <groupId>org.reflections</groupId>
             <version>${reflections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${lang3.version}</version>
         </dependency>
 
         <dependency>
