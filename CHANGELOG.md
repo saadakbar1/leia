@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.1-RC7]
+
+- LeiaClient - SchemaUtil to add support for building SchemaAttributes from the Schema class
+- LeiaCore - Added API support to validate schema payload against the SchemaDetails of a specified key
+
 ## [0.0.1-RC6]
 
 - LeiaClient - Introduced AuthHeaderSupplier in LeiaClientSupplier to support authentication on leia-server

@@ -26,7 +26,7 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 <dependency>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC6</version>
+    <versio>0.0.1-RC7</version>
 </dependency>
 ```
 
