@@ -1,4 +1,4 @@
-package com.grookage.leia.core.utils;
+package com.grookage.leia.common.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.models.attributes.ArrayAttribute;
@@ -61,7 +61,7 @@ public class ValidationUtils {
                 validateField(jsonNode, attribute, validationType, validationErrors);
                 continue;
             }
-            JsonNode fieldNode = jsonNode.get(fieldName);
+            final var fieldNode = jsonNode.get(fieldName);
             validateField(fieldNode, attribute, validationType, validationErrors);
         }
 
@@ -101,7 +101,7 @@ public class ValidationUtils {
                                       SchemaValidationType schemaValidationType,
                                       List<String> validationErrors) {
         fieldNode.fields().forEachRemaining(entry -> {
-            JsonNode keyNode = entry.getKey() != null
+            final var keyNode = entry.getKey() != null
                     ? MapperUtils.mapper().convertValue(entry.getKey(), JsonNode.class)
                     : null;
             if (!Objects.isNull(keyNode)) {

@@ -1,4 +1,4 @@
-package com.grookage.leia.models.annotations.qualifiers;
+package com.grookage.leia.models.annotations.attribute.qualifiers;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Encrypted {
+public @interface ShortLived {
+    long ttlSeconds();
 }

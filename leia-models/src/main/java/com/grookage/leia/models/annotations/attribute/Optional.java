@@ -1,4 +1,4 @@
-package com.grookage.leia.models.annotations;
+package com.grookage.leia.models.annotations.attribute;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,21 +1,34 @@
 package com.grookage.leia.common.utils;
 
-import com.grookage.leia.models.annotations.qualifiers.Encrypted;
-import com.grookage.leia.models.annotations.qualifiers.PII;
-import com.grookage.leia.models.annotations.qualifiers.ShortLived;
+import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
+import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
+import com.grookage.leia.models.annotations.attribute.qualifiers.ShortLived;
 import com.grookage.leia.models.qualifiers.EncryptedQualifier;
 import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
+import com.grookage.leia.models.qualifiers.QualifierType;
 import com.grookage.leia.models.qualifiers.ShortLivedQualifier;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @UtilityClass
 public class QualifierUtils {
+    public Optional<QualifierInfo> filter(final Set<QualifierInfo> qualifiers,
+                                          final QualifierType type) {
+        if (Objects.isNull(qualifiers)) {
+            return Optional.empty();
+        }
+        return qualifiers.stream()
+                .filter(qualifierInfo -> qualifierInfo.getType().equals(type))
+                .findFirst();
+    }
+
     public Set<QualifierInfo> getQualifierInfo(Type type) {
         if (type instanceof Class<?> klass) {
             return getQualifierInfo(klass);

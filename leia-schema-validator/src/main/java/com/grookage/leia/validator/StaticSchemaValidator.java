@@ -19,9 +19,9 @@ package com.grookage.leia.validator;
 import com.grookage.leia.common.exception.SchemaValidationException;
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.common.validation.SchemaValidationUtils;
+import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.validator.annotations.SchemaValidatable;
 import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -64,12 +64,12 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
         log.info("Starting the schema validator");
         packageRoots.forEach(handlerPackage -> {
             final var reflections = new Reflections(handlerPackage);
-            final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaValidatable.class);
+            final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaDefinition.class);
             annotatedClasses.forEach(annotatedClass -> {
-                final var annotation = annotatedClass.getAnnotation(SchemaValidatable.class);
+                final var annotation = annotatedClass.getAnnotation(SchemaDefinition.class);
                 final var schemaKey = SchemaKey.builder()
-                        .schemaName(annotation.schemaName())
-                        .version(annotation.versionId())
+                        .schemaName(annotation.name())
+                        .version(annotation.version())
                         .namespace(annotation.namespace())
                         .build();
                 klassRegistry.putIfAbsent(schemaKey, annotatedClass);

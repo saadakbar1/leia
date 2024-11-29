@@ -61,7 +61,8 @@ public class SchemaValidationUtils {
     }
 
     public boolean valid(final SchemaValidationType validationType,
-                         Set<SchemaAttribute> attributes, final Class<?> klass) {
+                         final Set<SchemaAttribute> attributes,
+                         final Class<?> klass) {
 
         final var fields = Utils.getAllFields(klass);
         if (!validSchema(validationType, attributes, fields)) {
@@ -71,8 +72,9 @@ public class SchemaValidationUtils {
                 each -> validAttribute(each, fields, validationType));
     }
 
-    private boolean validSchema(SchemaValidationType validationType, Set<SchemaAttribute> attributes,
-                                List<Field> fields) {
+    private boolean validSchema(final SchemaValidationType validationType,
+                                final Set<SchemaAttribute> attributes,
+                                final List<Field> fields) {
         final var fieldNames = fields.stream()
                 .map(Field::getName)
                 .map(String::toUpperCase)
@@ -108,7 +110,8 @@ public class SchemaValidationUtils {
     }
 
     private boolean validAttribute(final SchemaAttribute attribute,
-                                   List<Field> fields, SchemaValidationType validationType) {
+                                   final List<Field> fields,
+                                   final SchemaValidationType validationType) {
         final var field = fields.stream()
                 .filter(each -> each.getName().equals(attribute.getName()))
                 .findFirst().orElse(null);
@@ -116,7 +119,8 @@ public class SchemaValidationUtils {
     }
 
     public boolean valid(final SchemaValidationType validationType,
-                         SchemaAttribute attribute, final Type type) {
+                         final SchemaAttribute attribute,
+                         final Type type) {
         if (type instanceof Class<?> klass) {
             return valid(validationType, attribute, klass);
         } else if (type instanceof ParameterizedType parameterizedType) {
@@ -129,7 +133,8 @@ public class SchemaValidationUtils {
     }
 
     private boolean valid(final SchemaValidationType validationType,
-                          SchemaAttribute attribute, final Class<?> klass) {
+                          final SchemaAttribute attribute,
+                          final Class<?> klass) {
         return attribute.accept(new SchemaAttributeHandler<>(
                 assignableCheckFunction.apply(klass)) {
             @Override
@@ -156,7 +161,8 @@ public class SchemaValidationUtils {
     }
 
     private boolean valid(final SchemaValidationType validationType,
-                          SchemaAttribute attribute, final ParameterizedType parameterizedType) {
+                          final SchemaAttribute attribute,
+                          final ParameterizedType parameterizedType) {
         return attribute.accept(new SchemaAttributeHandler<>(throwException) {
             @Override
             public Boolean accept(ArrayAttribute attribute) {
@@ -177,7 +183,7 @@ public class SchemaValidationUtils {
                     return true;
                 }
                 final var rawType = (Class<?>) parameterizedType.getRawType();
-                if (!attribute.getType().getAssignableClass().isAssignableFrom(rawType)) {
+                if (!ClassUtils.isAssignable(rawType, attribute.getType().getAssignableClass())) {
                     return false;
                 }
                 final var typeArguments = Utils.getTypeArguments(parameterizedType);
@@ -188,7 +194,8 @@ public class SchemaValidationUtils {
     }
 
     private boolean valid(final SchemaValidationType validationType,
-                          SchemaAttribute attribute, final GenericArrayType arrayType) {
+                          final SchemaAttribute attribute,
+                          final GenericArrayType arrayType) {
         return attribute.accept(new SchemaAttributeHandler<>(throwException) {
             @Override
             public Boolean accept(final ArrayAttribute attribute) {
@@ -197,7 +204,8 @@ public class SchemaValidationUtils {
         });
     }
 
-    public boolean valid(Class<?> klass, SchemaAttribute schemaAttribute) {
+    public boolean valid(final Class<?> klass,
+                         final SchemaAttribute schemaAttribute) {
         return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
         });
     }
