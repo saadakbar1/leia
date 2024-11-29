@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator.exception;
+package com.grookage.leia.common.exception;
 
 import lombok.Getter;
 

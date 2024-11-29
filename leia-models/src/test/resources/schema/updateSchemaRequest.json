@@ -9,9 +9,11 @@
       "type": "ARRAY",
       "name": "testAttribute",
       "optional": true,
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     },
     {
       "type": "ENUM",
@@ -20,9 +22,11 @@
       "values": [
         "TEST_ENUM"
       ],
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     }
   ]
 }

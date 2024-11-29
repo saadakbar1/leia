@@ -16,12 +16,12 @@
 
 package com.grookage.leia.validator;
 
+import com.grookage.leia.common.exception.SchemaValidationException;
+import com.grookage.leia.common.exception.ValidationErrorCode;
+import com.grookage.leia.common.validation.SchemaValidationUtils;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.annotations.SchemaValidatable;
-import com.grookage.leia.validator.exception.SchemaValidationException;
-import com.grookage.leia.validator.exception.ValidationErrorCode;
-import com.grookage.leia.validator.utils.SchemaValidationUtils;
 import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

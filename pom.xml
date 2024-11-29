@@ -31,6 +31,7 @@
         <module>leia-parent</module>
         <module>leia-core</module>
         <module>leia-models</module>
+        <module>leia-common</module>
         <module>leia-dropwizard</module>
         <module>leia-repository</module>
         <module>leia-elastic</module>

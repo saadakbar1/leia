@@ -1,4 +1,4 @@
-package com.grookage.leia.client.utils;
+package com.grookage.leia.common.builder;
 
 import com.grookage.leia.models.annotations.Optional;
 import com.grookage.leia.models.annotations.qualifiers.Encrypted;
@@ -16,6 +16,8 @@ import com.grookage.leia.models.attributes.ObjectAttribute;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
 import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.qualifiers.EncryptedQualifier;
+import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.qualifiers.QualifierType;
 import com.grookage.leia.models.qualifiers.ShortLivedQualifier;
@@ -29,89 +31,89 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-class SchemaUtilTest {
+class SchemaBuilderTest {
 
     @Test
     void testSchemaAttributes_WithPrimitiveClass() {
-        final var schemaAttributeSet = SchemaUtil.buildSchemaAttributes(TestWithPrimitive.class);
+        final var schemaAttributeSet = SchemaBuilder.buildSchemaAttributes(TestWithPrimitive.class);
         Assertions.assertNotNull(schemaAttributeSet);
         Assertions.assertEquals(2, schemaAttributeSet.size());
         final var nameAttribute = new StringAttribute("name", true, new HashSet<>());
-        equals(nameAttribute, filter(schemaAttributeSet, "name").orElse(null));
+        assertEquals(nameAttribute, filter(schemaAttributeSet, "name").orElse(null));
         final var idAttribute = new IntegerAttribute("id", false, new HashSet<>());
-        equals(idAttribute, filter(schemaAttributeSet, "id").orElse(null));
+        assertEquals(idAttribute, filter(schemaAttributeSet, "id").orElse(null));
     }
 
     @Test
     void testSchemaAttributes_WithRecordClass() {
-        final var schemaAttributeSet = SchemaUtil.buildSchemaAttributes(TestRecord.class);
+        final var schemaAttributeSet = SchemaBuilder.buildSchemaAttributes(TestRecord.class);
         Assertions.assertNotNull(schemaAttributeSet);
         Assertions.assertEquals(2, schemaAttributeSet.size());
-        final var nameAttribute = new StringAttribute("name", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()));
-        equals(nameAttribute, filter(schemaAttributeSet, "name").orElse(null));
+        final var nameAttribute = new StringAttribute("name", false, Set.of(new PIIQualifier()));
+        assertEquals(nameAttribute, filter(schemaAttributeSet, "name").orElse(null));
         final var idAttribute = new IntegerAttribute("id", true, new HashSet<>());
-        equals(idAttribute, filter(schemaAttributeSet, "id").orElse(null));
+        assertEquals(idAttribute, filter(schemaAttributeSet, "id").orElse(null));
     }
 
     @Test
     void testSchemaAttributes_WithNestedObject() {
-        final var schemaAttributes = SchemaUtil.buildSchemaAttributes(TestWithNested.class);
+        final var schemaAttributes = SchemaBuilder.buildSchemaAttributes(TestWithNested.class);
         Assertions.assertFalse(schemaAttributes.isEmpty());
         Assertions.assertEquals(6, schemaAttributes.size());
         final var nameAttribute = new StringAttribute("name", false, new HashSet<>());
-        equals(nameAttribute, filter(schemaAttributes, "name").orElse(null));
+        assertEquals(nameAttribute, filter(schemaAttributes, "name").orElse(null));
 
         final var idAttribute = new IntegerAttribute("id", false, new HashSet<>());
-        equals(idAttribute, filter(schemaAttributes, "id").orElse(null));
+        assertEquals(idAttribute, filter(schemaAttributes, "id").orElse(null));
 
         final var testPIIDataAttributes = new HashSet<SchemaAttribute>();
         final var piiNameAttribute = new StringAttribute("name", false, new HashSet<>());
-        final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new com.grookage.leia.models.qualifiers.EncryptedQualifier()));
+        final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new EncryptedQualifier()));
         testPIIDataAttributes.add(piiNameAttribute);
         testPIIDataAttributes.add(accountNumberAttribute);
-        final var piiDataAttribute = new ObjectAttribute("piiData", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()), testPIIDataAttributes);
-        equals(piiDataAttribute, filter(schemaAttributes, "piiData").orElse(null));
+        final var piiDataAttribute = new ObjectAttribute("piiData", false, Set.of(new PIIQualifier(), new EncryptedQualifier()), testPIIDataAttributes);
+        assertEquals(piiDataAttribute, filter(schemaAttributes, "piiData").orElse(null));
 
         final var testRecordAttributes = new HashSet<SchemaAttribute>();
-        final var recordNameAttribute = new StringAttribute("name", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()));
+        final var recordNameAttribute = new StringAttribute("name", false, Set.of(new PIIQualifier()));
         final var recordIdAttribute = new IntegerAttribute("id", true, new HashSet<>());
         testRecordAttributes.add(recordNameAttribute);
         testRecordAttributes.add(recordIdAttribute);
-        final var testRecordAttribute = new ObjectAttribute("testRecord", false, Set.of(new com.grookage.leia.models.qualifiers.EncryptedQualifier()),
+        final var testRecordAttribute = new ObjectAttribute("testRecord", false, Set.of(new EncryptedQualifier()),
                 testRecordAttributes);
-        equals(testRecordAttribute, filter(schemaAttributes, "testRecord").orElse(null));
+        assertEquals(testRecordAttribute, filter(schemaAttributes, "testRecord").orElse(null));
 
         final var enumClassAttribute = new EnumAttribute("enumClass", false, new HashSet<>(), Set.of(EnumClass.ONE.name(),
                 EnumClass.TWO.name()));
-        equals(enumClassAttribute, filter(schemaAttributes, "enumClass").orElse(null));
+        assertEquals(enumClassAttribute, filter(schemaAttributes, "enumClass").orElse(null));
 
-        final var phoneNoAttribute = new StringAttribute("phoneNumber", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()));
-        equals(phoneNoAttribute, filter(schemaAttributes, "phoneNumber").orElse(null));
+        final var phoneNoAttribute = new StringAttribute("phoneNumber", false, Set.of(new PIIQualifier()));
+        assertEquals(phoneNoAttribute, filter(schemaAttributes, "phoneNumber").orElse(null));
     }
 
     @Test
     void testSchemaAttributes_WithParameterizedType() {
-        final var schemaAttributes = SchemaUtil.buildSchemaAttributes(TestWithParameterized.class);
+        final var schemaAttributes = SchemaBuilder.buildSchemaAttributes(TestWithParameterized.class);
         Assertions.assertNotNull(schemaAttributes);
         Assertions.assertEquals(3, schemaAttributes.size());
 
         final var valuesAttributes = new ArrayAttribute("values", false, new HashSet<>(),
                 new StringAttribute("element", false, new HashSet<>()));
-        equals(valuesAttributes, filter(schemaAttributes, "values").orElse(null));
+        assertEquals(valuesAttributes, filter(schemaAttributes, "values").orElse(null));
 
         final var testPIIDataAttributes = new HashSet<SchemaAttribute>();
         final var piiNameAttribute = new StringAttribute("name", false, new HashSet<>());
-        final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new com.grookage.leia.models.qualifiers.EncryptedQualifier()));
+        final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new EncryptedQualifier()));
         testPIIDataAttributes.add(piiNameAttribute);
         testPIIDataAttributes.add(accountNumberAttribute);
-        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()),
-                new ObjectAttribute("element", false, Set.of(new com.grookage.leia.models.qualifiers.PIIQualifier()), testPIIDataAttributes));
-        equals(piiDataListAttribute, filter(schemaAttributes, "piiDataList").orElse(null));
+        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(new PIIQualifier()),
+                new ObjectAttribute("element", false, Set.of(new PIIQualifier()), testPIIDataAttributes));
+        assertEquals(piiDataListAttribute, filter(schemaAttributes, "piiDataList").orElse(null));
 
-        final var mapAttribute = new MapAttribute("map", false, Set.of(new com.grookage.leia.models.qualifiers.EncryptedQualifier()),
+        final var mapAttribute = new MapAttribute("map", false, Set.of(new EncryptedQualifier()),
                 new EnumAttribute("key", false, new HashSet<>(), Set.of(EnumClass.ONE.name(), EnumClass.TWO.name())),
                 new StringAttribute("value", false, new HashSet<>()));
-        equals(mapAttribute, filter(schemaAttributes, "map").orElse(null));
+        assertEquals(mapAttribute, filter(schemaAttributes, "map").orElse(null));
     }
 
     enum EnumClass {
@@ -127,7 +129,7 @@ class SchemaUtilTest {
     }
 
     record TestRecord(@PII String name,
-                             @Optional int id) {
+                      @Optional int id) {
 
     }
 
@@ -141,6 +143,7 @@ class SchemaUtilTest {
         String name;
         int id;
         @PII
+        @Encrypted
         TestPIIData piiData;
         @Encrypted
         TestRecord testRecord;
@@ -164,8 +167,8 @@ class SchemaUtilTest {
                 .findFirst();
     }
 
-    private void equals(SchemaAttribute expected,
-                        SchemaAttribute original) {
+    private void assertEquals(SchemaAttribute expected,
+                              SchemaAttribute original) {
         if (Objects.isNull(expected) && Objects.isNull(original)) {
             return;
         }
@@ -174,7 +177,7 @@ class SchemaUtilTest {
         Assertions.assertEquals(expected.isOptional(), original.isOptional(), "Optionality mismatch");
 
         // Compare QualifierInfo
-        equals(expected.getQualifiers(), original.getQualifiers());
+        assertEquals(expected.getQualifiers(), original.getQualifiers());
 
         // Accept the expected attribute type and perform specific validations
         expected.accept(new SchemaAttributeAcceptor<Void>() {
@@ -232,7 +235,7 @@ class SchemaUtilTest {
             public Void accept(ArrayAttribute attribute) {
                 Assertions.assertInstanceOf(ArrayAttribute.class, original, "Original is not ArrayAttribute");
                 ArrayAttribute originalArray = (ArrayAttribute) original;
-                SchemaUtilTest.this.equals(attribute.getElementAttribute(), originalArray.getElementAttribute()); // Recursive comparison for elementAttribute
+                SchemaBuilderTest.this.assertEquals(attribute.getElementAttribute(), originalArray.getElementAttribute()); // Recursive comparison for elementAttribute
                 return null;
             }
 
@@ -240,8 +243,8 @@ class SchemaUtilTest {
             public Void accept(MapAttribute attribute) {
                 Assertions.assertInstanceOf(MapAttribute.class, original, "Original is not MapAttribute");
                 MapAttribute originalMap = (MapAttribute) original;
-                SchemaUtilTest.this.equals(attribute.getKeyAttribute(), originalMap.getKeyAttribute()); // Recursive comparison for key
-                SchemaUtilTest.this.equals(attribute.getValueAttribute(), originalMap.getValueAttribute()); // Recursive comparison for value
+                SchemaBuilderTest.this.assertEquals(attribute.getKeyAttribute(), originalMap.getKeyAttribute()); // Recursive comparison for key
+                SchemaBuilderTest.this.assertEquals(attribute.getValueAttribute(), originalMap.getValueAttribute()); // Recursive comparison for value
                 return null;
             }
 
@@ -257,15 +260,15 @@ class SchemaUtilTest {
                 Iterator<SchemaAttribute> originalIterator = originalObject.getNestedAttributes().iterator();
 
                 while (expectedIterator.hasNext() && originalIterator.hasNext()) {
-                    SchemaUtilTest.this.equals(expectedIterator.next(), originalIterator.next());
+                    SchemaBuilderTest.this.assertEquals(expectedIterator.next(), originalIterator.next());
                 }
                 return null;
             }
         });
     }
 
-    private void equals(Set<QualifierInfo> expected,
-                        Set<QualifierInfo> original) {
+    private void assertEquals(Set<QualifierInfo> expected,
+                              Set<QualifierInfo> original) {
         Assertions.assertNotNull(expected, "Expected qualifiers should not be null");
         Assertions.assertNotNull(original, "Actual qualifiers should not be null");
         Assertions.assertEquals(expected.size(), original.size(), "Qualifier sets size mismatch");

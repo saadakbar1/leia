@@ -9,8 +9,12 @@ import com.grookage.leia.models.attributes.ObjectAttribute;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaValidationType;
+import lombok.Builder;
+import lombok.Data;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -196,5 +200,49 @@ class ValidationUtilsTest {
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
+    }
+
+    @Test
+    void testValidateNested() {
+        final var testRecord = TestRecord.builder()
+                .id(100)
+                .name("name")
+                .nestedObjectsList(List.of(NestedObject.builder()
+                                .key("key")
+                                .version(5l)
+                                .enumclass(Enumclass.ONE)
+                        .build(), NestedObject.builder()
+                                .key("key")
+                                .version(6l)
+                                .enumclass(Enumclass.TWO)
+                        .build()))
+                .nestedObjectMap(Map.of(Enumclass.ONE, NestedObject.builder()
+                                .key("key")
+                                .version(7l)
+                                .enumclass(Enumclass.ONE)
+                        .build()))
+                .build();
+        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(testRecord);
+    }
+
+    static enum Enumclass {
+        ONE,
+        TWO
+    }
+    @Data
+    @Builder
+    static class NestedObject{
+        String key;
+        long version;
+        Enumclass enumclass;
+    }
+
+    @Data
+    @Builder
+    static class TestRecord {
+        String name;
+        int id;
+        List<NestedObject> nestedObjectsList;
+        Map<Enumclass, NestedObject> nestedObjectMap;
     }
 }

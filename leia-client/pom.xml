@@ -55,12 +55,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${lang3.version}</version>
-        </dependency>
-
-        <dependency>
             <artifactId>junit-jupiter</artifactId>
             <groupId>org.junit.jupiter</groupId>
         </dependency>

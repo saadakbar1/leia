@@ -1,27 +1,21 @@
-/*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package com.grookage.leia.common.validation;
 
-package com.grookage.leia.validator;
-
+import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.DataType;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
-import com.grookage.leia.validator.exception.ValidationErrorCode;
-import com.grookage.leia.validator.utils.SchemaValidationUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.ClassUtils;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 class SchemaValidationUtilsTest {
-
     @Test
     @SneakyThrows
     void testSchemaValidator() {
@@ -237,4 +230,5 @@ class SchemaValidationUtilsTest {
         Assertions.assertTrue(primitive.isPrimitive());
         Assertions.assertTrue(ClassUtils.isAssignable(primitive, dataType.getAssignableClass()));
     }
+
 }

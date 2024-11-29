@@ -4,7 +4,11 @@
   "optional": true,
   "qualifiers": [
     {
-      "type": "PII"
+      "type": "ENCRYPTED"
+    },
+    {
+      "type": "SHORT_LIVED",
+      "ttlSeconds": 100
     }
   ]
 }

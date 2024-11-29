@@ -92,9 +92,11 @@ A sample schema looks like the following
       "type": "ARRAY",
       "name": "testAttribute",
       "optional": true,
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     },
     {
       "type": "ENUM",
@@ -103,9 +105,11 @@ A sample schema looks like the following
       "values": [
         "TEST_ENUM"
       ],
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     }
   ],
   "transformationTargets": [

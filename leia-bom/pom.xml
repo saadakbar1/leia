@@ -41,6 +41,11 @@
             </dependency>
             <dependency>
                 <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
                 <artifactId>leia-core</artifactId>
                 <version>${project.version}</version>
             </dependency>

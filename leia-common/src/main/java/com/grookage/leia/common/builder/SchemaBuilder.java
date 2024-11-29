@@ -1,10 +1,8 @@
-package com.grookage.leia.client.utils;
+package com.grookage.leia.common.builder;
 
+import com.grookage.leia.common.utils.QualifierUtils;
+import com.grookage.leia.common.utils.Utils;
 import com.grookage.leia.models.annotations.Optional;
-import com.grookage.leia.models.annotations.qualifiers.Encrypted;
-import com.grookage.leia.models.annotations.qualifiers.PII;
-import com.grookage.leia.models.annotations.qualifiers.ShortLived;
-import com.grookage.leia.models.annotations.qualifiers.Standard;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
 import com.grookage.leia.models.attributes.DoubleAttribute;
@@ -16,11 +14,7 @@ import com.grookage.leia.models.attributes.MapAttribute;
 import com.grookage.leia.models.attributes.ObjectAttribute;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.attributes.StringAttribute;
-import com.grookage.leia.models.qualifiers.EncryptedQualifier;
-import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
-import com.grookage.leia.models.qualifiers.ShortLivedQualifier;
-import com.grookage.leia.models.qualifiers.StandardQualifier;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.ClassUtils;
 
@@ -28,20 +22,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @UtilityClass
-public class SchemaUtil {
+public class SchemaBuilder {
     public Set<SchemaAttribute> buildSchemaAttributes(final Class<?> klass) {
-        return getAllFields(klass)
-                .stream().map(SchemaUtil::schemaAttribute)
+        return Utils.getAllFields(klass)
+                .stream().map(SchemaBuilder::schemaAttribute)
                 .collect(Collectors.toSet());
     }
 
@@ -49,7 +39,7 @@ public class SchemaUtil {
         return schemaAttribute(
                 field.getGenericType(),
                 field.getName(),
-                getQualifierInfo(field),
+                QualifierUtils.getQualifierInfo(field),
                 isOptional(field)
         );
     }
@@ -103,8 +93,8 @@ public class SchemaUtil {
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(keyType, "key", getQualifierInfo(keyType), isOptional(keyType)),
-                schemaAttribute(valueType, "value", getQualifierInfo(valueType), isOptional(valueType))
+                schemaAttribute(keyType, "key", QualifierUtils.getQualifierInfo(keyType), isOptional(keyType)),
+                schemaAttribute(valueType, "value", QualifierUtils.getQualifierInfo(valueType), isOptional(valueType))
         );
     }
 
@@ -116,7 +106,8 @@ public class SchemaUtil {
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(elementType, "element", getQualifierInfo(elementType), isOptional(elementType))
+                schemaAttribute(elementType, "element", QualifierUtils.getQualifierInfo(elementType),
+                        isOptional(elementType))
         );
     }
 
@@ -129,7 +120,8 @@ public class SchemaUtil {
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(componentType, "element", getQualifierInfo(componentType), isOptional(componentType))
+                schemaAttribute(componentType, "element", QualifierUtils.getQualifierInfo(componentType),
+                        isOptional(componentType))
         );
     }
 
@@ -143,7 +135,7 @@ public class SchemaUtil {
         }
 
         if (klass.isEnum()) {
-            return new EnumAttribute(name, optional, qualifiers, getEnumValues(klass));
+            return new EnumAttribute(name, optional, qualifiers, Utils.getEnumValues(klass));
         }
 
         if (klass.isPrimitive()) {
@@ -157,7 +149,8 @@ public class SchemaUtil {
                     name,
                     optional,
                     qualifiers,
-                    schemaAttribute(componentType, "element", getQualifierInfo(componentType), isOptional(componentType))
+                    schemaAttribute(componentType, "element", QualifierUtils.getQualifierInfo(componentType),
+                            isOptional(componentType))
             );
         }
 
@@ -188,63 +181,6 @@ public class SchemaUtil {
 
         throw new UnsupportedOperationException("Unsupported primitive class type: " + klass.getName());
 
-    }
-
-    private List<Field> getAllFields(Class<?> type) {
-        List<Field> fields = new ArrayList<>();
-        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-        }
-        return fields;
-    }
-
-    private Set<String> getEnumValues(Class<?> klass) {
-        return Arrays.stream(klass.getEnumConstants())
-                .map(enumConstant -> ((Enum<?>) enumConstant).name())
-                .collect(Collectors.toSet());
-    }
-
-    private Set<QualifierInfo> getQualifierInfo(Field field) {
-        Set<QualifierInfo> qualifierInfos = new HashSet<>();
-        if (field.isAnnotationPresent(Encrypted.class)) {
-            qualifierInfos.add(new EncryptedQualifier());
-        }
-        if (field.isAnnotationPresent(Standard.class)) {
-            qualifierInfos.add(new StandardQualifier());
-        }
-        if (field.isAnnotationPresent(PII.class)) {
-            qualifierInfos.add(new PIIQualifier());
-        }
-        if (field.isAnnotationPresent(ShortLived.class)) {
-            final var shortLived = field.getAnnotation(ShortLived.class);
-            qualifierInfos.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
-        }
-        return qualifierInfos;
-    }
-
-    private Set<QualifierInfo> getQualifierInfo(Type type) {
-        if (type instanceof Class<?> klass) {
-            return getQualifierInfo(klass);
-        }
-        return new HashSet<>();
-    }
-
-    private Set<QualifierInfo> getQualifierInfo(Class<?> klass) {
-        Set<QualifierInfo> qualifierInfos = new HashSet<>();
-        if (klass.isAnnotationPresent(Encrypted.class)) {
-            qualifierInfos.add(new EncryptedQualifier());
-        }
-        if (klass.isAnnotationPresent(Standard.class)) {
-            qualifierInfos.add(new StandardQualifier());
-        }
-        if (klass.isAnnotationPresent(PII.class)) {
-            qualifierInfos.add(new PIIQualifier());
-        }
-        if (klass.isAnnotationPresent(ShortLived.class)) {
-            final var shortLived = klass.getAnnotation(ShortLived.class);
-            qualifierInfos.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
-        }
-        return qualifierInfos;
     }
 
     private boolean isOptional(Type type) {

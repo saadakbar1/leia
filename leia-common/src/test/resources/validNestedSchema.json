@@ -14,25 +14,31 @@
       "type": "STRING",
       "name": "stringAttribute",
       "optional": true,
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     },
     {
       "type": "OBJECT",
       "name": "nestedObjectAttribute",
       "optional": true,
-      "qualifierInfo": {
-        "type": "PII"
-      },
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ],
       "nestedAttributes": [
         {
           "type": "INTEGER",
           "name": "integerAttribute",
           "optional": true,
-          "qualifierInfo": {
-            "type": "PII"
-          }
+          "qualifiers": [
+            {
+              "type": "PII"
+            }
+          ]
         }
       ]
     }

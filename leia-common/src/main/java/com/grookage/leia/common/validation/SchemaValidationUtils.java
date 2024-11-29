@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator.utils;
+package com.grookage.leia.common.validation;
 
 import com.google.common.collect.Sets;
+import com.grookage.leia.common.exception.SchemaValidationException;
+import com.grookage.leia.common.exception.ValidationErrorCode;
+import com.grookage.leia.common.utils.Utils;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.MapAttribute;
 import com.grookage.leia.models.attributes.ObjectAttribute;
@@ -25,8 +28,6 @@ import com.grookage.leia.models.attributes.SchemaAttributeHandler;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
-import com.grookage.leia.validator.exception.SchemaValidationException;
-import com.grookage.leia.validator.exception.ValidationErrorCode;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
@@ -35,8 +36,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class SchemaValidationUtils {
     public boolean valid(final SchemaValidationType validationType,
                          Set<SchemaAttribute> attributes, final Class<?> klass) {
 
-        final var fields = getAllFields(klass);
+        final var fields = Utils.getAllFields(klass);
         if (!validSchema(validationType, attributes, fields)) {
             return false;
         }
@@ -108,14 +107,6 @@ public class SchemaValidationUtils {
         });
     }
 
-    private List<Field> getAllFields(Class<?> type) {
-        List<Field> fields = new ArrayList<>();
-        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-        }
-        return fields;
-    }
-
     private boolean validAttribute(final SchemaAttribute attribute,
                                    List<Field> fields, SchemaValidationType validationType) {
         final var field = fields.stream()
@@ -149,12 +140,12 @@ public class SchemaValidationUtils {
                     }
                     return valid(validationType, attribute.getElementAttribute(), klass.getComponentType());
                 }
-                return Collection.class.isAssignableFrom(klass) && attribute.getElementAttribute() == null;
+                return ClassUtils.isAssignable(klass, Collection.class) && attribute.getElementAttribute() == null;
             }
 
             @Override
             public Boolean accept(MapAttribute attribute) {
-                return Map.class.isAssignableFrom(klass) && attribute.getKeyAttribute() == null;
+                return ClassUtils.isAssignable(klass, Map.class) && attribute.getKeyAttribute() == null;
             }
 
             @Override
@@ -173,10 +164,10 @@ public class SchemaValidationUtils {
                     return true;
                 }
                 final var rawType = (Class<?>) parameterizedType.getRawType();
-                if (!attribute.getType().getAssignableClass().isAssignableFrom(rawType)) {
+                if (!ClassUtils.isAssignable(rawType, attribute.getType().getAssignableClass())) {
                     return false;
                 }
-                final var typeArguments = getTypeArguments(parameterizedType);
+                final var typeArguments = Utils.getTypeArguments(parameterizedType);
                 return valid(validationType, attribute.getElementAttribute(), typeArguments[0]);
             }
 
@@ -189,7 +180,7 @@ public class SchemaValidationUtils {
                 if (!attribute.getType().getAssignableClass().isAssignableFrom(rawType)) {
                     return false;
                 }
-                final var typeArguments = getTypeArguments(parameterizedType);
+                final var typeArguments = Utils.getTypeArguments(parameterizedType);
                 return valid(validationType, attribute.getKeyAttribute(), typeArguments[0]) &&
                         valid(validationType, attribute.getValueAttribute(), typeArguments[1]);
             }
@@ -204,15 +195,6 @@ public class SchemaValidationUtils {
                 return valid(validationType, attribute.getElementAttribute(), arrayType.getGenericComponentType());
             }
         });
-    }
-
-    private Type[] getTypeArguments(ParameterizedType parameterizedType) {
-        Type[] typeArguments = parameterizedType.getActualTypeArguments();
-        if (typeArguments.length == 0) {
-            throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS,
-                    String.format("No type arguments found for %s", parameterizedType));
-        }
-        return typeArguments;
     }
 
     public boolean valid(Class<?> klass, SchemaAttribute schemaAttribute) {
