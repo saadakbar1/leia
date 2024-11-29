@@ -33,9 +33,9 @@ public class ObjectAttribute extends SchemaAttribute {
 
     public ObjectAttribute(final String name,
                            final boolean optional,
-                           final QualifierInfo qualifierInfo,
+                           final Set<QualifierInfo> qualifiers,
                            Set<SchemaAttribute> nestedAttributes) {
-        super(DataType.OBJECT, name, optional, qualifierInfo);
+        super(DataType.OBJECT, name, optional, qualifiers);
         this.nestedAttributes = nestedAttributes;
     }
 

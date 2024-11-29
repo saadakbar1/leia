@@ -40,6 +40,8 @@ class AttributeTest {
         Assertions.assertNotNull(attribute);
         Assertions.assertEquals("testAttribute", attribute.getName());
         Assertions.assertSame(DataType.ARRAY, attribute.getType());
-        Assertions.assertTrue(attribute.getQualifierInfo() != null && attribute.getQualifierInfo().getType() == QualifierType.PII);
+        Assertions.assertEquals(1, attribute.getQualifiers().size());
+        Assertions.assertEquals(QualifierType.PII, attribute.getQualifiers().stream().findFirst().get().getType());
+
     }
 }

@@ -1,7 +1,6 @@
 package com.grookage.leia.core.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
 import com.grookage.leia.models.attributes.ByteAttribute;
@@ -16,6 +15,7 @@ import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
 import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaValidationType;
+import com.grookage.leia.models.utils.MapperUtils;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
@@ -101,9 +101,8 @@ public class ValidationUtils {
                                       SchemaValidationType schemaValidationType,
                                       List<String> validationErrors) {
         fieldNode.fields().forEachRemaining(entry -> {
-            // Validate key
             JsonNode keyNode = entry.getKey() != null
-                    ? ResourceHelper.getObjectMapper().convertValue(entry.getKey(), JsonNode.class)
+                    ? MapperUtils.mapper().convertValue(entry.getKey(), JsonNode.class)
                     : null;
             if (!Objects.isNull(keyNode)) {
                 // validate Key
