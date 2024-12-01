@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class Utils {
-    public List<Field> getAllFields(Class<?> type) {
+    public List<Field> getAllFields(final Class<?> type) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
             fields.addAll(Arrays.asList(c.getDeclaredFields()));
@@ -39,7 +39,7 @@ public class Utils {
         return fields;
     }
 
-    public Type[] getTypeArguments(ParameterizedType parameterizedType) {
+    public Type[] getTypeArguments(final ParameterizedType parameterizedType) {
         final var typeArguments = parameterizedType.getActualTypeArguments();
         if (typeArguments.length == 0) {
             throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS,
@@ -48,7 +48,7 @@ public class Utils {
         return typeArguments;
     }
 
-    public Set<String> getEnumValues(Class<?> klass) {
+    public Set<String> getEnumValues(final Class<?> klass) {
         return Arrays.stream(klass.getEnumConstants())
                 .map(enumConstant -> ((Enum<?>) enumConstant).name())
                 .collect(Collectors.toSet());

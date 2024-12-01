@@ -5,8 +5,8 @@ All notable changes to this project will be documented in this file.
 
 - Introduced utils classes for building SchemaAttributes from Class and validating a json payload
   against the SchemaDetails of a specified schema key
-- Introduced a leia-common to host all the common utils classes 
-- Removed the SchemaValidatable annotation and moved it to a generic SchemaDefinition
+- Introduced a `leia-common` module to host all the common utils classes 
+- Removed the `SchemaValidatable` annotation and moved it to a generic `SchemaDefinition`
 - Few Bug fixes in SchemaValidationUtils 
 
 ## [0.0.1-RC6]

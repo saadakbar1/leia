@@ -45,40 +45,40 @@ public class QualifierUtils {
                 .findFirst();
     }
 
-    public Set<QualifierInfo> getQualifierInfo(Type type) {
+    public Set<QualifierInfo> getQualifierInfo(final Type type) {
         if (type instanceof Class<?> klass) {
             return getQualifierInfo(klass);
         }
         return new HashSet<>();
     }
 
-    public Set<QualifierInfo> getQualifierInfo(Field field) {
-        Set<QualifierInfo> qualifierInfos = new HashSet<>();
+    public Set<QualifierInfo> getQualifierInfo(final Field field) {
+        Set<QualifierInfo> qualifiers = new HashSet<>();
         if (field.isAnnotationPresent(Encrypted.class)) {
-            qualifierInfos.add(new EncryptedQualifier());
+            qualifiers.add(new EncryptedQualifier());
         }
         if (field.isAnnotationPresent(PII.class)) {
-            qualifierInfos.add(new PIIQualifier());
+            qualifiers.add(new PIIQualifier());
         }
         if (field.isAnnotationPresent(ShortLived.class)) {
             final var shortLived = field.getAnnotation(ShortLived.class);
-            qualifierInfos.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
+            qualifiers.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
         }
-        return qualifierInfos;
+        return qualifiers;
     }
 
-    public Set<QualifierInfo> getQualifierInfo(Class<?> klass) {
-        Set<QualifierInfo> qualifierInfos = new HashSet<>();
+    public Set<QualifierInfo> getQualifierInfo(final Class<?> klass) {
+        Set<QualifierInfo> qualifiers = new HashSet<>();
         if (klass.isAnnotationPresent(Encrypted.class)) {
-            qualifierInfos.add(new EncryptedQualifier());
+            qualifiers.add(new EncryptedQualifier());
         }
         if (klass.isAnnotationPresent(PII.class)) {
-            qualifierInfos.add(new PIIQualifier());
+            qualifiers.add(new PIIQualifier());
         }
         if (klass.isAnnotationPresent(ShortLived.class)) {
             final var shortLived = klass.getAnnotation(ShortLived.class);
-            qualifierInfos.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
+            qualifiers.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
         }
-        return qualifierInfos;
+        return qualifiers;
     }
 }

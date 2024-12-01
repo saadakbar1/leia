@@ -98,10 +98,10 @@ public class SchemaAttributeUtils {
         throw new UnsupportedOperationException("Unsupported field type: " + parameterizedType.getTypeName());
     }
 
-    private SchemaAttribute handleMap(ParameterizedType parameterizedType,
-                                      String name,
-                                      Set<QualifierInfo> qualifiers,
-                                      boolean optional) {
+    private SchemaAttribute handleMap(final ParameterizedType parameterizedType,
+                                      final String name,
+                                      final Set<QualifierInfo> qualifiers,
+                                      final boolean optional) {
         final var keyType = parameterizedType.getActualTypeArguments()[0];
         final var valueType = parameterizedType.getActualTypeArguments()[1];
         return new MapAttribute(
@@ -113,9 +113,9 @@ public class SchemaAttributeUtils {
         );
     }
 
-    private SchemaAttribute handleCollection(ParameterizedType parameterizedType,
-                                             String name,
-                                             Set<QualifierInfo> qualifiers, boolean optional) {
+    private SchemaAttribute handleCollection(final ParameterizedType parameterizedType,
+                                             final String name,
+                                             final Set<QualifierInfo> qualifiers, boolean optional) {
         final var elementType = parameterizedType.getActualTypeArguments()[0];
         return new ArrayAttribute(
                 name,
@@ -143,7 +143,7 @@ public class SchemaAttributeUtils {
 
     private SchemaAttribute schemaAttribute(final Class<?> klass,
                                             final String name,
-                                            Set<QualifierInfo> qualifiers,
+                                            final Set<QualifierInfo> qualifiers,
                                             final boolean optional) {
         if (klass == String.class) {
             return new StringAttribute(name, optional, qualifiers);
@@ -213,18 +213,18 @@ public class SchemaAttributeUtils {
 
     }
 
-    private boolean isOptional(Type type) {
+    private boolean isOptional(final Type type) {
         if (type instanceof Class<?> klass) {
             return isOptional(klass);
         }
         return false;
     }
 
-    private boolean isOptional(Class<?> klass) {
+    private boolean isOptional(final Class<?> klass) {
         return klass.isAnnotationPresent(Optional.class);
     }
 
-    private boolean isOptional(Field field) {
+    private boolean isOptional(final Field field) {
         return field.isAnnotationPresent(Optional.class);
     }
 }

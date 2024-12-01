@@ -43,9 +43,9 @@ import java.util.Set;
 
 @UtilityClass
 public class ValidationUtils {
-    public static List<String> validate(JsonNode jsonNode,
-                                        SchemaValidationType validationType,
-                                        Set<SchemaAttribute> schemaAttributes) {
+    public static List<String> validate(final JsonNode jsonNode,
+                                        final SchemaValidationType validationType,
+                                        final Set<SchemaAttribute> schemaAttributes) {
         List<String> validationErrors = new ArrayList<>();
 
         Map<String, SchemaAttribute> schemaMap = new HashMap<>();
@@ -84,10 +84,10 @@ public class ValidationUtils {
         return validationErrors;
     }
 
-    private void validateField(JsonNode fieldNode,
-                               SchemaAttribute attribute,
-                               SchemaValidationType validationType,
-                               List<String> validationErrors) {
+    private void validateField(final JsonNode fieldNode,
+                               final SchemaAttribute attribute,
+                               final SchemaValidationType validationType,
+                               final List<String> validationErrors) {
         final var fieldName = attribute.getName();
         if (!isMatchingType(fieldNode, attribute)) {
             validationErrors.add("Type mismatch for field: " + fieldName +
@@ -111,10 +111,10 @@ public class ValidationUtils {
         }
     }
 
-    private void validateCollectionAttribute(JsonNode fieldNode,
-                                             ArrayAttribute arrayAttribute,
-                                             SchemaValidationType schemaValidationType,
-                                             List<String> validationErrors) {
+    private void validateCollectionAttribute(final JsonNode fieldNode,
+                                             final ArrayAttribute arrayAttribute,
+                                             final SchemaValidationType schemaValidationType,
+                                             final List<String> validationErrors) {
         // Handling Non-Parameterized Collections (eg: List.class, Set.class, Map.class etc.)
         if (arrayAttribute.getElementAttribute() == null) {
             return;
@@ -125,10 +125,10 @@ public class ValidationUtils {
         }
     }
 
-    private void validateMapAttribute(JsonNode fieldNode,
-                                      MapAttribute mapAttribute,
-                                      SchemaValidationType schemaValidationType,
-                                      List<String> validationErrors) {
+    private void validateMapAttribute(final JsonNode fieldNode,
+                                      final MapAttribute mapAttribute,
+                                      final SchemaValidationType schemaValidationType,
+                                      final List<String> validationErrors) {
         // Handling Raw Map.class
         if (Objects.isNull(mapAttribute.getKeyAttribute()) && Objects.isNull(mapAttribute.getValueAttribute())) {
             return;
@@ -150,7 +150,8 @@ public class ValidationUtils {
 
     }
 
-    private boolean isMatchingType(JsonNode fieldNode, SchemaAttribute attribute) {
+    private boolean isMatchingType(final JsonNode fieldNode,
+                                   final SchemaAttribute attribute) {
         return attribute.accept(new SchemaAttributeAcceptor<>() {
             @Override
             public Boolean accept(BooleanAttribute attribute) {
