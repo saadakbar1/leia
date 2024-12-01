@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.grookage.leia.common.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -82,17 +98,30 @@ public class ValidationUtils {
 
         // Recursively validate nested objects
         if (attribute instanceof ObjectAttribute objectAttribute) {
-            validationErrors.addAll(validate(fieldNode, validationType, objectAttribute.getNestedAttributes()));
-            return;
-        }
-        if (attribute instanceof ArrayAttribute arrayAttribute) {
-            for (JsonNode arrayElement : fieldNode) {
-                validationErrors.addAll(validate(arrayElement, validationType, Set.of(arrayAttribute.getElementAttribute())));
+            if (objectAttribute.getNestedAttributes() != null) {
+                validationErrors.addAll(validate(fieldNode, validationType, objectAttribute.getNestedAttributes()));
             }
             return;
         }
+        if (attribute instanceof ArrayAttribute arrayAttribute) {
+            validateCollectionAttribute(fieldNode, arrayAttribute, validationType, validationErrors);
+        }
         if (attribute instanceof MapAttribute mapAttribute) {
             validateMapAttribute(fieldNode, mapAttribute, validationType, validationErrors);
+        }
+    }
+
+    private void validateCollectionAttribute(JsonNode fieldNode,
+                                             ArrayAttribute arrayAttribute,
+                                             SchemaValidationType schemaValidationType,
+                                             List<String> validationErrors) {
+        // Handling Non-Parameterized Collections (eg: List.class, Set.class, Map.class etc.)
+        if (arrayAttribute.getElementAttribute() == null) {
+            return;
+        }
+
+        for (JsonNode arrayElement : fieldNode) {
+            validateField(arrayElement, arrayAttribute.getElementAttribute(), schemaValidationType, validationErrors);
         }
     }
 
@@ -100,6 +129,10 @@ public class ValidationUtils {
                                       MapAttribute mapAttribute,
                                       SchemaValidationType schemaValidationType,
                                       List<String> validationErrors) {
+        // Handling Raw Map.class
+        if (Objects.isNull(mapAttribute.getKeyAttribute()) && Objects.isNull(mapAttribute.getValueAttribute())) {
+            return;
+        }
         fieldNode.fields().forEachRemaining(entry -> {
             final var keyNode = entry.getKey() != null
                     ? MapperUtils.mapper().convertValue(entry.getKey(), JsonNode.class)
@@ -171,6 +204,10 @@ public class ValidationUtils {
 
             @Override
             public Boolean accept(ObjectAttribute attribute) {
+                // Handling Object.class
+                if (attribute.getNestedAttributes() == null) {
+                    return true;
+                }
                 return fieldNode.isObject();
             }
         });

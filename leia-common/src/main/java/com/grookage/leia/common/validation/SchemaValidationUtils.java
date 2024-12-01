@@ -155,6 +155,10 @@ public class SchemaValidationUtils {
 
             @Override
             public Boolean accept(ObjectAttribute attribute) {
+                // Handling plain Object.class
+                if (klass.equals(Object.class) && attribute.getNestedAttributes() == null) {
+                    return true;
+                }
                 return valid(validationType, attribute.getNestedAttributes(), klass);
             }
         });

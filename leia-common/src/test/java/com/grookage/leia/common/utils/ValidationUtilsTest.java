@@ -1,5 +1,9 @@
 package com.grookage.leia.common.utils;
 
+import com.grookage.leia.common.stubs.NestedStub;
+import com.grookage.leia.common.stubs.TestObjectStub;
+import com.grookage.leia.common.stubs.TestParameterizedStub;
+import com.grookage.leia.common.stubs.TestRawCollectionStub;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
@@ -9,12 +13,10 @@ import com.grookage.leia.models.attributes.ObjectAttribute;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaValidationType;
-import lombok.Builder;
-import lombok.Data;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -202,48 +204,43 @@ class ValidationUtilsTest {
         assertEquals(1, errors.size());
     }
 
+    @SneakyThrows
     @Test
     void testValidateNested() {
-        final var testRecord = TestRecord.builder()
-                .id(100)
-                .name("name")
-                .nestedObjectsList(List.of(NestedObject.builder()
-                                .key("key")
-                                .version(5l)
-                                .enumclass(Enumclass.ONE)
-                        .build(), NestedObject.builder()
-                                .key("key")
-                                .version(6l)
-                                .enumclass(Enumclass.TWO)
-                        .build()))
-                .nestedObjectMap(Map.of(Enumclass.ONE, NestedObject.builder()
-                                .key("key")
-                                .version(7l)
-                                .enumclass(Enumclass.ONE)
-                        .build()))
-                .build();
-        // TODO::Abhishek Finish this
-        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(testRecord);
+        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
+                NestedStub.class));
+        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(NestedStub.class);
+        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        assertTrue(errors.isEmpty());
     }
 
-    static enum Enumclass {
-        ONE,
-        TWO
-    }
-    @Data
-    @Builder
-    static class NestedObject{
-        String key;
-        long version;
-        Enumclass enumclass;
+    @SneakyThrows
+    @Test
+    void testValidateParameterizedStub() {
+        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
+                TestParameterizedStub.class));
+        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestParameterizedStub.class);
+        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        assertTrue(errors.isEmpty());
     }
 
-    @Data
-    @Builder
-    static class TestRecord {
-        String name;
-        int id;
-        List<NestedObject> nestedObjectsList;
-        Map<Enumclass, NestedObject> nestedObjectMap;
+    @SneakyThrows
+    @Test
+    void testObjectValidation() {
+        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
+                TestObjectStub.class));
+        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestObjectStub.class);
+        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        Assertions.assertTrue(errors.isEmpty());
+    }
+
+    @SneakyThrows
+    @Test
+    void testRawCollectionSchemaValidation() {
+        final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
+                TestRawCollectionStub.class));
+        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestRawCollectionStub.class);
+        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        Assertions.assertTrue(errors.isEmpty());
     }
 }

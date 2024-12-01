@@ -5,7 +5,6 @@ import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
 import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.DataType;
 import com.grookage.leia.models.attributes.DoubleAttribute;
 import com.grookage.leia.models.attributes.EnumAttribute;
 import com.grookage.leia.models.attributes.FloatAttribute;
@@ -17,7 +16,6 @@ import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.ClassUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -79,6 +77,9 @@ class SchemaValidationUtilsTest {
 
         final var mapAttribute = new MapAttribute("testAttribute", true, null, stringAttribute, stringAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(Map.class, mapAttribute));
+
+        final var plainObjectAttribute = new ObjectAttribute("testAttribute", true, null, null);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Object.class, plainObjectAttribute));
 
         final var objectAttribute = new ObjectAttribute("testAttribute", true, null, Set.of(stringAttribute));
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaDetails.class, objectAttribute));
@@ -221,14 +222,6 @@ class SchemaValidationUtilsTest {
 
     static class GenericArrayTestClass {
         List<String>[] arrayAttribute;
-    }
-
-    @Test
-    void testIsAssignableFrom() {
-        Class<?> primitive = long.class;
-        final var dataType = DataType.LONG;
-        Assertions.assertTrue(primitive.isPrimitive());
-        Assertions.assertTrue(ClassUtils.isAssignable(primitive, dataType.getAssignableClass()));
     }
 
 }

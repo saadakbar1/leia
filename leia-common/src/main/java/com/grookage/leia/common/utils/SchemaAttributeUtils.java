@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.grookage.leia.common.utils;
 
 import com.grookage.leia.models.annotations.attribute.Optional;
@@ -137,6 +153,7 @@ public class SchemaAttributeUtils {
             return new EnumAttribute(name, optional, qualifiers, Utils.getEnumValues(klass));
         }
 
+        // Handle int, long, boolean etc.
         if (klass.isPrimitive()) {
             return handlePrimitive(klass, name, qualifiers, optional);
         }
@@ -151,6 +168,20 @@ public class SchemaAttributeUtils {
                     schemaAttribute(componentType, "element", QualifierUtils.getQualifierInfo(componentType),
                             isOptional(componentType))
             );
+        }
+
+        // Handle Raw List, Set
+        if (ClassUtils.isAssignable(klass, Collection.class)) {
+            return new ArrayAttribute(name, optional, qualifiers, null);
+        }
+
+        // Handle Raw Map
+        if (ClassUtils.isAssignable(klass, Map.class)) {
+            return new MapAttribute(name, optional, qualifiers, null, null);
+        }
+
+        if (klass.equals(Object.class)) {
+            return new ObjectAttribute(name, optional, qualifiers, null);
         }
 
         // Handling custom defined POJO's
