@@ -1,0 +1,38 @@
+{
+  "rawList": [
+    42,
+    87,
+    19
+  ],
+  "rawLinkedList": [
+    10000000000,
+    20000000000,
+    30000000000
+  ],
+  "rawSet": [
+    true,
+    false,
+    true
+  ],
+  "rawHashSet": [
+    3.14,
+    2.71,
+    1.41
+  ],
+  "rawMap": {
+    "1": 123,
+    "2": 456,
+    "3": 789
+  },
+  "rawSortedMap": {
+    "1": {
+      "key": "Nested Value 1"
+    },
+    "2": {
+      "key": "Nested Value 2"
+    },
+    "3": {
+      "key": "Nested Value 3"
+    }
+  }
+}
