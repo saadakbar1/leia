@@ -57,17 +57,6 @@
             <version>${lang3.version}</version>
         </dependency>
 
-        <dependency>
-            <artifactId>leia-models</artifactId>
-            <type>test-jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-            <groupId>com.grookage.leia</groupId>
-        </dependency>
     </dependencies>
 
 </project>

@@ -3,8 +3,11 @@
 All notable changes to this project will be documented in this file.
 ## [0.0.1-RC7]
 
-- LeiaClient - SchemaUtil to add support for building SchemaAttributes from the Schema class
-- LeiaCore - Added API support to validate schema payload against the SchemaDetails of a specified key
+- Introduced utils classes for building SchemaAttributes from Class and validating a json payload
+  against the SchemaDetails of a specified schema key
+- Introduced a leia-common to host all the common utils classes 
+- Removed the SchemaValidatable annotation and moved it to a generic SchemaDefinition
+- Few Bug fixes in SchemaValidationUtils 
 
 ## [0.0.1-RC6]
 
