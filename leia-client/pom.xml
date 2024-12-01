@@ -76,6 +76,11 @@
 
         <dependency>
             <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
             <artifactId>leia-schema-validator</artifactId>
         </dependency>
 
