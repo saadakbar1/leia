@@ -1,10 +1,10 @@
 package com.grookage.leia.common.validation;
 
+import com.grookage.leia.common.builder.SchemaBuilder;
 import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.TestObjectStub;
 import com.grookage.leia.common.stubs.TestParameterizedStub;
 import com.grookage.leia.common.stubs.TestRawCollectionStub;
-import com.grookage.leia.common.utils.SchemaAttributeUtils;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
@@ -210,7 +210,7 @@ class SchemaPayloadValidatorTest {
     void testValidateNested() {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
                 NestedStub.class));
-        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(NestedStub.class);
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(NestedStub.class);
         final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         assertTrue(errors.isEmpty());
     }
@@ -220,7 +220,7 @@ class SchemaPayloadValidatorTest {
     void testValidateParameterizedStub() {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
                 TestParameterizedStub.class));
-        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestParameterizedStub.class);
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
         final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         assertTrue(errors.isEmpty());
     }
@@ -230,7 +230,7 @@ class SchemaPayloadValidatorTest {
     void testObjectValidation() {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
                 TestObjectStub.class));
-        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestObjectStub.class);
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestObjectStub.class);
         final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         Assertions.assertTrue(errors.isEmpty());
     }
@@ -240,7 +240,7 @@ class SchemaPayloadValidatorTest {
     void testRawCollectionSchemaValidation() {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
                 TestRawCollectionStub.class));
-        final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestRawCollectionStub.class);
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRawCollectionStub.class);
         final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         Assertions.assertTrue(errors.isEmpty());
     }

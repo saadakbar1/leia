@@ -45,14 +45,14 @@ public class QualifierUtils {
                 .findFirst();
     }
 
-    public Set<QualifierInfo> getQualifierInfo(final Type type) {
+    public Set<QualifierInfo> getQualifiers(final Type type) {
         if (type instanceof Class<?> klass) {
-            return getQualifierInfo(klass);
+            return getQualifiers(klass);
         }
         return new HashSet<>();
     }
 
-    public Set<QualifierInfo> getQualifierInfo(final Field field) {
+    public Set<QualifierInfo> getQualifiers(final Field field) {
         Set<QualifierInfo> qualifiers = new HashSet<>();
         if (field.isAnnotationPresent(Encrypted.class)) {
             qualifiers.add(new EncryptedQualifier());
@@ -67,7 +67,7 @@ public class QualifierUtils {
         return qualifiers;
     }
 
-    public Set<QualifierInfo> getQualifierInfo(final Class<?> klass) {
+    public Set<QualifierInfo> getQualifiers(final Class<?> klass) {
         Set<QualifierInfo> qualifiers = new HashSet<>();
         if (klass.isAnnotationPresent(Encrypted.class)) {
             qualifiers.add(new EncryptedQualifier());

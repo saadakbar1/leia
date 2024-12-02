@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @UtilityClass
-public class TestUtils {
+public class LeiaTestUtils {
     public Optional<SchemaAttribute> filter(Set<SchemaAttribute> schemaAttributes,
                                             String name) {
         return schemaAttributes.stream()

@@ -63,7 +63,7 @@ public class SchemaValidationUtils {
                          final Set<SchemaAttribute> attributes,
                          final Class<?> klass) {
 
-        final var fields = Utils.getAllFields(klass);
+        final var fields = FieldUtils.getAllFields(klass);
         if (!validSchema(validationType, attributes, fields)) {
             return false;
         }
@@ -176,7 +176,7 @@ public class SchemaValidationUtils {
                 if (!ClassUtils.isAssignable(rawType, attribute.getType().getAssignableClass())) {
                     return false;
                 }
-                final var typeArguments = Utils.getTypeArguments(parameterizedType);
+                final var typeArguments = getTypeArguments(parameterizedType);
                 return valid(validationType, attribute.getElementAttribute(), typeArguments[0]);
             }
 
@@ -189,11 +189,20 @@ public class SchemaValidationUtils {
                 if (!ClassUtils.isAssignable(rawType, attribute.getType().getAssignableClass())) {
                     return false;
                 }
-                final var typeArguments = Utils.getTypeArguments(parameterizedType);
+                final var typeArguments = getTypeArguments(parameterizedType);
                 return valid(validationType, attribute.getKeyAttribute(), typeArguments[0]) &&
                         valid(validationType, attribute.getValueAttribute(), typeArguments[1]);
             }
         });
+    }
+
+    private Type[] getTypeArguments(final ParameterizedType parameterizedType) {
+        final var typeArguments = parameterizedType.getActualTypeArguments();
+        if (typeArguments.length == 0) {
+            throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS,
+                    String.format("No type arguments found for %s", parameterizedType));
+        }
+        return typeArguments;
     }
 
     private boolean valid(final SchemaValidationType validationType,
