@@ -1,4 +1,4 @@
-package com.grookage.leia.common.validation;
+package com.grookage.leia.common.utils;
 
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.models.ResourceHelper;

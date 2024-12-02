@@ -18,7 +18,7 @@ package com.grookage.leia.validator;
 
 import com.grookage.leia.common.exception.SchemaValidationException;
 import com.grookage.leia.common.exception.ValidationErrorCode;
-import com.grookage.leia.common.validation.SchemaValidationUtils;
+import com.grookage.leia.common.utils.SchemaValidationUtils;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;

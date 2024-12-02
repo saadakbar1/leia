@@ -19,7 +19,7 @@ package com.grookage.leia.dropwizard.bundle.resources;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.grookage.leia.common.utils.ValidationUtils;
+import com.grookage.leia.common.validation.SchemaPayloadValidator;
 import com.grookage.leia.core.exception.LeiaErrorCode;
 import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
@@ -90,7 +90,8 @@ public class SchemaResource {
                                                         @Valid JsonNode jsonNode) {
         final var schemaDetails = schemaRetriever.getSchemaDetails(schemaKey)
                 .orElseThrow(() -> LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND));
-        final var validationErrors = ValidationUtils.validate(jsonNode, schemaDetails.getValidationType(), schemaDetails.getAttributes());
+        final var validationErrors = SchemaPayloadValidator.validate(jsonNode, schemaDetails.getValidationType(),
+                schemaDetails.getAttributes());
         if (validationErrors.isEmpty()) {
             return GenericResponse.<List<String>>builder()
                     .success(true)

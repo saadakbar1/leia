@@ -1,9 +1,10 @@
-package com.grookage.leia.common.utils;
+package com.grookage.leia.common.validation;
 
 import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.TestObjectStub;
 import com.grookage.leia.common.stubs.TestParameterizedStub;
 import com.grookage.leia.common.stubs.TestRawCollectionStub;
+import com.grookage.leia.common.utils.SchemaAttributeUtils;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.BooleanAttribute;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ValidationUtilsTest {
+class SchemaPayloadValidatorTest {
     @Test
     void testValidJsonAgainstSchema() throws Exception {
         final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
@@ -40,7 +41,7 @@ class ValidationUtilsTest {
                 new BooleanAttribute("isActive", false, null)
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertTrue(errors.isEmpty());
     }
@@ -62,7 +63,7 @@ class ValidationUtilsTest {
                 new BooleanAttribute("isActive", false, null)
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -82,7 +83,7 @@ class ValidationUtilsTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -103,7 +104,7 @@ class ValidationUtilsTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -130,7 +131,7 @@ class ValidationUtilsTest {
                 new ObjectAttribute("user", false, null, nestedAttributes)
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertTrue(errors.isEmpty());
     }
@@ -147,7 +148,7 @@ class ValidationUtilsTest {
                 new ArrayAttribute("numbers", false, null, new IntegerAttribute("element", false, null))
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertTrue(errors.isEmpty());
     }
@@ -173,7 +174,7 @@ class ValidationUtilsTest {
                 )
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertTrue(errors.isEmpty());
     }
@@ -198,7 +199,7 @@ class ValidationUtilsTest {
                 )
         );
 
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -210,7 +211,7 @@ class ValidationUtilsTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
                 NestedStub.class));
         final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(NestedStub.class);
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         assertTrue(errors.isEmpty());
     }
 
@@ -220,7 +221,7 @@ class ValidationUtilsTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
                 TestParameterizedStub.class));
         final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestParameterizedStub.class);
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         assertTrue(errors.isEmpty());
     }
 
@@ -230,7 +231,7 @@ class ValidationUtilsTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
                 TestObjectStub.class));
         final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestObjectStub.class);
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         Assertions.assertTrue(errors.isEmpty());
     }
 
@@ -240,7 +241,7 @@ class ValidationUtilsTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
                 TestRawCollectionStub.class));
         final var schemaAttributes = SchemaAttributeUtils.getSchemaAttributes(TestRawCollectionStub.class);
-        final var errors = ValidationUtils.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
         Assertions.assertTrue(errors.isEmpty());
     }
 }

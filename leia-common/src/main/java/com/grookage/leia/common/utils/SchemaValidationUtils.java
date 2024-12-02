@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.common.validation;
+package com.grookage.leia.common.utils;
 
 import com.google.common.collect.Sets;
 import com.grookage.leia.common.exception.SchemaValidationException;
 import com.grookage.leia.common.exception.ValidationErrorCode;
-import com.grookage.leia.common.utils.Utils;
 import com.grookage.leia.models.attributes.ArrayAttribute;
 import com.grookage.leia.models.attributes.MapAttribute;
 import com.grookage.leia.models.attributes.ObjectAttribute;

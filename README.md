@@ -136,6 +136,8 @@ A sample schema looks like the following
   the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to
   be jsonPathRules.
 
+Please refer to the `SchemaBuilder` class which can be used to generate schema against a class.   
+
 #### Using the LeiaClientBundle
 
 On the client side, please use the `LeiaClientBundle`

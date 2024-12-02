@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.common.utils;
+package com.grookage.leia.common.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.models.attributes.ArrayAttribute;
@@ -42,7 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @UtilityClass
-public class ValidationUtils {
+public class SchemaPayloadValidator {
     public static List<String> validate(final JsonNode jsonNode,
                                         final SchemaValidationType validationType,
                                         final Set<SchemaAttribute> schemaAttributes) {
