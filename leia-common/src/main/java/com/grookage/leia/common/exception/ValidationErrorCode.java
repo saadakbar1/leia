@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator.annotations;
+package com.grookage.leia.common.exception;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import lombok.Getter;
 
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SchemaValidatable {
+@Getter
+public enum ValidationErrorCode {
 
-    String schemaName();
+    NO_SCHEMA_FOUND(400),
 
-    String versionId();
+    INVALID_SCHEMAS(412),
+    NOT_SUPPORTED(501);
 
-    String namespace();
+    final int status;
 
+    ValidationErrorCode(int status) {
+        this.status = status;
+    }
 }

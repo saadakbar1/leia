@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia</artifactId>
-    <version>0.0.1-RC6</version>
+    <version>0.0.1-RC7</version>
     <packaging>pom</packaging>
 
     <name>Leia</name>
@@ -31,6 +31,7 @@
         <module>leia-parent</module>
         <module>leia-core</module>
         <module>leia-models</module>
+        <module>leia-common</module>
         <module>leia-dropwizard</module>
         <module>leia-repository</module>
         <module>leia-elastic</module>

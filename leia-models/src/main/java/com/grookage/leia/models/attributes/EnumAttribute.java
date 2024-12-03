@@ -34,9 +34,9 @@ public class EnumAttribute extends SchemaAttribute {
 
     public EnumAttribute(final String name,
                          final boolean optional,
-                         final QualifierInfo qualifierInfo,
+                         final Set<QualifierInfo> qualifiers,
                          final Set<String> values) {
-        super(DataType.ENUM, name, optional, qualifierInfo);
+        super(DataType.ENUM, name, optional, qualifiers);
         this.values = values;
     }
 

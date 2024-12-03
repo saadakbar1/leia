@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,9 +33,9 @@ public class ArrayAttribute extends SchemaAttribute {
 
     public ArrayAttribute(final String name,
                           final boolean optional,
-                          final QualifierInfo qualifierInfo,
+                          final Set<QualifierInfo> qualifiers,
                           SchemaAttribute elementAttribute) {
-        super(DataType.ARRAY, name, optional, qualifierInfo);
+        super(DataType.ARRAY, name, optional, qualifiers);
         this.elementAttribute = elementAttribute;
     }
 

@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC6</version>
+        <version>0.0.1-RC7</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
@@ -33,6 +33,7 @@
         <maven.deploy.skip>false</maven.deploy.skip>
         <reflections.version>0.9.9</reflections.version>
         <guice.inject.version>7.0.0</guice.inject.version>
+        <lang3.version>3.11</lang3.version>
     </properties>
 
     <dependencies>
@@ -40,24 +41,22 @@
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-models</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-common</artifactId>
+        </dependency>
 
         <dependency>
             <artifactId>reflections</artifactId>
             <groupId>org.reflections</groupId>
             <version>${reflections.version}</version>
         </dependency>
-
         <dependency>
-            <artifactId>leia-models</artifactId>
-            <type>test-jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-            <groupId>com.grookage.leia</groupId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${lang3.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>

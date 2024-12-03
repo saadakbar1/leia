@@ -5,7 +5,9 @@
   "values": [
     "TEST_ENUM"
   ],
-  "qualifierInfo": {
-    "type": "PII"
-  }
+  "qualifiers": [
+    {
+      "type": "PII"
+    }
+  ]
 }

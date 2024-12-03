@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC6</version>
+        <version>0.0.1-RC7</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
@@ -31,6 +31,11 @@
         <dependency>
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-models</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-common</artifactId>
         </dependency>
 
         <dependency>

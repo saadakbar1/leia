@@ -23,6 +23,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,10 +36,10 @@ public class MapAttribute extends SchemaAttribute {
 
     public MapAttribute(final String name,
                         final boolean optional,
-                        final QualifierInfo qualifierInfo,
+                        final Set<QualifierInfo> qualifiers,
                         SchemaAttribute keyAttribute,
                         SchemaAttribute valueAttribute) {
-        super(DataType.MAP, name, optional, qualifierInfo);
+        super(DataType.MAP, name, optional, qualifiers);
         Preconditions.checkArgument(keyAttribute == null || valueAttribute != null);
         this.keyAttribute = keyAttribute;
         this.valueAttribute = valueAttribute;

@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,8 +32,8 @@ public class IntegerAttribute extends SchemaAttribute {
 
     public IntegerAttribute(final String name,
                             final boolean optional,
-                            final QualifierInfo qualifierInfo) {
-        super(DataType.INTEGER, name, optional, qualifierInfo);
+                            final Set<QualifierInfo> qualifiers) {
+        super(DataType.INTEGER, name, optional, qualifiers);
     }
 
     @Override

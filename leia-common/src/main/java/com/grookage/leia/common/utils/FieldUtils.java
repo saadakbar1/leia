@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator.exception;
+package com.grookage.leia.common.utils;
 
-import lombok.Getter;
+import lombok.experimental.UtilityClass;
 
-@Getter
-public enum ValidationErrorCode {
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    NO_SCHEMA_FOUND(400),
-
-    INVALID_SCHEMAS(412),
-    NOT_SUPPORTED(501);
-
-    final int status;
-
-    ValidationErrorCode(int status) {
-        this.status = status;
+@UtilityClass
+public class FieldUtils {
+    public List<Field> getAllFields(final Class<?> type) {
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        }
+        return fields;
     }
 }

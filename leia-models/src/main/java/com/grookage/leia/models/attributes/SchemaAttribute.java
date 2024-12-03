@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Pattern;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -53,7 +54,7 @@ public abstract class SchemaAttribute {
 
     private boolean optional;
 
-    private QualifierInfo qualifierInfo;
+    private Set<QualifierInfo> qualifiers;
 
     public abstract <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor);
 }

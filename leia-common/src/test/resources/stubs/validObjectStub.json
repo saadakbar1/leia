@@ -1,0 +1,26 @@
+{
+  "object": "Sample String",
+  "objects": [
+    true,
+    false,
+    true
+  ],
+  "objectList": [
+    "String 1",
+    "String 2",
+    "String 3"
+  ],
+  "objectSet": [
+    1,
+    2,
+    3
+  ],
+  "objectMap": {
+    "ONE": {
+      "key": "value 1"
+    },
+    "TWO": {
+      "key": "value 2"
+    }
+  }
+}

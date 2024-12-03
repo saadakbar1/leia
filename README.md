@@ -26,7 +26,7 @@ Leia is a governance and metadata framework aimed at meeting compliance requirem
 <dependency>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia-bom</artifactId>
-    <versio>0.0.1-RC6</version>
+    <versio>0.0.1-RC7</version>
 </dependency>
 ```
 
@@ -92,9 +92,11 @@ A sample schema looks like the following
       "type": "ARRAY",
       "name": "testAttribute",
       "optional": true,
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     },
     {
       "type": "ENUM",
@@ -103,9 +105,11 @@ A sample schema looks like the following
       "values": [
         "TEST_ENUM"
       ],
-      "qualifierInfo": {
-        "type": "PII"
-      }
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
     }
   ],
   "transformationTargets": [
@@ -131,6 +135,8 @@ A sample schema looks like the following
   namespace, `testNamespace` and schemaName, `testSchema` with version `V1234`, during message production
   the `LeiaMessageProduceClient`, will multiplex the testSchema to both the versions, the transformationTargets ought to
   be jsonPathRules.
+
+Please refer to the `SchemaBuilder` class which can be used to generate schema against a class.   
 
 #### Using the LeiaClientBundle
 

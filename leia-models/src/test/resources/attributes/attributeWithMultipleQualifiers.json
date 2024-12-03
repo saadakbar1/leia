@@ -1,0 +1,14 @@
+{
+  "type": "ARRAY",
+  "name": "testAttribute",
+  "optional": true,
+  "qualifiers": [
+    {
+      "type": "ENCRYPTED"
+    },
+    {
+      "type": "SHORT_LIVED",
+      "ttlSeconds": 100
+    }
+  ]
+}
