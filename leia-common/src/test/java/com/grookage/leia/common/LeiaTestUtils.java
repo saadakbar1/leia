@@ -1,19 +1,7 @@
 package com.grookage.leia.common;
 
 import com.grookage.leia.common.utils.QualifierUtils;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.EnumAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.qualifiers.QualifierType;
 import com.grookage.leia.models.qualifiers.ShortLivedQualifier;
