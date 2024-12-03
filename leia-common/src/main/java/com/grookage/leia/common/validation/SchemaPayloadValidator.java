@@ -17,41 +17,25 @@
 package com.grookage.leia.common.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.EnumAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.utils.MapperUtils;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class SchemaPayloadValidator {
     public static List<String> validate(final JsonNode jsonNode,
                                         final SchemaValidationType validationType,
                                         final Set<SchemaAttribute> schemaAttributes) {
-        List<String> validationErrors = new ArrayList<>();
-
-        Map<String, SchemaAttribute> schemaMap = new HashMap<>();
-        for (SchemaAttribute attribute : schemaAttributes) {
-            schemaMap.put(attribute.getName(), attribute);
-        }
+        final List<String> validationErrors = new ArrayList<>();
+        final var schemaMap = schemaAttributes.stream()
+                .collect(Collectors.toMap(SchemaAttribute::getName, attribute -> attribute, (a, b) -> b));
 
         // Validate extra fields in case of Strict Validation
         if (validationType == SchemaValidationType.STRICT) {
@@ -63,23 +47,22 @@ public class SchemaPayloadValidator {
         }
 
         // Validate missing and type mismatched fields
-        for (SchemaAttribute attribute : schemaAttributes) {
+        // Check the attribute only if the jsonNode is an object
+        schemaAttributes.forEach(attribute -> {
             final var fieldName = attribute.getName();
-            // Check the attribute only if the jsonNode is an object
             if (jsonNode.isObject() && !jsonNode.has(fieldName)) {
                 if (!attribute.isOptional()) {
                     validationErrors.add("Missing required field: " + fieldName);
                 }
-                continue;
+                return;
             }
-
             if (jsonNode.isValueNode()) {
                 validateField(jsonNode, attribute, validationType, validationErrors);
-                continue;
+                return;
             }
             final var fieldNode = jsonNode.get(fieldName);
             validateField(fieldNode, attribute, validationType, validationErrors);
-        }
+        });
 
         return validationErrors;
     }
@@ -101,12 +84,9 @@ public class SchemaPayloadValidator {
             if (objectAttribute.getNestedAttributes() != null) {
                 validationErrors.addAll(validate(fieldNode, validationType, objectAttribute.getNestedAttributes()));
             }
-            return;
-        }
-        if (attribute instanceof ArrayAttribute arrayAttribute) {
+        } else if (attribute instanceof ArrayAttribute arrayAttribute) {
             validateCollectionAttribute(fieldNode, arrayAttribute, validationType, validationErrors);
-        }
-        if (attribute instanceof MapAttribute mapAttribute) {
+        } else if (attribute instanceof MapAttribute mapAttribute) {
             validateMapAttribute(fieldNode, mapAttribute, validationType, validationErrors);
         }
     }
