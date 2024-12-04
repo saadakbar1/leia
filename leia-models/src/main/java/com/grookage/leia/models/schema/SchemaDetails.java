@@ -66,7 +66,7 @@ public class SchemaDetails {
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+        return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
     @JsonIgnore
