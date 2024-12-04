@@ -19,17 +19,7 @@ package com.grookage.leia.common.builder;
 import com.grookage.leia.common.utils.FieldUtils;
 import com.grookage.leia.common.utils.QualifierUtils;
 import com.grookage.leia.models.annotations.SchemaDefinition;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.EnumAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
@@ -39,16 +29,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class SchemaBuilder {
+
+    private static final String ELEMENT = "element";
+
     public Optional<CreateSchemaRequest> buildSchemaRequest(final Class<?> klass) {
         if (Objects.isNull(klass) || !klass.isAnnotationPresent(SchemaDefinition.class)) {
             return Optional.empty();
@@ -143,7 +131,7 @@ public class SchemaBuilder {
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(elementType, "element", QualifierUtils.getQualifiers(elementType),
+                schemaAttribute(elementType, ELEMENT, QualifierUtils.getQualifiers(elementType),
                         isOptional(elementType))
         );
     }
@@ -157,7 +145,7 @@ public class SchemaBuilder {
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(componentType, "element", QualifierUtils.getQualifiers(componentType),
+                schemaAttribute(componentType, ELEMENT, QualifierUtils.getQualifiers(componentType),
                         isOptional(componentType))
         );
     }
@@ -187,7 +175,7 @@ public class SchemaBuilder {
                     name,
                     optional,
                     qualifiers,
-                    schemaAttribute(componentType, "element", QualifierUtils.getQualifiers(componentType),
+                    schemaAttribute(componentType, ELEMENT, QualifierUtils.getQualifiers(componentType),
                             isOptional(componentType))
             );
         }

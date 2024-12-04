@@ -1,6 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
 ## [0.0.1-RC8]
 
 - LeiaElasticBundle: Fixes the override for adding ElasticHealthCheck
@@ -11,16 +12,15 @@ All notable changes to this project will be documented in this file.
 - FieldUtils: Excluding non-serializable fields(static, transient, @JsonIgnore) for building the schema attributes
 - SchemaResource: Bug fix in SchemaValidation resource
 
-
 ## [0.0.1-RC7]
 
-- Introduced a `leia-common` module to host all the common utils classes 
+- Introduced a `leia-common` module to host all the common utils classes
 - Added annotation classes for the Qualifiers( PII, Encrypted, ShortLived) that can be added on the members of
   the Schema class
 - Replaced the `SchemaValidatable` annotation and moved it to a generic `SchemaDefinition`
 - Introduced `SchemaBuilder`: For building the schema request against a class annotated with SchemaDefinition
 - Introduced `SchemaPayloadValidator`: For validating a schema json payload against a specified SchemaKey
-- Addressed issues in handling plain `Object` and Primitive Class types in `SchemaValidationUtils` 
+- Addressed issues in handling plain `Object` and Primitive Class types in `SchemaValidationUtils`
 
 ## [0.0.1-RC6]
 
