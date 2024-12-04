@@ -22,6 +22,7 @@ import com.grookage.leia.models.qualifiers.EncryptedQualifier;
 import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 class SchemaBuilderTest {
+    @SneakyThrows
     @Test
     void testSchemaRequest() {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)

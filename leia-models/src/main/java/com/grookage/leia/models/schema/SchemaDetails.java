@@ -69,6 +69,7 @@ public class SchemaDetails {
         return Joiner.on(".").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
+    @JsonIgnore
     public SchemaKey getSchemaKey() {
         return SchemaKey.builder()
                 .schemaName(schemaName)
