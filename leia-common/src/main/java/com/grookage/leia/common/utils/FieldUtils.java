@@ -19,17 +19,27 @@ package com.grookage.leia.common.utils;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @UtilityClass
 public class FieldUtils {
     public List<Field> getAllFields(final Class<?> type) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+            // filtering out static final fields
+            Arrays.stream(c.getDeclaredFields())
+                    .filter(field -> !isStaticFinal(field))
+                    .forEach(fields::add);
         }
         return fields;
+    }
+
+    private boolean isStaticFinal(final Field field) {
+        int modifiers = field.getModifiers();
+        return Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
     }
 }

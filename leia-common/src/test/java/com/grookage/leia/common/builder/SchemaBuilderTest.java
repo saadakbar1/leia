@@ -34,6 +34,7 @@ class SchemaBuilderTest {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)
                 .orElse(null);
         Assertions.assertNotNull(schemaCreateRequest);
+        Assertions.assertEquals(5, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
         Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
         Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
