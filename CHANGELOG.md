@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.1-RC8]
+- SchemaResource - Bug fix in SchemaValidation resource
+- LeiaElasticBundle: Fixes the override for adding ElasticHealthCheck
+- Removed the unused `LeiaCompiledPath` class 
+
 ## [0.0.1-RC7]
 
 - Introduced a `leia-common` module to host all the common utils classes 

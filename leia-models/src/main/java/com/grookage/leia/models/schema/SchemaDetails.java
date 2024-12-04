@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Locale;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -38,13 +39,18 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
-    @NotNull SchemaKey schemaKey;
+    @NotNull
+    SchemaKey schemaKey;
     String description;
-    @NotNull SchemaState schemaState;
-    @NotNull SchemaType schemaType;
+    @NotNull
+    SchemaState schemaState;
+    @NotNull
+    SchemaType schemaType;
     SchemaValidationType validationType = SchemaValidationType.MATCHING;
-    @NotNull SchemaMeta schemaMeta;
-    @NotEmpty Set<SchemaAttribute> attributes;
+    @NotNull
+    SchemaMeta schemaMeta;
+    @NotEmpty
+    Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
 
@@ -59,6 +65,6 @@ public class SchemaDetails {
                 schemaKey.getNamespace(),
                 schemaKey.getSchemaName(),
                 schemaKey.getVersion()
-        );
+        ).toUpperCase(Locale.ROOT);
     }
 }
