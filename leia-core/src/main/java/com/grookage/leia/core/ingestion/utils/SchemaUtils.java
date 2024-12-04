@@ -34,12 +34,9 @@ public class SchemaUtils {
                                          final String email,
                                          final Supplier<VersionIDGenerator> versionSupplier) {
         return SchemaDetails.builder()
-                .schemaKey(SchemaKey.builder()
-                        .namespace(createSchemaRequest.getNamespace())
-                        .schemaName(createSchemaRequest.getSchemaName())
-                        .version(versionSupplier.get().generateVersionId("V"))
-                        .build()
-                )
+                .namespace(createSchemaRequest.getNamespace())
+                .schemaName(createSchemaRequest.getSchemaName())
+                .version(versionSupplier.get().generateVersionId("V"))
                 .schemaState(SchemaState.CREATED)
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())

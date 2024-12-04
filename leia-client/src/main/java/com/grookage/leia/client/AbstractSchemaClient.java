@@ -46,7 +46,7 @@ public abstract class AbstractSchemaClient implements LeiaSchemaClient {
             throw new IllegalStateException("The configuration object has returned null data. Something gone wrong with refresher");
         }
         return refresher.getData().stream()
-                .filter(each -> namespaces.contains(each.getSchemaKey().getNamespace())).toList();
+                .filter(each -> namespaces.contains(each.getNamespace())).toList();
     }
 
     public boolean valid(SchemaKey schemaKey) {

@@ -28,6 +28,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
@@ -39,8 +40,12 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
-    @NotNull
-    SchemaKey schemaKey;
+    @NotBlank
+    String namespace;
+    @NotBlank
+    String schemaName;
+    @NotBlank
+    String version;
     String description;
     @NotNull
     SchemaState schemaState;
@@ -56,15 +61,20 @@ public class SchemaDetails {
 
     @JsonIgnore
     public boolean match(final SchemaKey thatKey) {
-        return schemaKey.equals(thatKey);
+        return getReferenceId().equals(thatKey.getReferenceId());
     }
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(":").join(
-                schemaKey.getNamespace(),
-                schemaKey.getSchemaName(),
-                schemaKey.getVersion()
-        ).toUpperCase(Locale.ROOT);
+        return Joiner.on(".").join(namespace, schemaName, version)
+                .toUpperCase(Locale.ROOT);
+    }
+
+    public SchemaKey getSchemaKey() {
+        return SchemaKey.builder()
+                .schemaName(schemaName)
+                .namespace(namespace)
+                .version(version)
+                .build();
     }
 }

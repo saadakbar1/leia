@@ -42,13 +42,13 @@ public class SchemaRegistry {
     }
 
     public List<SchemaDetails> getSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.getSchemaKey().getNamespace()) &&
+        return schemas.values().stream().filter(each -> namespaces.contains(each.getNamespace()) &&
                         each.getSchemaState() == SchemaState.APPROVED)
                 .toList();
     }
 
     public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.getSchemaKey().getNamespace()))
+        return schemas.values().stream().filter(each -> namespaces.contains(each.getNamespace()))
                 .toList();
     }
 }
