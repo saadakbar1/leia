@@ -2,9 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 ## [0.0.1-RC8]
-- SchemaResource - Bug fix in SchemaValidation resource
+
 - LeiaElasticBundle: Fixes the override for adding ElasticHealthCheck
-- Removed the unused `LeiaCompiledPath` class 
+- Removed the unused `LeiaCompiledPath` class
+- SchemaDetails: 
+  - Moved the nested `SchemaKey` attributes to the class level
+  - made the getReferenceId() uniform with `SchemaKey` implementation 
+- FieldUtils: Excluding non-serializable fields(static, transient, @JsonIgnore) for building the schema attributes
+- SchemaResource: Bug fix in SchemaValidation resource
+
 
 ## [0.0.1-RC7]
 
