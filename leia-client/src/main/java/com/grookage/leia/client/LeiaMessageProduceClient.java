@@ -88,7 +88,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 .build()
         );
         final var sourceSchemaDetails = super.getSchemaDetails()
-                .stream().filter(each -> each.getSchemaKey().equals(schemaKey))
+                .stream().filter(each -> each.match(schemaKey))
                 .findFirst().orElse(null);
 
         final var transformationTargets = null == sourceSchemaDetails ? null :
@@ -112,10 +112,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     @Override
     public void start() {
         super.getSchemaDetails().forEach(schemaDetails -> {
-            final var validSchema = super.valid(schemaDetails.getSchemaKey());
+            final var schemaKey = schemaDetails.getSchemaKey();
+            final var validSchema = super.valid(schemaKey);
             if (!validSchema) {
                 log.error("The source schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                        schemaDetails.getSchemaKey());
+                        schemaKey);
                 throw new IllegalStateException("Invalid source schema");
             }
             final var transformationTargets = schemaDetails.getTransformationTargets();

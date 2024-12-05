@@ -24,6 +24,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Locale;
 
 @Builder
@@ -32,13 +33,16 @@ import java.util.Locale;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaKey {
+    @NotBlank
     private String namespace;
+    @NotBlank
     private String schemaName;
+    @NotBlank
     private String version;
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(".").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+        return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
     @Override

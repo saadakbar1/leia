@@ -28,8 +28,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Locale;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -38,27 +40,41 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
-    @NotNull SchemaKey schemaKey;
+    @NotBlank
+    String namespace;
+    @NotBlank
+    String schemaName;
+    @NotBlank
+    String version;
     String description;
-    @NotNull SchemaState schemaState;
-    @NotNull SchemaType schemaType;
+    @NotNull
+    SchemaState schemaState;
+    @NotNull
+    SchemaType schemaType;
     SchemaValidationType validationType = SchemaValidationType.MATCHING;
-    @NotNull SchemaMeta schemaMeta;
-    @NotEmpty Set<SchemaAttribute> attributes;
+    @NotNull
+    SchemaMeta schemaMeta;
+    @NotEmpty
+    Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
 
     @JsonIgnore
     public boolean match(final SchemaKey thatKey) {
-        return schemaKey.equals(thatKey);
+        return getReferenceId().equals(thatKey.getReferenceId());
     }
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(":").join(
-                schemaKey.getNamespace(),
-                schemaKey.getSchemaName(),
-                schemaKey.getVersion()
-        );
+        return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+    }
+
+    @JsonIgnore
+    public SchemaKey getSchemaKey() {
+        return SchemaKey.builder()
+                .schemaName(schemaName)
+                .namespace(namespace)
+                .version(version)
+                .build();
     }
 }

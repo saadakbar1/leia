@@ -1,9 +1,7 @@
 {
-  "schemaKey": {
-    "namespace": "testNamespace",
-    "schemaName": "testSchema",
-    "version": "V1234"
-  },
+  "namespace": "testNamespace",
+  "schemaName": "testSchema",
+  "version": "V1234",
   "schemaState": "CREATED",
   "schemaType": "JSON",
   "schemaMeta": {

@@ -43,11 +43,9 @@ class SchemaUtilsTest {
                 "testEmail", () -> generator
         );
         Assertions.assertNotNull(schemaDetails);
-        final var schemaKey = schemaDetails.getSchemaKey();
-        Assertions.assertNotNull(schemaKey);
-        Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
-        Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
-        Assertions.assertEquals("V1234", schemaKey.getVersion());
+        Assertions.assertEquals("testNamespace", schemaDetails.getNamespace());
+        Assertions.assertEquals("testSchema", schemaDetails.getSchemaName());
+        Assertions.assertEquals("V1234", schemaDetails.getVersion());
         final var schemaMeta = schemaDetails.getSchemaMeta();
         Assertions.assertNotNull(schemaMeta);
         Assertions.assertEquals("testUser", schemaMeta.getCreatedBy());

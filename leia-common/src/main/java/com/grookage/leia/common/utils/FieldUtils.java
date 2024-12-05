@@ -16,9 +16,11 @@
 
 package com.grookage.leia.common.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +30,18 @@ public class FieldUtils {
     public List<Field> getAllFields(final Class<?> type) {
         List<Field> fields = new ArrayList<>();
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
+            Arrays.stream(c.getDeclaredFields())
+                    .filter(field -> !isNonSerializable(field))
+                    .forEach(fields::add);
         }
         return fields;
+    }
+
+    private boolean isNonSerializable(final Field field) {
+        if (field.isAnnotationPresent(JsonIgnore.class)) {
+            return true;
+        }
+        int modifiers = field.getModifiers();
+        return Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers);
     }
 }

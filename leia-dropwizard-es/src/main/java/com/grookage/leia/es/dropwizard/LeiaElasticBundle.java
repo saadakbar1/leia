@@ -46,6 +46,7 @@ public abstract class LeiaElasticBundle<T extends Configuration, U extends Schem
         return () -> elasticSchemaRepository;
     }
 
+    @Override
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
         return List.of(new ElasticHealthCheck(elasticConfig, elasticsearchClient));
     }

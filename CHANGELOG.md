@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC8]
+
+- SchemaDetails: 
+  - Moved the nested `SchemaKey` attributes to the class level
+  - made the getReferenceId() uniform with `SchemaKey` implementation 
+- FieldUtils: Excluding non-serializable fields(static, transient, @JsonIgnore) for building the schema attributes
+- SchemaResource: Bug fix in SchemaValidation resource
+- Removed the unused `LeiaCompiledPath` class
+
 ## [0.0.1-RC7]
 
 - Introduced a `leia-common` module to host all the common utils classes
