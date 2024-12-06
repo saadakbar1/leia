@@ -18,7 +18,6 @@ package com.grookage.leia.core.ingestion.utils;
 
 import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaMeta;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;

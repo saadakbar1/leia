@@ -62,7 +62,7 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
         storedSchema.getSchemaMeta().setUpdatedByEmail(email);
         storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
         storedSchema.setSchemaState(SchemaState.APPROVED);
-        getRepositorySupplier().get().update(storedSchema);
+        getRepositorySupplier().get().rollOverAndUpdate(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

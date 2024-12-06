@@ -32,6 +32,8 @@ public interface SchemaRepository {
 
     void update(final SchemaDetails schema);
 
+    void rollOverAndUpdate(final SchemaDetails schema);
+
     Optional<SchemaDetails> get(final SchemaKey schemaKey);
 
     List<SchemaDetails> getSchemas(final Set<String> namespaces,
