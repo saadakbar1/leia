@@ -40,6 +40,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -125,9 +126,11 @@ public class ElasticRepository extends AbstractSchemaRepository {
                 SchemaDetails.class
         );
         final var newSchemas = storedResults.hits().hits().stream()
-                .map(Hit::source).collect(Collectors.toList());
-        newSchemas.stream().filter(each -> !each.getReferenceId().equalsIgnoreCase(schema.getReferenceId()))
-                .forEach(each -> each.setSchemaState(SchemaState.ROLLED));
+                .map(Hit::source)
+                .filter(Objects::nonNull)
+                .filter(each -> !each.getReferenceId().equalsIgnoreCase(schema.getReferenceId()))
+                .peek(each -> each.setSchemaState(SchemaState.ROLLED))
+                .collect(Collectors.toList());
         newSchemas.add(schema);
         final var br = new BulkRequest.Builder()
                 .index(SCHEMA_INDEX)
