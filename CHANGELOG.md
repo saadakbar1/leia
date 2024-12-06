@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC9]
+
+- RollOverAndUpdate
+  - Introduced rollOverAndUpdate, fixing a bug of multiple approved records.
+
 ## [0.0.1-RC8]
 
 - SchemaDetails: 
