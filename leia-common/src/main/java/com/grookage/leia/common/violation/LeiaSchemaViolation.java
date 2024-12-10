@@ -4,4 +4,6 @@ public interface LeiaSchemaViolation {
     String message();
 
     String fieldPath();
+
+    Class<?> rootKlass();
 }

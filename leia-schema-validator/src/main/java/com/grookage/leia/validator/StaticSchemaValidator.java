@@ -52,7 +52,7 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     }
 
     @SneakyThrows
-    private Set<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
+    private List<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
         final var details = supplier.get().stream()
                 .filter(each -> each.match(schemaKey)).findFirst().orElse(null);
         if (null == details) {
@@ -64,7 +64,7 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     @Override
     public void start() {
         log.info("Starting the schema validator");
-        Map<SchemaKey, Set<LeiaSchemaViolation>> violations = new HashMap<>();
+        Map<SchemaKey, List<LeiaSchemaViolation>> violations = new HashMap<>();
         packageRoots.forEach(handlerPackage -> {
             final var reflections = new Reflections(handlerPackage);
             final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaDefinition.class);

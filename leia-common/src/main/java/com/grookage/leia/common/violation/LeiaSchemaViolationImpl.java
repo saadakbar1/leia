@@ -1,5 +1,6 @@
 package com.grookage.leia.common.violation;
 
+import com.google.common.base.Joiner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class LeiaSchemaViolationImpl implements LeiaSchemaViolation {
     private String message;
     private String fieldPath;
+    private Class<?> rootKlass;
 
     @Override
     public String message() {
@@ -24,7 +26,13 @@ public class LeiaSchemaViolationImpl implements LeiaSchemaViolation {
     }
 
     @Override
+    public Class<?> rootKlass() {
+        return rootKlass;
+    }
+
     public String toString() {
-        return String.format("[Violation] %s: %s", fieldPath, message);
+        return Joiner.on(":")
+                .skipNulls()
+                .join(rootKlass, fieldPath, message);
     }
 }
