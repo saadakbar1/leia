@@ -117,7 +117,7 @@ public class SchemaPayloadValidator {
             final var keyNode = entry.getKey() != null
                     ? MapperUtils.mapper().convertValue(entry.getKey(), JsonNode.class)
                     : null;
-            if (!Objects.isNull(keyNode)) {
+            if (Objects.nonNull(keyNode)) {
                 // validate Key
                 validateField(keyNode, mapAttribute.getKeyAttribute(), schemaValidationType, validationErrors);
                 // Validate value
