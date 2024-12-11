@@ -56,7 +56,8 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
         final var details = supplier.get().stream()
                 .filter(each -> each.match(schemaKey)).findFirst().orElse(null);
         if (null == details) {
-            throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND);
+            throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND,
+                    String.format("No schema found with key: %s", schemaKey.getReferenceId()));
         }
         return SchemaValidationUtils.valid(details, klass);
     }
@@ -85,7 +86,10 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
         });
         if (!violations.isEmpty()) {
             log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", violations);
-            throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS);
+            throw SchemaValidationException.builder()
+                    .errorCode(ValidationErrorCode.INVALID_SCHEMAS)
+                    .context(Map.of("schemaViolations", violations))
+                    .build();
         }
     }
 

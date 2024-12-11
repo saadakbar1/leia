@@ -56,6 +56,17 @@
             <artifactId>commons-lang3</artifactId>
             <version>${lang3.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.leia</groupId>
+            <artifactId>leia-models</artifactId>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
     </dependencies>
 

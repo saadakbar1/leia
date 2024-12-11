@@ -1,6 +1,8 @@
 package com.grookage.leia.common.utils;
 
 import com.grookage.leia.common.exception.ValidationErrorCode;
+import com.grookage.leia.common.stubs.NestedStub;
+import com.grookage.leia.common.stubs.PIIData;
 import com.grookage.leia.common.violation.ViolationContext;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.ArrayAttribute;
@@ -108,14 +110,14 @@ class SchemaValidationUtilsTest {
     @Test
     void testRawArray() {
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, null);
-//        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-//                Set.of(arrayAttribute), RawSetTestClass.class, new ViolationContext()).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
+                Set.of(arrayAttribute), RawSetTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
                 Set.of(arrayAttribute), SetTestClass.class, new ViolationContext()).isEmpty());
-//        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-//                Set.of(arrayAttribute), ListTestClass.class, new ViolationContext()).isEmpty());
-//        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-//                Set.of(arrayAttribute), ArrayTestClass.class, new ViolationContext()).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
+                Set.of(arrayAttribute), ListTestClass.class, new ViolationContext()).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
+                Set.of(arrayAttribute), ArrayTestClass.class, new ViolationContext()).isEmpty());
     }
 
     @Test
@@ -159,6 +161,23 @@ class SchemaValidationUtilsTest {
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, listAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
                 GenericArrayTestClass.class, new ViolationContext()).isEmpty());
+    }
+
+    @SneakyThrows
+    @Test
+    void testInvalidNestedStubSchema() {
+        final var schemaDetails = ResourceHelper.getResource("invalidNestedStubSchema.json", SchemaDetails.class);
+        final var violations = SchemaValidationUtils.valid(schemaDetails, NestedStub.class);
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertEquals(4, violations.size());
+        final var nestedStubViolations = violations.stream()
+                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(NestedStub.class))
+                .toList();
+        Assertions.assertEquals(3, nestedStubViolations.size());
+        final var piiDataViolations = violations.stream()
+                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(PIIData.class))
+                .toList();
+        Assertions.assertEquals(1, piiDataViolations.size());
     }
 
     enum TestEnum {

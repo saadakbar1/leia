@@ -1,0 +1,92 @@
+{
+  "namespace": "testNamespace",
+  "schemaName": "NestedStub",
+  "version": "V1234",
+  "schemaState": "CREATED",
+  "schemaType": "JSON",
+  "validationType": "STRICT",
+  "schemaMeta": {
+    "createdBy": "testUser"
+  },
+  "attributes": [
+    {
+      "type": "INTEGER",
+      "name": "phoneNumber",
+      "optional": false,
+      "qualifiers": [
+        {
+          "type": "PII"
+        }
+      ]
+    },
+    {
+      "type": "OBJECT",
+      "name": "piiData",
+      "optional": false,
+      "qualifiers": [
+        {
+          "type": "ENCRYPTED"
+        },
+        {
+          "type": "PII"
+        }
+      ],
+      "nestedAttributes": [
+        {
+          "type": "STRING",
+          "name": "accountNumber",
+          "optional": false,
+          "qualifiers": [
+            {
+              "type": "ENCRYPTED"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "LONG",
+      "name": "id",
+      "optional": false,
+      "qualifiers": []
+    },
+    {
+      "type": "ENUM",
+      "name": "enumClass",
+      "optional": false,
+      "qualifiers": [],
+      "values": [
+        "ONE",
+        "TWO"
+      ]
+    },
+    {
+      "type": "OBJECT",
+      "name": "recordStub",
+      "optional": false,
+      "qualifiers": [
+        {
+          "type": "ENCRYPTED"
+        }
+      ],
+      "nestedAttributes": [
+        {
+          "type": "INTEGER",
+          "name": "id",
+          "optional": true,
+          "qualifiers": []
+        },
+        {
+          "type": "STRING",
+          "name": "name",
+          "optional": false,
+          "qualifiers": [
+            {
+              "type": "PII"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

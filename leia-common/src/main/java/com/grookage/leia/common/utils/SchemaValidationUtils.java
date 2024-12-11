@@ -19,11 +19,7 @@ package com.grookage.leia.common.utils;
 import com.google.common.collect.Sets;
 import com.grookage.leia.common.violation.LeiaSchemaViolation;
 import com.grookage.leia.common.violation.ViolationContext;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeHandler;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
@@ -31,14 +27,8 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,7 +38,7 @@ public class SchemaValidationUtils {
     static Function<Class<?>, Function<SchemaAttribute, Boolean>> assignableCheckFunction =
             klass -> attribute -> ClassUtils.isAssignable(klass, attribute.getType().getAssignableClass());
 
-    private static final String TYPE_VIOLATION = "Incompatible Type, expected: %s, provided: %s";
+    private static final String TYPE_MISMATCH_MESSAGE = "Type mismatch, expected: %s, provided: %s";
 
     public List<LeiaSchemaViolation> valid(final SchemaDetails schemaDetails,
                                            final Class<?> klass) {
@@ -61,7 +51,7 @@ public class SchemaValidationUtils {
                                            final ViolationContext context) {
         context.pushClass(klass);
         final var fields = FieldUtils.getAllFields(klass);
-        validSchema(validationType, attributes, fields, klass, context);
+        validSchema(validationType, attributes, fields, context);
         attributes.forEach(each -> validAttribute(each, fields, validationType, context));
         context.popClass();
         return context.getViolations();
@@ -70,7 +60,6 @@ public class SchemaValidationUtils {
     private void validSchema(final SchemaValidationType validationType,
                              final Set<SchemaAttribute> attributes,
                              final List<Field> fields,
-                             final Class<?> klass,
                              final ViolationContext context) {
         final var fieldNames = fields.stream()
                 .map(Field::getName)
@@ -136,7 +125,7 @@ public class SchemaValidationUtils {
                        final Class<?> klass,
                        final ViolationContext context) {
         if (!isMatchingType(klass, schemaAttribute)) {
-            context.addViolation(String.format(TYPE_VIOLATION, schemaAttribute.getType(), klass.getSimpleName()),
+            context.addViolation(String.format(TYPE_MISMATCH_MESSAGE, schemaAttribute.getType(), klass.getSimpleName()),
                     schemaAttribute.getName());
             return;
         }
@@ -144,10 +133,12 @@ public class SchemaValidationUtils {
         schemaAttribute.accept(new SchemaAttributeHandler<Void>(a -> null) {
             @Override
             public Void accept(ArrayAttribute attribute) {
-                if (klass.isArray()) {
-                    valid(validationType, attribute.getElementAttribute(), klass.getComponentType(), context);
-                    return null;
-                } else if (!Objects.isNull(attribute.getElementAttribute())) {
+                if (Objects.nonNull(attribute.getElementAttribute())) {
+                    if (klass.isArray()) {
+                        valid(validationType, attribute.getElementAttribute(), klass.getComponentType(), context);
+                        return null;
+                    }
+                    // Provided List, Set expected List<?>, Set<?>
                     context.addViolation(String.format("Missing Type arguments, expected ParameterizedType:%s",
                             attribute.getElementAttribute().getType()), attribute.getName());
                 }
@@ -156,7 +147,8 @@ public class SchemaValidationUtils {
 
             @Override
             public Void accept(MapAttribute attribute) {
-                if (!Objects.isNull(attribute.getKeyAttribute()) || !Objects.isNull(attribute.getValueAttribute())) {
+                if (Objects.nonNull(attribute.getKeyAttribute()) || Objects.nonNull(attribute.getValueAttribute())) {
+                    // Provided Map, expected Map<?,?>
                     context.addViolation(String.format("Missing Type Arguments, expected parameterized Types key:%s value:%s",
                             attribute.getKeyAttribute().getType(), attribute.getValueAttribute().getType()), attribute.getName());
                 }
@@ -165,7 +157,9 @@ public class SchemaValidationUtils {
 
             @Override
             public Void accept(ObjectAttribute attribute) {
-                valid(validationType, attribute.getNestedAttributes(), klass, context);
+                if (Objects.nonNull(attribute.getNestedAttributes())) {
+                    valid(validationType, attribute.getNestedAttributes(), klass, context);
+                }
                 return null;
             }
         });
@@ -189,7 +183,7 @@ public class SchemaValidationUtils {
             valid(validationType, mapAttribute.getKeyAttribute(), typeArguments[0], context);
             valid(validationType, mapAttribute.getValueAttribute(), typeArguments[1], context);
         } else {
-            context.addViolation(String.format(TYPE_VIOLATION, attribute.getType(), parameterizedType), attribute.getName());
+            context.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), parameterizedType), attribute.getName());
         }
     }
 
@@ -201,7 +195,7 @@ public class SchemaValidationUtils {
             valid(validationType, arrayAttribute.getElementAttribute(), arrayType.getGenericComponentType(), context);
             return;
         }
-        context.addViolation(String.format(TYPE_VIOLATION, attribute.getType(), arrayType), attribute.getName());
+        context.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), arrayType), attribute.getName());
     }
 
     private boolean isMatchingType(final Class<?> klass,
@@ -214,7 +208,7 @@ public class SchemaValidationUtils {
 
             @Override
             public Boolean accept(ObjectAttribute attribute) {
-                if (klass.equals(Object.class) && !Objects.isNull(attribute.getNestedAttributes())) {
+                if (klass.equals(Object.class) && Objects.nonNull(attribute.getNestedAttributes())) {
                     return false;
                 }
                 return true;
