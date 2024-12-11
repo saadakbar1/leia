@@ -1,8 +1,21 @@
 package com.grookage.leia.common.utils;
 
 import com.grookage.leia.common.exception.ValidationErrorCode;
+import com.grookage.leia.common.stubs.NestedStub;
+import com.grookage.leia.common.stubs.PIIData;
+import com.grookage.leia.common.violation.ViolationContext;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.SneakyThrows;
@@ -21,9 +34,9 @@ class SchemaValidationUtilsTest {
         final var schemaDetails = ResourceHelper
                 .getResource("validSchema.json", SchemaDetails.class);
         Assertions.assertNotNull(schemaDetails);
-        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class));
+        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
         schemaDetails.setValidationType(SchemaValidationType.STRICT);
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class));
+        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
     }
 
     @Test
@@ -33,7 +46,7 @@ class SchemaValidationUtilsTest {
                 .getResource("validSchema.json", SchemaDetails.class);
         schemaDetails.setValidationType(SchemaValidationType.MATCHING);
         Assertions.assertNotNull(schemaDetails);
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidTestClass.class));
+        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidTestClass.class).isEmpty());
     }
 
     @Test
@@ -85,26 +98,26 @@ class SchemaValidationUtilsTest {
         final var stringAttribute = new StringAttribute("stringAttribute", true, null);
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, stringAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                SetTestClass.class));
+                SetTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ListTestClass.class));
+                ListTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ArrayTestClass.class));
+                ArrayTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                RawSetTestClass.class));
+                RawSetTestClass.class, new ViolationContext()).isEmpty());
     }
 
     @Test
     void testRawArray() {
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), RawSetTestClass.class));
+                Set.of(arrayAttribute), RawSetTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), SetTestClass.class));
+                Set.of(arrayAttribute), SetTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), ListTestClass.class));
+                Set.of(arrayAttribute), ListTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), ArrayTestClass.class));
+                Set.of(arrayAttribute), ArrayTestClass.class, new ViolationContext()).isEmpty());
     }
 
     @Test
@@ -113,22 +126,22 @@ class SchemaValidationUtilsTest {
         final var valueAttribute = new StringAttribute("valueAttribute", true, null);
         final var mapAttribute = new MapAttribute("mapAttribute", true, null, keyAttribute, valueAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class));
+                MapTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class));
+                ConcurrentMapTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class));
+                RawMapTestClass.class, new ViolationContext()).isEmpty());
     }
 
     @Test
     void testRawMap() {
         final var mapAttribute = new MapAttribute("mapAttribute", true, null, null, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class));
+                RawMapTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class));
+                MapTestClass.class, new ViolationContext()).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class));
+                ConcurrentMapTestClass.class, new ViolationContext()).isEmpty());
     }
 
     @Test
@@ -137,8 +150,8 @@ class SchemaValidationUtilsTest {
         final var schemaDetails = ResourceHelper
                 .getResource("validNestedSchema.json", SchemaDetails.class);
         schemaDetails.setValidationType(SchemaValidationType.MATCHING);
-        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidObjectTestClass.class));
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidObjectTestClass.class));
+        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidObjectTestClass.class).isEmpty());
+        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidObjectTestClass.class).isEmpty());
     }
 
     @Test
@@ -147,7 +160,24 @@ class SchemaValidationUtilsTest {
         final var listAttribute = new ArrayAttribute("listAttribute", true, null, stringAttribute);
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, listAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                GenericArrayTestClass.class));
+                GenericArrayTestClass.class, new ViolationContext()).isEmpty());
+    }
+
+    @SneakyThrows
+    @Test
+    void testInvalidNestedStubSchema() {
+        final var schemaDetails = ResourceHelper.getResource("invalidNestedStubSchema.json", SchemaDetails.class);
+        final var violations = SchemaValidationUtils.valid(schemaDetails, NestedStub.class);
+        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertEquals(4, violations.size());
+        final var nestedStubViolations = violations.stream()
+                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(NestedStub.class))
+                .toList();
+        Assertions.assertEquals(3, nestedStubViolations.size());
+        final var piiDataViolations = violations.stream()
+                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(PIIData.class))
+                .toList();
+        Assertions.assertEquals(1, piiDataViolations.size());
     }
 
     enum TestEnum {

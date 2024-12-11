@@ -1,0 +1,43 @@
+{
+  "namespace" : "test",
+  "schemaName" : "TEST_RECORD",
+  "version" : "v1",
+  "description" : "Test Record",
+  "schemaState" : "CREATED",
+  "schemaType" : "JSON",
+  "validationType" : "STRICT",
+  "schemaMeta" : {
+    "createdBy" : "testUser",
+    "createdByEmail" : "testEmail",
+    "createdAt" : 1733897544626,
+    "updatedBy" : null,
+    "updatedByEmail" : null,
+    "updatedAt" : 0
+  },
+  "attributes" : [ {
+    "type" : "INTEGER",
+    "name" : "ttl",
+    "optional" : false,
+    "qualifiers" : [ ]
+  }, {
+    "type" : "STRING",
+    "name" : "accountNumber",
+    "optional" : false,
+    "qualifiers" : [ {
+      "type" : "ENCRYPTED"
+    }, {
+      "type" : "PII"
+    } ]
+  }, {
+    "type" : "STRING",
+    "name" : "accountId",
+    "optional" : true,
+    "qualifiers" : [ ]
+  }, {
+    "type" : "LONG",
+    "name" : "id",
+    "optional" : false,
+    "qualifiers" : [ ]
+  } ],
+  "transformationTargets" : [ ]
+}

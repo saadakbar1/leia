@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.0.1-RC10]
+
+- LeiaSchemaViolation
+  - Introduced SchemaViolation & ViolationContext for generating violations as part of schema validation
+- SchemaValidationUtils: Returns list of LeiaSchemaViolations instead of boolean
+- StaticSchemaValidator: Updated to return all schema validation violations instead of stopping at the first error occurrence
+- LeiaClientMarshaller: Bug fix in serialization
+- Adds tests for `leia-schema-validator` module
+
 ## [0.0.1-RC9]
 
 - RollOverAndUpdate
