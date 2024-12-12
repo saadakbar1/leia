@@ -17,11 +17,13 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
 import com.grookage.leia.client.stubs.TestSchemaUnit;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.LeiaSchemaValidator;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 class LeiaMessageProduceClientTest {
@@ -63,6 +66,10 @@ class LeiaMessageProduceClientTest {
                 .mapper(new ObjectMapper())
                 .refresher(clientRefresher)
                 .schemaValidator(schemaValidator)
+                .messageProcessor(() -> messages -> {
+                    Assertions.assertFalse(messages.isEmpty());
+                    Assertions.assertEquals(2, messages.size());
+                })
                 .build();
         schemaClient.start();
         final var testSchema = TestSchema.builder()
@@ -70,10 +77,6 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        schemaClient.processMessages(sourceSchema, mapper.writeValueAsBytes(testSchema), messages -> {
-            Assertions.assertFalse(messages.isEmpty());
-            Assertions.assertEquals(2, messages.size());
-            return messages;
-        });
+        schemaClient.processMessages(sourceSchema, mapper.writeValueAsBytes(testSchema));
     }
 }

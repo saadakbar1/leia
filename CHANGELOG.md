@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC11]
+
+- MessageProcessor
+  - Introduced MessageProcessor in LeiaMessageProduceClient instead of a lambda
+  - GetMessages from LeiaMessageProducerClient is now public
 
 ## [0.0.1-RC10]
 
