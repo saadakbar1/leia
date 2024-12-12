@@ -19,6 +19,7 @@ package com.grookage.leia.dw.client;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
+import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
@@ -65,6 +66,8 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .build();
     }
 
+    protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
+
     @Override
     public void run(T configuration, Environment environment) {
         final var namespaceDataSource = getNamespaceDataSource(configuration);
@@ -94,6 +97,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .refresher(clientRefresher)
                     .schemaValidator(validator)
                     .mapper(environment.getObjectMapper())
+                    .messageProcessor(getMessageProcessor(configuration))
                     .build();
             producerClient.start();
         }

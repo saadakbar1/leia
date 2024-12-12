@@ -16,6 +16,7 @@
 
 package com.grookage.leia.client;
 
+import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 
@@ -42,6 +44,8 @@ import java.util.function.UnaryOperator;
 public class LeiaMessageProduceClient extends AbstractSchemaClient {
 
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
+
+    private final Supplier<MessageProcessor> messageProcessor;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -80,7 +84,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 Optional.ofNullable(compiledPaths.get(schemaKey).get(attributeName)) : Optional.empty();
     }
 
-    private Map<SchemaKey, LeiaMessage> getMessages(SchemaKey schemaKey, byte[] sourceMessage) {
+    public Map<SchemaKey, LeiaMessage> getMessages(SchemaKey schemaKey, byte[] sourceMessage) {
         final var messages = new HashMap<SchemaKey, LeiaMessage>();
         messages.put(schemaKey, LeiaMessage.builder()
                 .schemaKey(schemaKey)
@@ -104,9 +108,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     }
 
     public void processMessages(final SchemaKey schemaKey,
-                                final byte[] sourceMessage,
-                                final UnaryOperator<Map<SchemaKey, LeiaMessage>> messageHandler) {
-        messageHandler.apply(getMessages(schemaKey, sourceMessage));
+                                final byte[] sourceMessage) {
+        messageProcessor.get().processMessages(getMessages(schemaKey, sourceMessage));
     }
 
     @Override
