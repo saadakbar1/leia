@@ -16,6 +16,7 @@
 
 package com.grookage.leia.models.mux;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.models.schema.SchemaKey;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Builder
@@ -36,5 +38,5 @@ public class LeiaMessage {
     private SchemaKey schemaKey;
     private List<String> tags = List.of();
     @NotNull
-    private byte[] message;
+    private JsonNode message;
 }

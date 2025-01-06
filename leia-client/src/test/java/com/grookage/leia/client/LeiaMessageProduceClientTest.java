@@ -24,6 +24,7 @@ import com.grookage.leia.client.stubs.TestSchema;
 import com.grookage.leia.client.stubs.TestSchemaUnit;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.LeiaSchemaValidator;
@@ -77,6 +78,10 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        schemaClient.processMessages(sourceSchema, mapper.writeValueAsBytes(testSchema));
+        schemaClient.processMessages(MessageRequest.builder()
+                                             .schemaKey(sourceSchema)
+                                             .message(mapper.valueToTree(testSchema))
+                                             .includeSource(true)
+                                             .build());
     }
 }

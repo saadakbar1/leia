@@ -16,25 +16,28 @@
 
 package com.grookage.leia.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -46,6 +49,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
 
     private final Supplier<MessageProcessor> messageProcessor;
+
+    private static final Configuration configuration = Configuration.builder()
+            .jsonProvider(new JacksonJsonNodeJsonProvider())
+            .mappingProvider(new JacksonMappingProvider())
+            .build();
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -60,13 +68,13 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == registeredKlass) {
             return Optional.empty();
         }
-        final var responseObject = new LinkedHashMap<String, Object>();
+        final var responseObject = JsonNodeFactory.instance.objectNode();
         transformationTarget.getTransformers().forEach(transformer -> {
-            final var jsonPath = getJsonPath(transformationTarget.getSchemaKey(), transformer.getTransformationPath())
+            final var jsonPath = getJsonPath(transformationTarget.getSchemaKey(), transformer.getAttributeName())
                     .orElse(null);
             if (null != jsonPath) {
-                final var attribute = sourceContext.read(jsonPath);
-                responseObject.put(transformer.getAttributeName(), attribute);
+                final JsonNode attribute = sourceContext.read(jsonPath);
+                responseObject.set(transformer.getAttributeName(), attribute);
             }
         });
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
@@ -74,7 +82,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 LeiaMessage.builder()
                         .schemaKey(transformationTarget.getSchemaKey())
                         .tags(transformationTarget.getTags())
-                        .message(responseObject.toString().getBytes(StandardCharsets.UTF_8))
+                        .message(responseObject)
                         .build()
         );
     }
@@ -84,15 +92,17 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 Optional.ofNullable(compiledPaths.get(schemaKey).get(attributeName)) : Optional.empty();
     }
 
-    public Map<SchemaKey, LeiaMessage> getMessages(SchemaKey schemaKey, byte[] sourceMessage) {
+    public Map<SchemaKey, LeiaMessage> getMessages(MessageRequest messageRequest) {
         final var messages = new HashMap<SchemaKey, LeiaMessage>();
-        messages.put(schemaKey, LeiaMessage.builder()
-                .schemaKey(schemaKey)
-                .message(sourceMessage)
-                .build()
-        );
+        if (messageRequest.isIncludeSource()) {
+            messages.put(messageRequest.getSchemaKey(), LeiaMessage.builder()
+                    .schemaKey(messageRequest.getSchemaKey())
+                    .message(messageRequest.getMessage())
+                    .build()
+            );
+        }
         final var sourceSchemaDetails = super.getSchemaDetails()
-                .stream().filter(each -> each.match(schemaKey))
+                .stream().filter(each -> each.match(messageRequest.getSchemaKey()))
                 .findFirst().orElse(null);
 
         final var transformationTargets = null == sourceSchemaDetails ? null :
@@ -100,16 +110,15 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == transformationTargets) {
             return messages;
         }
-        final var documentContext = JsonPath.parse(new String(sourceMessage));
+        final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         transformationTargets.forEach(transformationTarget ->
                 createMessage(documentContext, transformationTarget).ifPresent(message ->
                         messages.put(message.getSchemaKey(), message)));
         return messages;
     }
 
-    public void processMessages(final SchemaKey schemaKey,
-                                final byte[] sourceMessage) {
-        messageProcessor.get().processMessages(getMessages(schemaKey, sourceMessage));
+    public void processMessages(MessageRequest messageRequest) {
+        messageProcessor.get().processMessages(getMessages(messageRequest));
     }
 
     @Override
