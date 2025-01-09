@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC12]
+
+- LeiaMessageProduceClient
+  - Introduced a flag to control whether the source message should be included during multiplexing.
+  - Modified the message datatype to JsonNode from byte[] to reduce serialization overhead.
+
 ## [0.0.1-RC11]
 
 - MessageProcessor

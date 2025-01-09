@@ -17,40 +17,42 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
 import com.grookage.leia.client.stubs.TestSchemaUnit;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 class LeiaMessageProduceClientTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+    private LeiaMessageProduceClient.LeiaMessageProduceClientBuilder<?, ?> schemaClientBuilder;
+    private SchemaKey sourceSchema;
+    private SchemaKey targetSchema;
 
-    @Test
     @SneakyThrows
-    void testLeiaMessageProduceClient() {
+    @BeforeEach
+    void setUp() {
         final var clientRefresher = Mockito.mock(LeiaClientRefresher.class);
         final var schemaValidator = Mockito.mock(LeiaSchemaValidator.class);
-        final var sourceSchema = SchemaKey.builder()
+        sourceSchema = SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
                 .build();
-        final var targetSchema = SchemaKey.builder()
+        targetSchema = SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("v")
@@ -62,11 +64,15 @@ class LeiaMessageProduceClientTest {
         Mockito.when(schemaValidator.getKlass(sourceSchema)).thenReturn(Optional.of(TestSchema.class));
         Mockito.when(schemaValidator.getKlass(targetSchema)).thenReturn(Optional.of(TargetSchema.class));
         Mockito.when(schemaValidator.valid(Mockito.any(SchemaKey.class))).thenReturn(true);
-        final var schemaClient = LeiaMessageProduceClient.builder()
+        schemaClientBuilder = LeiaMessageProduceClient.builder()
                 .mapper(new ObjectMapper())
                 .refresher(clientRefresher)
-                .schemaValidator(schemaValidator)
-                .messageProcessor(() -> messages -> {
+                .schemaValidator(schemaValidator);
+    }
+
+    @Test
+    void testLeiaMessageProduceClient() {
+        final var schemaClient = schemaClientBuilder.messageProcessor(() -> messages -> {
                     Assertions.assertFalse(messages.isEmpty());
                     Assertions.assertEquals(2, messages.size());
                 })
@@ -77,6 +83,31 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        schemaClient.processMessages(sourceSchema, mapper.writeValueAsBytes(testSchema));
+        schemaClient.processMessages(MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(true)
+                .build());
+    }
+
+    @Test
+    void testClientWithoutSourceMessage() {
+        final var schemaClient = schemaClientBuilder.messageProcessor(() -> messages -> {
+                    Assertions.assertFalse(messages.isEmpty());
+                    Assertions.assertEquals(1, messages.size());
+                    Assertions.assertEquals("testUser", messages.get(targetSchema).getMessage().get("name").asText());
+                })
+                .build();
+        schemaClient.start();
+        final var testSchema = TestSchema.builder()
+                .userName("testUser")
+                .schemaUnits(List.of(TestSchemaUnit.builder()
+                        .registeredName("testRegisteredName").build()))
+                .build();
+        schemaClient.processMessages(MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(false)
+                .build());
     }
 }
