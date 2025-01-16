@@ -35,7 +35,6 @@ public abstract class AbstractLeiaRefresher<T> implements LeiaRefresher<T> {
                 TimeUnit.SECONDS,
                 periodicRefresh
         );
-        this.dataProvider.start();
     }
 
     @Override
@@ -46,5 +45,10 @@ public abstract class AbstractLeiaRefresher<T> implements LeiaRefresher<T> {
     @Override
     public void refresh() {
         dataProvider.update();
+    }
+
+    @Override
+    public void start() {
+        this.dataProvider.start();
     }
 }

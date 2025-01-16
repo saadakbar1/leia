@@ -27,6 +27,7 @@ import com.grookage.leia.validator.LeiaSchemaValidator;
 import com.grookage.leia.validator.StaticSchemaValidator;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
 import lombok.Getter;
 
@@ -91,7 +92,13 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .periodicRefresh(refreshEnabled(configuration))
                 .build();
         final var validator = getSchemaValidator(configuration, clientRefresher);
-        validator.start();
+        environment.lifecycle().manage(new Managed() {
+            @Override
+            public void start() throws Exception {
+                clientRefresher.start();
+                validator.start();
+            }
+        });
         if (withProducerClient) {
             producerClient = LeiaMessageProduceClient.builder()
                     .refresher(clientRefresher)
@@ -99,7 +106,12 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .mapper(environment.getObjectMapper())
                     .messageProcessor(getMessageProcessor(configuration))
                     .build();
-            producerClient.start();
+            environment.lifecycle().manage(new Managed() {
+                @Override
+                public void start() throws Exception {
+                    producerClient.start();
+                }
+            });
         }
     }
 }

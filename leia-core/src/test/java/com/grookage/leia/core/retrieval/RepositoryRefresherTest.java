@@ -24,6 +24,7 @@ import com.grookage.leia.models.utils.LeiaUtils;
 import com.grookage.leia.provider.exceptions.RefresherErrorCode;
 import com.grookage.leia.provider.exceptions.RefresherException;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,6 +42,7 @@ class RepositoryRefresherTest {
                 .build();
         Mockito.when(supplier.get()).thenReturn(registry);
         final var refresher = new RepositoryRefresher(supplier, 5, true);
+        refresher.start();
         Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
         registry.add(schemaDetails);
         LeiaUtils.sleepFor(6);
@@ -57,8 +59,9 @@ class RepositoryRefresherTest {
     void testRepositoryRefresher_whenSupplierReturnNullAtStart() {
         final var supplier = Mockito.mock(RepositorySupplier.class);
         Mockito.doReturn(null).when(supplier).get();
+        val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
         final var exception = Assertions.assertThrows(RefresherException.class,
-                () -> new RepositoryRefresher(supplier, 5, true));
+                repositoryRefresher::start);
         Assertions.assertNotNull(exception);
         Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
@@ -67,8 +70,9 @@ class RepositoryRefresherTest {
     void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
         final var supplier = Mockito.mock(RepositorySupplier.class);
         Mockito.doThrow(RefresherException.error(RefresherErrorCode.REFRESH_FAILED)).when(supplier).get();
+        val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
         final var exception = Assertions.assertThrows(RefresherException.class,
-                () -> new RepositoryRefresher(supplier, 5, true));
+                repositoryRefresher::start);
         Assertions.assertNotNull(exception);
         Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }

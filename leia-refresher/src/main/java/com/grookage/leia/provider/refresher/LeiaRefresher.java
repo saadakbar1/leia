@@ -22,4 +22,5 @@ public interface LeiaRefresher<T> {
 
     void refresh();
 
+    void start();
 }
