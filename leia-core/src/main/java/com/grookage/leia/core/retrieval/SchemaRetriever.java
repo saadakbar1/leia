@@ -56,6 +56,7 @@ public class SchemaRetriever {
                     .refreshTimeInSeconds(cacheConfig.getRefreshCacheSeconds())
                     .periodicRefresh(true)
                     .build();
+            refresher.start();
         }
     }
 
