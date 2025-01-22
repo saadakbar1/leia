@@ -106,7 +106,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == retriever) {
             return messages;
         }
-        final var transformationTargets = retriever.getTargets(messageRequest, getRefresher().getData());
+        final var transformationTargets = retriever.getTargets(messageRequest, super.getSchemaDetails());
         if (null == transformationTargets || transformationTargets.isEmpty()) {
             return messages;
         }
