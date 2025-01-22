@@ -29,7 +29,7 @@ public class DefaultTargetRetriever implements TargetRetriever {
 
     @Override
     public Set<TransformationTarget> getTargets(MessageRequest messageRequest, List<SchemaDetails> schemaDetails) {
-        if (null == schemaDetails || schemaDetails.isEmpty() || null == messageRequest) return Set.of();
+        if (null == schemaDetails || null == messageRequest) return Set.of();
         return schemaDetails
                 .stream()
                 .filter(each -> each.getSchemaKey().equals(messageRequest.getSchemaKey()))
