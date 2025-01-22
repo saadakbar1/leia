@@ -17,6 +17,8 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grookage.leia.client.processor.DefaultTargetRetriever;
+import com.grookage.leia.client.processor.TargetRetriever;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
@@ -25,6 +27,7 @@ import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -34,6 +37,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 class LeiaMessageProduceClientTest {
 
@@ -67,15 +71,13 @@ class LeiaMessageProduceClientTest {
         schemaClientBuilder = LeiaMessageProduceClient.builder()
                 .mapper(new ObjectMapper())
                 .refresher(clientRefresher)
-                .schemaValidator(schemaValidator);
+                .schemaValidator(schemaValidator)
+                .targetRetriever(DefaultTargetRetriever::new);
     }
 
     @Test
     void testLeiaMessageProduceClient() {
-        final var schemaClient = schemaClientBuilder.messageProcessor(() -> messages -> {
-                    Assertions.assertFalse(messages.isEmpty());
-                    Assertions.assertEquals(2, messages.size());
-                })
+        final var schemaClient = schemaClientBuilder
                 .build();
         schemaClient.start();
         final var testSchema = TestSchema.builder()
@@ -87,17 +89,15 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build());
+                .build(), messages -> {
+            Assertions.assertFalse(messages.isEmpty());
+            Assertions.assertEquals(2, messages.size());
+        }, null);
     }
 
     @Test
     void testClientWithoutSourceMessage() {
-        final var schemaClient = schemaClientBuilder.messageProcessor(() -> messages -> {
-                    Assertions.assertFalse(messages.isEmpty());
-                    Assertions.assertEquals(1, messages.size());
-                    Assertions.assertEquals("testUser", messages.get(targetSchema).getMessage().get("name").asText());
-                })
-                .build();
+        final var schemaClient = schemaClientBuilder.build();
         schemaClient.start();
         final var testSchema = TestSchema.builder()
                 .userName("testUser")
@@ -108,6 +108,43 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(false)
-                .build());
+                .build(), messages -> {
+            Assertions.assertFalse(messages.isEmpty());
+            Assertions.assertEquals(1, messages.size());
+            Assertions.assertEquals("testUser", messages.get(targetSchema).getMessage().get("name").asText());
+        }, null);
+    }
+
+    @Test
+    void testTargetRetriever() {
+        final var schemaClient = schemaClientBuilder.build();
+        schemaClient.start();
+        final var testSchema = TestSchema.builder()
+                .userName("testUser")
+                .schemaUnits(List.of(TestSchemaUnit.builder()
+                        .registeredName("testRegisteredName").build()))
+                .build();
+        Assertions.assertNotNull(schemaClient.getTargetRetriever());
+        Assertions.assertNotNull(schemaClient.getTargetRetriever().get());
+        Assertions.assertTrue(schemaClient.getTargetRetriever().get() instanceof DefaultTargetRetriever);
+        final var messageRequest = MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(true)
+                .build();
+        var messages = schemaClient.getMessages(messageRequest, null);
+        Assertions.assertNotNull(messages);
+        Assertions.assertFalse(messages.isEmpty());
+        Assertions.assertEquals(2, messages.size());
+        final var testRetriever = new TargetRetriever() {
+            @Override
+            public Set<TransformationTarget> getTargets(MessageRequest messageRequest, List<SchemaDetails> schemaDetails) {
+                return Set.of();
+            }
+        };
+        messages = schemaClient.getMessages(messageRequest, testRetriever);
+        Assertions.assertNotNull(messages);
+        Assertions.assertFalse(messages.isEmpty());
+        Assertions.assertEquals(1, messages.size());
     }
 }

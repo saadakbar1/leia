@@ -71,6 +71,7 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
         storedSchema.getSchemaMeta().setCreatedAt(System.currentTimeMillis());
         storedSchema.setValidationType(updateSchemaRequest.getValidationType());
         storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
+        storedSchema.setData(updateSchemaRequest.getData());
         if (null != updateSchemaRequest.getTransformationTargets()) {
             storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
         }

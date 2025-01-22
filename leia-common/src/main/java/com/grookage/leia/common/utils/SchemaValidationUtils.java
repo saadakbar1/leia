@@ -27,18 +27,23 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @UtilityClass
 @Slf4j
 public class SchemaValidationUtils {
+    private static final String TYPE_MISMATCH_MESSAGE = "Type mismatch, expected: %s, provided: %s";
     static Function<Class<?>, Function<SchemaAttribute, Boolean>> assignableCheckFunction =
             klass -> attribute -> ClassUtils.isAssignable(klass, attribute.getType().getAssignableClass());
-
-    private static final String TYPE_MISMATCH_MESSAGE = "Type mismatch, expected: %s, provided: %s";
 
     public List<LeiaSchemaViolation> valid(final SchemaDetails schemaDetails,
                                            final Class<?> klass) {
@@ -208,10 +213,7 @@ public class SchemaValidationUtils {
 
             @Override
             public Boolean accept(ObjectAttribute attribute) {
-                if (klass.equals(Object.class) && Objects.nonNull(attribute.getNestedAttributes())) {
-                    return false;
-                }
-                return true;
+                return !klass.equals(Object.class) || !Objects.nonNull(attribute.getNestedAttributes());
             }
         });
     }

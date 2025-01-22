@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.mux;
+package com.grookage.leia.client.processor;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.schema.SchemaKey;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Map;
 
-@AllArgsConstructor
-@Builder
-@Data
-@NoArgsConstructor
-public class LeiaMessage {
-
-    @NotEmpty
-    private SchemaKey schemaKey;
-    private List<String> tags = List.of();
-    @NotNull
-    private JsonNode message;
+public class NoOpMessageProcessor implements MessageProcessor {
+    @Override
+    public void processMessages(Map<SchemaKey, LeiaMessage> messages) {
+        //Nothing to here. Gracefully ignore
+    }
 }

@@ -19,6 +19,7 @@ package com.grookage.leia.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.grookage.leia.client.processor.MessageProcessor;
+import com.grookage.leia.client.processor.TargetRetriever;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -46,14 +47,13 @@ import java.util.function.Supplier;
 @Slf4j
 public class LeiaMessageProduceClient extends AbstractSchemaClient {
 
-    private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
-
-    private final Supplier<MessageProcessor> messageProcessor;
-
     private static final Configuration configuration = Configuration.builder()
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .mappingProvider(new JacksonMappingProvider())
             .build();
+    private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
+    private final Supplier<MessageProcessor> messageProcessor;
+    private final Supplier<TargetRetriever> targetRetriever;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -92,7 +92,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 Optional.ofNullable(compiledPaths.get(schemaKey).get(attributeName)) : Optional.empty();
     }
 
-    public Map<SchemaKey, LeiaMessage> getMessages(MessageRequest messageRequest) {
+    public Map<SchemaKey, LeiaMessage> getMessages(MessageRequest messageRequest,
+                                                   TargetRetriever argRetriever) {
         final var messages = new HashMap<SchemaKey, LeiaMessage>();
         if (messageRequest.isIncludeSource()) {
             messages.put(messageRequest.getSchemaKey(), LeiaMessage.builder()
@@ -101,13 +102,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                     .build()
             );
         }
-        final var sourceSchemaDetails = super.getSchemaDetails()
-                .stream().filter(each -> each.match(messageRequest.getSchemaKey()))
-                .findFirst().orElse(null);
-
-        final var transformationTargets = null == sourceSchemaDetails ? null :
-                sourceSchemaDetails.getTransformationTargets();
-        if (null == transformationTargets) {
+        final var retriever = null != argRetriever ? argRetriever : targetRetriever.get();
+        if (null == retriever) {
+            return messages;
+        }
+        final var transformationTargets = retriever.getTargets(messageRequest, getRefresher().getData());
+        if (null == transformationTargets || transformationTargets.isEmpty()) {
             return messages;
         }
         final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
@@ -117,8 +117,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         return messages;
     }
 
-    public void processMessages(MessageRequest messageRequest) {
-        messageProcessor.get().processMessages(getMessages(messageRequest));
+    public void processMessages(MessageRequest messageRequest,
+                                MessageProcessor mProcessor,
+                                TargetRetriever retriever) {
+        final var processor = null != mProcessor ? mProcessor : messageProcessor.get();
+        processor.processMessages(getMessages(messageRequest, retriever));
     }
 
     @Override

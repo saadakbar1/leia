@@ -19,6 +19,7 @@ package com.grookage.leia.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Joiner;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -58,6 +59,7 @@ public class SchemaDetails {
     Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
+    JsonNode data;
 
     @JsonIgnore
     public boolean match(final SchemaKey thatKey) {
