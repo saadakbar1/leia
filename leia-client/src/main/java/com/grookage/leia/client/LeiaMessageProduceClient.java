@@ -19,7 +19,7 @@ package com.grookage.leia.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.grookage.leia.client.processor.MessageProcessor;
-import com.grookage.leia.client.processor.TargetRetriever;
+import com.grookage.leia.client.processor.TargetValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -53,7 +53,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             .build();
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> messageProcessor;
-    private final Supplier<TargetRetriever> targetRetriever;
+    private final Supplier<TargetValidator> targetValidator;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -93,7 +93,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     }
 
     public Map<SchemaKey, LeiaMessage> getMessages(MessageRequest messageRequest,
-                                                   TargetRetriever argRetriever) {
+                                                   TargetValidator tValidator) {
         final var messages = new HashMap<SchemaKey, LeiaMessage>();
         if (messageRequest.isIncludeSource()) {
             messages.put(messageRequest.getSchemaKey(), LeiaMessage.builder()
@@ -102,24 +102,31 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                     .build()
             );
         }
-        final var retriever = null != argRetriever ? argRetriever : targetRetriever.get();
-        if (null == retriever) {
+        final var sourceSchemaDetails = super.getSchemaDetails()
+                .stream().filter(each -> each.match(messageRequest.getSchemaKey()))
+                .findFirst().orElse(null);
+
+        final var transformationTargets = null == sourceSchemaDetails ? null :
+                sourceSchemaDetails.getTransformationTargets();
+        if (null == transformationTargets) {
             return messages;
         }
-        final var transformationTargets = retriever.getTargets(messageRequest, super.getSchemaDetails());
-        if (null == transformationTargets || transformationTargets.isEmpty()) {
-            return messages;
-        }
+
+        final var validator = null != tValidator ? tValidator : targetValidator.get();
         final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
-        transformationTargets.forEach(transformationTarget ->
-                createMessage(documentContext, transformationTarget).ifPresent(message ->
-                        messages.put(message.getSchemaKey(), message)));
+        transformationTargets.
+                stream().filter(each -> null == validator || validator.validate(
+                        each, messageRequest, sourceSchemaDetails
+                ))
+                .forEach(transformationTarget ->
+                        createMessage(documentContext, transformationTarget).ifPresent(message ->
+                                messages.put(message.getSchemaKey(), message)));
         return messages;
     }
 
     public void processMessages(MessageRequest messageRequest,
                                 MessageProcessor mProcessor,
-                                TargetRetriever retriever) {
+                                TargetValidator retriever) {
         final var processor = null != mProcessor ? mProcessor : messageProcessor.get();
         processor.processMessages(getMessages(messageRequest, retriever));
     }

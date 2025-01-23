@@ -17,8 +17,8 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.client.processor.DefaultTargetRetriever;
-import com.grookage.leia.client.processor.TargetRetriever;
+import com.grookage.leia.client.processor.DefaultTargetValidator;
+import com.grookage.leia.client.processor.TargetValidator;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
@@ -37,7 +37,6 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 class LeiaMessageProduceClientTest {
 
@@ -72,7 +71,7 @@ class LeiaMessageProduceClientTest {
                 .mapper(new ObjectMapper())
                 .refresher(clientRefresher)
                 .schemaValidator(schemaValidator)
-                .targetRetriever(DefaultTargetRetriever::new);
+                .targetValidator(DefaultTargetValidator::new);
     }
 
     @Test
@@ -124,9 +123,9 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        Assertions.assertNotNull(schemaClient.getTargetRetriever());
-        Assertions.assertNotNull(schemaClient.getTargetRetriever().get());
-        Assertions.assertTrue(schemaClient.getTargetRetriever().get() instanceof DefaultTargetRetriever);
+        Assertions.assertNotNull(schemaClient.getTargetValidator());
+        Assertions.assertNotNull(schemaClient.getTargetValidator().get());
+        Assertions.assertTrue(schemaClient.getTargetValidator().get() instanceof DefaultTargetValidator);
         final var messageRequest = MessageRequest.builder()
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
@@ -136,10 +135,10 @@ class LeiaMessageProduceClientTest {
         Assertions.assertNotNull(messages);
         Assertions.assertFalse(messages.isEmpty());
         Assertions.assertEquals(2, messages.size());
-        final var testRetriever = new TargetRetriever() {
+        final var testRetriever = new TargetValidator() {
             @Override
-            public Set<TransformationTarget> getTargets(MessageRequest messageRequest, List<SchemaDetails> schemaDetails) {
-                return Set.of();
+            public boolean validate(TransformationTarget transformationTarget, MessageRequest messageRequest, SchemaDetails schemaDetails) {
+                return false;
             }
         };
         messages = schemaClient.getMessages(messageRequest, testRetriever);

@@ -19,9 +19,9 @@ package com.grookage.leia.dw.client;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
-import com.grookage.leia.client.processor.DefaultTargetRetriever;
+import com.grookage.leia.client.processor.DefaultTargetValidator;
 import com.grookage.leia.client.processor.MessageProcessor;
-import com.grookage.leia.client.processor.TargetRetriever;
+import com.grookage.leia.client.processor.TargetValidator;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
@@ -71,8 +71,8 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
 
-    protected Supplier<TargetRetriever> getTargetRetriever(T configuration) {
-        return DefaultTargetRetriever::new;
+    protected Supplier<TargetValidator> getTargetRetriever(T configuration) {
+        return DefaultTargetValidator::new;
     }
 
     @Override
@@ -111,7 +111,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .schemaValidator(validator)
                     .mapper(environment.getObjectMapper())
                     .messageProcessor(getMessageProcessor(configuration))
-                    .targetRetriever(getTargetRetriever(configuration))
+                    .targetValidator(getTargetRetriever(configuration))
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override

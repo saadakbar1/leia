@@ -19,22 +19,9 @@ package com.grookage.leia.client.processor;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
-import lombok.AllArgsConstructor;
 
-import java.util.List;
-import java.util.Set;
-
-@AllArgsConstructor
-public class DefaultTargetRetriever implements TargetRetriever {
-
-    @Override
-    public Set<TransformationTarget> getTargets(MessageRequest messageRequest, List<SchemaDetails> schemaDetails) {
-        if (null == schemaDetails || null == messageRequest) return Set.of();
-        return schemaDetails
-                .stream()
-                .filter(each -> each.getSchemaKey().equals(messageRequest.getSchemaKey()))
-                .findFirst()
-                .map(SchemaDetails::getTransformationTargets)
-                .orElse(Set.of());
-    }
+public interface TargetValidator {
+    boolean validate(TransformationTarget transformationTarget,
+                     MessageRequest messageRequest,
+                     SchemaDetails schemaDetails);
 }

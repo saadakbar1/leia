@@ -19,11 +19,15 @@ package com.grookage.leia.client.processor;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import lombok.AllArgsConstructor;
 
-import java.util.List;
-import java.util.Set;
+@AllArgsConstructor
+public class DefaultTargetValidator implements TargetValidator {
 
-public interface TargetRetriever {
-    Set<TransformationTarget> getTargets(MessageRequest messageRequest,
-                                         List<SchemaDetails> schemaDetails);
+    @Override
+    public boolean validate(TransformationTarget transformationTarget,
+                            MessageRequest messageRequest,
+                            SchemaDetails schemaDetails) {
+        return true;
+    }
 }

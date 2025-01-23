@@ -5,9 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [0.0.1-RC14]
 
 - LeiaMessageProduceClient
-    - Introduced a targetRetriever for dynamically computing transformation targets.
-    - Both the messageProcessor and the target retriever can be runtime args along with initialzied values
-- SchemaDetails : Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema definitions if required
+    - Introduced a TargetValidator for dynamically validating transformation targets.
+    - Both the messageProcessor and the target validator can be runtime args along with initialzied values
+- SchemaDetails : Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema
+  definitions if required
 
 ## [0.0.1-RC13]
 
