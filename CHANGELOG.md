@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC13]
 
-- LeiaClientBundle: Use dropwizard lifecyle to initialize the validator, refresher and producer client
+- LeiaClientBundle: Use dropwizard lifecycle to initialize the validator, refresher and producer client
 - LeiaRefresher: Add a start method to initialize data instead of doing it in constructor
 
 ## [0.0.1-RC12]
