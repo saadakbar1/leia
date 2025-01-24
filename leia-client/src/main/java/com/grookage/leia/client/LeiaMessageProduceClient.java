@@ -142,27 +142,22 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 
     @Override
     public void start() {
-        super.getSchemaDetails().forEach(schemaDetails -> {
-            final var schemaKey = schemaDetails.getSchemaKey();
-            final var validSchema = super.valid(schemaKey);
-            if (!validSchema) {
-                log.error("The source schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                        schemaKey);
-                throw new IllegalStateException("Invalid source schema");
-            }
-            final var transformationTargets = schemaDetails.getTransformationTargets();
-            transformationTargets.forEach(transformationTarget -> {
-                final var valid = super.valid(transformationTarget.getSchemaKey());
-                if (!valid) {
-                    log.error("The transformationSchema schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                            transformationTarget.getSchemaKey());
-                    throw new IllegalStateException("Invalid transformation schema");
-                }
-                final var paths = new HashMap<String, JsonPath>();
-                transformationTarget.getTransformers().forEach(transformer -> paths.put(transformer.getAttributeName(),
-                        JsonPath.compile(transformer.getTransformationPath())));
-                compiledPaths.put(transformationTarget.getSchemaKey(), paths);
-            });
-        });
+        super.getSchemaDetails().stream()
+                .filter(schemaDetails -> super.valid(schemaDetails.getSchemaKey()))
+                .forEach(schemaDetails -> {
+                    final var transformationTargets = schemaDetails.getTransformationTargets();
+                    transformationTargets.forEach(transformationTarget -> {
+                        final var valid = super.valid(transformationTarget.getSchemaKey());
+                        if (!valid) {
+                            log.error("The transformationSchema schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
+                                    transformationTarget.getSchemaKey());
+                            throw new IllegalStateException("Invalid transformation schema");
+                        }
+                        final var paths = new HashMap<String, JsonPath>();
+                        transformationTarget.getTransformers().forEach(transformer -> paths.put(transformer.getAttributeName(),
+                                JsonPath.compile(transformer.getTransformationPath())));
+                        compiledPaths.put(transformationTarget.getSchemaKey(), paths);
+                    });
+                });
     }
 }

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - LeiaMessageProduceClient
     - Introduced a TargetValidator for dynamically validating transformation targets.
     - Both the messageProcessor and the target validator can be runtime args along with initialzied values
+    - No exception on a schema not present in the client side
 - SchemaDetails : 
     - Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema
       definitions if required
