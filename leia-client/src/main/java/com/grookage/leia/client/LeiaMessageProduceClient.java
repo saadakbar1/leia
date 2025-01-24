@@ -18,8 +18,8 @@ package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.grookage.leia.client.processor.MessageProcessor;
-import com.grookage.leia.client.processor.TargetValidator;
+import com.grookage.leia.mux.processors.MessageProcessor;
+import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaKey;

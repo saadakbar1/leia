@@ -40,6 +40,7 @@
         <module>leia-schema-validator</module>
         <module>leia-client</module>
         <module>leia-client-dropwizard</module>
+        <module>leia-processors</module>
     </modules>
 
     <distributionManagement>

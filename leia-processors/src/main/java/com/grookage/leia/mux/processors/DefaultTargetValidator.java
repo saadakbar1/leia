@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.client.processor;
+package com.grookage.leia.mux.processors;
 
-import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.mux.MessageRequest;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import lombok.AllArgsConstructor;
 
-import java.util.Map;
+@AllArgsConstructor
+public class DefaultTargetValidator implements TargetValidator {
 
-public class NoOpMessageProcessor implements MessageProcessor {
     @Override
-    public void processMessages(Map<SchemaKey, LeiaMessage> messages) {
-        //Nothing to here. Gracefully ignore
+    public boolean validate(TransformationTarget transformationTarget,
+                            MessageRequest messageRequest,
+                            SchemaDetails schemaDetails) {
+        return true;
     }
 }

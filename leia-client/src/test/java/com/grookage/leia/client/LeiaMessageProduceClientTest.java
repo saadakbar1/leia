@@ -17,8 +17,8 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.client.processor.DefaultTargetValidator;
-import com.grookage.leia.client.processor.TargetValidator;
+import com.grookage.leia.mux.processors.DefaultTargetValidator;
+import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2024-2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.client.processor;
+package com.grookage.leia.mux.processors;
 
-import com.grookage.leia.models.mux.MessageRequest;
-import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.schema.SchemaKey;
 
-public interface TargetValidator {
-    boolean validate(TransformationTarget transformationTarget,
-                     MessageRequest messageRequest,
-                     SchemaDetails schemaDetails);
+import java.util.Map;
+
+public interface MessageProcessor {
+
+    void processMessages(Map<SchemaKey, LeiaMessage> messages);
+
 }
