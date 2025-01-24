@@ -18,6 +18,8 @@ package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
 import com.grookage.leia.mux.processors.MessageProcessor;
 import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
@@ -55,6 +57,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> messageProcessor;
     private final Supplier<TargetValidator> targetValidator;
+    private final TargetValidator jsonRuleValidator = new JsonRuleTargetValidator();
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -110,16 +113,24 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == transformationTargets) {
             return messages;
         }
-        final var validator = null != tValidator ? tValidator : targetValidator.get();
         final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
-        transformationTargets.
-                stream().filter(each -> null == validator || validator.validate(
-                        each, messageRequest, sourceSchemaDetails
-                ))
+        transformationTargets.stream()
+                .filter(each -> targetValid(messageRequest, sourceSchemaDetails, each, tValidator))
                 .forEach(transformationTarget ->
                         createMessage(documentContext, transformationTarget).ifPresent(message ->
                                 messages.put(message.getSchemaKey(), message)));
         return messages;
+    }
+
+    public boolean targetValid(MessageRequest messageRequest,
+                               SchemaDetails schemaDetails,
+                               TransformationTarget transformationTarget,
+                               TargetValidator tValidator) {
+        var validator = jsonRuleValidator;
+        if (null == transformationTarget.getValidityRule()) {
+            validator = tValidator != null ? tValidator : targetValidator.get();
+        }
+        return null == validator || validator.validate(transformationTarget, messageRequest, schemaDetails);
     }
 
     public void processMessages(MessageRequest messageRequest,

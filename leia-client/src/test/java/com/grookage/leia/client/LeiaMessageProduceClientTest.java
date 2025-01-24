@@ -29,6 +29,7 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.validator.LeiaSchemaValidator;
+import io.appform.jsonrules.expressions.equality.EqualsExpression;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +42,10 @@ import java.util.Optional;
 class LeiaMessageProduceClientTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private LeiaMessageProduceClient.LeiaMessageProduceClientBuilder<?, ?> schemaClientBuilder;
+    private LeiaMessageProduceClient schemaClient;
     private SchemaKey sourceSchema;
     private SchemaKey targetSchema;
+    private SchemaDetails schemaDetails;
 
     @SneakyThrows
     @BeforeEach
@@ -60,25 +62,24 @@ class LeiaMessageProduceClientTest {
                 .schemaName("testSchema")
                 .version("v")
                 .build();
-        final var schemaDetails = ResourceHelper
+        schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         Assertions.assertNotNull(schemaDetails);
-        Mockito.when(clientRefresher.getData()).thenReturn(List.of(schemaDetails));
+        Mockito.when(clientRefresher.getData()).thenAnswer(i -> List.of(schemaDetails));
         Mockito.when(schemaValidator.getKlass(sourceSchema)).thenReturn(Optional.of(TestSchema.class));
         Mockito.when(schemaValidator.getKlass(targetSchema)).thenReturn(Optional.of(TargetSchema.class));
         Mockito.when(schemaValidator.valid(Mockito.any(SchemaKey.class))).thenReturn(true);
-        schemaClientBuilder = LeiaMessageProduceClient.builder()
+        schemaClient = LeiaMessageProduceClient.builder()
                 .mapper(new ObjectMapper())
                 .refresher(clientRefresher)
                 .schemaValidator(schemaValidator)
-                .targetValidator(DefaultTargetValidator::new);
+                .targetValidator(DefaultTargetValidator::new)
+                .build();
+        schemaClient.start();
     }
 
     @Test
     void testLeiaMessageProduceClient() {
-        final var schemaClient = schemaClientBuilder
-                .build();
-        schemaClient.start();
         final var testSchema = TestSchema.builder()
                 .userName("testUser")
                 .schemaUnits(List.of(TestSchemaUnit.builder()
@@ -96,8 +97,6 @@ class LeiaMessageProduceClientTest {
 
     @Test
     void testClientWithoutSourceMessage() {
-        final var schemaClient = schemaClientBuilder.build();
-        schemaClient.start();
         final var testSchema = TestSchema.builder()
                 .userName("testUser")
                 .schemaUnits(List.of(TestSchemaUnit.builder()
@@ -115,9 +114,7 @@ class LeiaMessageProduceClientTest {
     }
 
     @Test
-    void testTargetRetriever() {
-        final var schemaClient = schemaClientBuilder.build();
-        schemaClient.start();
+    void testTargetValidator() {
         final var testSchema = TestSchema.builder()
                 .userName("testUser")
                 .schemaUnits(List.of(TestSchemaUnit.builder()
@@ -145,5 +142,36 @@ class LeiaMessageProduceClientTest {
         Assertions.assertNotNull(messages);
         Assertions.assertFalse(messages.isEmpty());
         Assertions.assertEquals(1, messages.size());
+    }
+
+    @Test
+    void testTargetValidityRule() {
+        schemaDetails.getTransformationTargets()
+                .forEach(each -> each.setValidityRule(EqualsExpression.builder()
+                        .path("$.userName")
+                        .value("testUser")
+                        .build()));
+        final var testSchema = TestSchema.builder()
+                .userName("testUser")
+                .schemaUnits(List.of(TestSchemaUnit.builder()
+                        .registeredName("testRegisteredName").build()))
+                .build();
+        schemaClient.processMessages(MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(true)
+                .build(), messages -> {
+            Assertions.assertFalse(messages.isEmpty());
+            Assertions.assertEquals(2, messages.size());
+        }, null);
+        testSchema.setUserName("testUserForInvalidTarget");
+        schemaClient.processMessages(MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(true)
+                .build(), messages -> {
+            Assertions.assertFalse(messages.isEmpty());
+            Assertions.assertEquals(1, messages.size());
+        }, null);
     }
 }

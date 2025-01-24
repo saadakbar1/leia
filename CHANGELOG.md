@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
       definitions if required
     - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the 
       exact version.
+- TransformationTarget :
+    - Introduced a validityRule to validate transformation targets based on source object
 - Multiple Version Support:
     - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the necessary
       information.
