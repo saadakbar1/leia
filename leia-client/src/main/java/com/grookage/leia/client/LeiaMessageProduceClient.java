@@ -24,6 +24,7 @@ import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.grookage.leia.models.utils.SchemaUtils;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -102,16 +103,13 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                     .build()
             );
         }
-        final var sourceSchemaDetails = super.getSchemaDetails()
-                .stream().filter(each -> each.match(messageRequest.getSchemaKey()))
-                .findFirst().orElse(null);
-
+        final var sourceSchemaDetails = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), messageRequest.getSchemaKey())
+                .orElse(null);
         final var transformationTargets = null == sourceSchemaDetails ? null :
                 sourceSchemaDetails.getTransformationTargets();
         if (null == transformationTargets) {
             return messages;
         }
-
         final var validator = null != tValidator ? tValidator : targetValidator.get();
         final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         transformationTargets.

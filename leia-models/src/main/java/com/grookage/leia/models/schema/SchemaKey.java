@@ -45,6 +45,16 @@ public class SchemaKey {
         return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
+    @JsonIgnore
+    public String getReferenceTag() {
+        return Joiner.on(":").join(namespace, schemaName).toUpperCase(Locale.ROOT);
+    }
+
+    @JsonIgnore
+    public boolean latest() {
+        return null != version && version.equalsIgnoreCase("latest");
+    }
+
     @Override
     public int hashCode() {
         return this.getReferenceId().hashCode();
