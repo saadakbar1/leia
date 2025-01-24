@@ -29,7 +29,7 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-public class RejectSchemaProcessorTest extends SchemaProcessorTest {
+class RejectSchemaProcessorTest extends SchemaProcessorTest {
     @Override
     SchemaProcessor getSchemaProcessor() {
         return RejectSchemaProcessor.builder()
@@ -50,7 +50,7 @@ public class RejectSchemaProcessorTest extends SchemaProcessorTest {
 
     @Test
     @SneakyThrows
-    void testSchemaRejectionsNotCreatedState() {
+    void testSchemaRejectionsApprovedState() {
         final var schemaKey = ResourceHelper.getResource(
                 "schema/schemaKey.json",
                 SchemaKey.class
@@ -61,10 +61,13 @@ public class RejectSchemaProcessorTest extends SchemaProcessorTest {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         final var schemaProcessor = getSchemaProcessor();
         Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+        schemaProcessor.process(schemaContext);
+        Assertions.assertEquals(SchemaState.REJECTED, schemaDetails.getSchemaState());
+        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
     }
 
     @Test
@@ -81,6 +84,7 @@ public class RejectSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
         final var schemaProcessor = getSchemaProcessor();
         Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
         schemaProcessor.process(schemaContext);

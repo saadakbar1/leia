@@ -35,5 +35,10 @@ public class StubbedSchemaUpdater implements SchemaUpdater {
         return "name@grookage.com";
     }
 
+    @Override
+    public String userId() {
+        return "nameId";
+    }
+
 
 }

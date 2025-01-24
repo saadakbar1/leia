@@ -23,4 +23,5 @@ public interface SchemaUpdater {
 
     String email();
 
+    String userId();
 }

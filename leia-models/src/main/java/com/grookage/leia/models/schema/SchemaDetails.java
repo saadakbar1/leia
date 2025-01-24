@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -53,13 +54,13 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     @NotNull
     SchemaType schemaType;
     SchemaValidationType validationType = SchemaValidationType.MATCHING;
-    @NotNull
-    SchemaMeta schemaMeta;
     @NotEmpty
     Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
     JsonNode data;
+    @Builder.Default
+    Set<SchemaHistoryItem> histories = new HashSet<>();
 
     @JsonIgnore
     public String getReferenceId() {
@@ -83,5 +84,13 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     @Override
     public int compareTo(SchemaDetails o) {
         return this.version.compareTo(o.getVersion());
+    }
+
+    @JsonIgnore
+    public synchronized void addHistory(SchemaHistoryItem historyItem) {
+        if (null == histories) {
+            histories = new HashSet<>();
+        }
+        histories.add(historyItem);
     }
 }

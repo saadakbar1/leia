@@ -62,13 +62,9 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
                     updateSchemaRequest.getSchemaName());
             throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
         storedSchema.setDescription(updateSchemaRequest.getDescription());
         storedSchema.setAttributes(updateSchemaRequest.getAttributes());
-        storedSchema.getSchemaMeta().setCreatedBy(userName);
-        storedSchema.getSchemaMeta().setCreatedByEmail(email);
-        storedSchema.getSchemaMeta().setCreatedAt(System.currentTimeMillis());
+        addHistory(context, storedSchema);
         storedSchema.setValidationType(updateSchemaRequest.getValidationType());
         storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
         storedSchema.setData(updateSchemaRequest.getData());

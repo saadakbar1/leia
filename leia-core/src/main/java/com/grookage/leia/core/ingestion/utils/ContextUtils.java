@@ -30,11 +30,13 @@ public class ContextUtils {
 
     private static final String USER = "USER";
     private static final String EMAIL = "EMAIL";
+    private static final String USER_ID = "USER_ID";
 
     public static void addSchemaUpdaterContext(final SchemaContext schemaContext,
                                                final SchemaUpdater schemaUpdater) {
         schemaContext.addContext(USER, schemaUpdater.name());
         schemaContext.addContext(EMAIL, schemaUpdater.email());
+        schemaContext.addContext(USER_ID, schemaUpdater.userId());
     }
 
     @SneakyThrows
@@ -46,6 +48,12 @@ public class ContextUtils {
     @SneakyThrows
     public static String getEmail(final SchemaContext schemaContext) {
         return schemaContext.getValue(EMAIL)
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+    }
+
+    @SneakyThrows
+    public static String getUserId(final SchemaContext schemaContext) {
+        return schemaContext.getValue(USER_ID)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
     }
 }

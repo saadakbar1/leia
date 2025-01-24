@@ -58,9 +58,8 @@ public class CreateSchemaProcessor extends SchemaProcessor {
                     createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
             throw LeiaException.error(LeiaErrorCode.SCHEMA_ALREADY_EXISTS);
         }
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, userName, email, getVersionSupplier());
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, getVersionSupplier());
+        addHistory(context, schemaDetails);
         getRepositorySupplier().get().create(schemaDetails);
         context.addContext(SchemaDetails.class.getSimpleName(), schemaDetails);
     }

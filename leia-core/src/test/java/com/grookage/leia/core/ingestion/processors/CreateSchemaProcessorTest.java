@@ -53,6 +53,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
         getSchemaProcessor().process(schemaContext);
         Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).create(Mockito.any(SchemaDetails.class));
     }
@@ -68,6 +69,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         );
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);

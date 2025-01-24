@@ -7,7 +7,6 @@ import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.SchemaMeta;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.validator.stubs.TestNestedRecordStub;
 import com.grookage.leia.validator.stubs.TestRecordStub;
@@ -74,11 +73,6 @@ class StaticSchemaValidatorTest {
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())
                 .attributes(createSchemaRequest.getAttributes())
-                .schemaMeta(SchemaMeta.builder()
-                        .createdBy("testUser")
-                        .createdByEmail("testEmail")
-                        .createdAt(System.currentTimeMillis())
-                        .build())
                 .validationType(createSchemaRequest.getValidationType())
                 .transformationTargets(createSchemaRequest.getTransformationTargets())
                 .build();

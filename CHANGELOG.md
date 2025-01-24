@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
       definitions if required
     - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the 
       exact version.
+- Multiple Version Support:
+    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the necessary
+      information.
 
 ## [0.0.1-RC13]
 

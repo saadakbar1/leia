@@ -42,6 +42,11 @@ class ContextUtilsTest {
                 return "email";
             }
 
+            @Override
+            public String userId() {
+                return "nameId";
+            }
+
         });
         Assertions.assertNotNull(ContextUtils.getEmail(schemaContext));
         Assertions.assertNotNull(ContextUtils.getUser(schemaContext));

@@ -86,7 +86,12 @@
             </dependency>
             <dependency>
                 <groupId>com.grookage.leia</groupId>
-                <artifactId>leia-processors</artifactId>
+                <artifactId>leia-processor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-http-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

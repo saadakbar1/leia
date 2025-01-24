@@ -56,13 +56,9 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
                     schemaKey.getSchemaName());
             throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
-        storedSchema.getSchemaMeta().setUpdatedBy(userName);
-        storedSchema.getSchemaMeta().setUpdatedByEmail(email);
-        storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
+        addHistory(context, storedSchema);
         storedSchema.setSchemaState(SchemaState.APPROVED);
-        getRepositorySupplier().get().rollOverAndUpdate(storedSchema);
+        getRepositorySupplier().get().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
     }
 }

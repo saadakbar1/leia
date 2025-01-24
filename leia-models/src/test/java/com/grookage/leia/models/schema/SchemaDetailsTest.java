@@ -34,9 +34,6 @@ class SchemaDetailsTest {
         Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
         Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
         Assertions.assertEquals("V1234", schemaKey.getVersion());
-        final var schemaMeta = schemaDetails.getSchemaMeta();
-        Assertions.assertNotNull(schemaMeta);
-        Assertions.assertEquals("testUser", schemaMeta.getCreatedBy());
         final var schemaAttributes = schemaDetails.getAttributes();
         Assertions.assertNotNull(schemaAttributes);
         Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
