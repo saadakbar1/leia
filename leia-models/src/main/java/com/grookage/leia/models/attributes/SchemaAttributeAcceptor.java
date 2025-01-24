@@ -34,6 +34,8 @@ public interface SchemaAttributeAcceptor<T> {
 
     T accept(StringAttribute attribute);
 
+    T accept(DateAttribute attribute);
+
     T accept(ArrayAttribute attribute);
 
     T accept(MapAttribute attribute);

@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
 - Multiple Version Support:
     - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the necessary
       information.
+- SchemaAttribute:
+    - Introduced a DateAttribute for explicitly validating Date
 
 ## [0.0.1-RC13]
 
