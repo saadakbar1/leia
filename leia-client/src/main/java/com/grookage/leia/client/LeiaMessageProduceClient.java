@@ -115,14 +115,14 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         }
         final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         transformationTargets.stream()
-                .filter(each -> targetValid(messageRequest, sourceSchemaDetails, each, tValidator))
+                .filter(each -> validTarget(messageRequest, sourceSchemaDetails, each, tValidator))
                 .forEach(transformationTarget ->
                         createMessage(documentContext, transformationTarget).ifPresent(message ->
                                 messages.put(message.getSchemaKey(), message)));
         return messages;
     }
 
-    public boolean targetValid(MessageRequest messageRequest,
+    public boolean validTarget(MessageRequest messageRequest,
                                SchemaDetails schemaDetails,
                                TransformationTarget transformationTarget,
                                TargetValidator tValidator) {
