@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 @Getter
@@ -38,6 +39,8 @@ public enum DataType {
     BOOLEAN(Boolean.class),
 
     BYTES(Byte.class),
+
+    DATE(Date.class),
 
     ARRAY(Collection.class),
 

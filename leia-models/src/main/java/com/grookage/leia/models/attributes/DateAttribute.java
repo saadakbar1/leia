@@ -14,29 +14,30 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema.transformer;
+package com.grookage.leia.models.attributes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.grookage.leia.models.schema.SchemaKey;
-import io.appform.jsonrules.Expression;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.grookage.leia.models.qualifiers.QualifierInfo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
-@Builder
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TransformationTarget {
+@NoArgsConstructor
+public class DateAttribute extends SchemaAttribute {
 
-    @NotNull SchemaKey schemaKey;
-    Expression criteria;
-    @NotEmpty List<AttributeTransformer> transformers = List.of();
-    private List<String> tags = List.of();
+    public DateAttribute(final String name,
+                         final boolean optional,
+                         final Set<QualifierInfo> qualifiers) {
+        super(DataType.DATE, name, optional, qualifiers);
+    }
+
+    @Override
+    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+        return attributeAcceptor.accept(this);
+    }
 }

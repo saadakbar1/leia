@@ -18,6 +18,8 @@ package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
 import com.grookage.leia.mux.processors.MessageProcessor;
 import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
@@ -26,7 +28,6 @@ import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.models.utils.SchemaUtils;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
@@ -55,6 +56,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> messageProcessor;
     private final Supplier<TargetValidator> targetValidator;
+    private final TargetValidator jsonRuleValidator = new JsonRuleTargetValidator();
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -62,14 +64,20 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         b) Checks if there is a transformationTarget, if none, returns source as is.
      */
     @SneakyThrows
-    private Optional<LeiaMessage> createMessage(DocumentContext sourceContext,
-                                                TransformationTarget transformationTarget) {
+    private Optional<LeiaMessage> createMessage(MessageRequest messageRequest,
+                                                SchemaDetails schemaDetails,
+                                                TransformationTarget transformationTarget,
+                                                TargetValidator tValidator) {
+        if (!validTarget(messageRequest, schemaDetails, transformationTarget, tValidator)) {
+            return Optional.empty();
+        }
         final var registeredKlass = getSchemaValidator()
                 .getKlass(transformationTarget.getSchemaKey()).orElse(null);
         if (null == registeredKlass) {
             return Optional.empty();
         }
         final var responseObject = JsonNodeFactory.instance.objectNode();
+        final var sourceContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         transformationTarget.getTransformers().forEach(transformer -> {
             final var jsonPath = getJsonPath(transformationTarget.getSchemaKey(), transformer.getAttributeName())
                     .orElse(null);
@@ -110,16 +118,21 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == transformationTargets) {
             return messages;
         }
-        final var validator = null != tValidator ? tValidator : targetValidator.get();
-        final var documentContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
-        transformationTargets.
-                stream().filter(each -> null == validator || validator.validate(
-                        each, messageRequest, sourceSchemaDetails
-                ))
-                .forEach(transformationTarget ->
-                        createMessage(documentContext, transformationTarget).ifPresent(message ->
-                                messages.put(message.getSchemaKey(), message)));
+        transformationTargets.forEach(transformationTarget ->
+                createMessage(messageRequest, sourceSchemaDetails, transformationTarget, tValidator)
+                        .ifPresent(message -> messages.put(message.getSchemaKey(), message)));
         return messages;
+    }
+
+    public boolean validTarget(MessageRequest messageRequest,
+                               SchemaDetails schemaDetails,
+                               TransformationTarget transformationTarget,
+                               TargetValidator tValidator) {
+        var validator = jsonRuleValidator;
+        if (null == transformationTarget.getCriteria()) {
+            validator = tValidator != null ? tValidator : targetValidator.get();
+        }
+        return null == validator || validator.validate(transformationTarget, messageRequest, schemaDetails);
     }
 
     public void processMessages(MessageRequest messageRequest,
@@ -132,12 +145,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     @Override
     public void start() {
         super.getSchemaDetails().forEach(schemaDetails -> {
-            final var schemaKey = schemaDetails.getSchemaKey();
-            final var validSchema = super.valid(schemaKey);
-            if (!validSchema) {
-                log.error("The source schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                        schemaKey);
-                throw new IllegalStateException("Invalid source schema");
+            if (!super.valid(schemaDetails.getSchemaKey())) {
+                return;
             }
             final var transformationTargets = schemaDetails.getTransformationTargets();
             transformationTargets.forEach(transformationTarget -> {
