@@ -19,6 +19,7 @@ package com.grookage.leia.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.mux.processors.DefaultTargetValidator;
 import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
 import com.grookage.leia.mux.processors.MessageProcessor;
 import com.grookage.leia.mux.processors.TargetValidator;
@@ -33,12 +34,14 @@ import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -53,10 +56,10 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .mappingProvider(new JacksonMappingProvider())
             .build();
+    private static final TargetValidator DEFAULT_VALIDATOR = new DefaultTargetValidator();
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> messageProcessor;
     private final Supplier<TargetValidator> targetValidator;
-    private final TargetValidator jsonRuleValidator = new JsonRuleTargetValidator();
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -128,11 +131,9 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                                SchemaDetails schemaDetails,
                                TransformationTarget transformationTarget,
                                TargetValidator tValidator) {
-        var validator = jsonRuleValidator;
-        if (null == transformationTarget.getCriteria()) {
-            validator = tValidator != null ? tValidator : targetValidator.get();
-        }
-        return null == validator || validator.validate(transformationTarget, messageRequest, schemaDetails);
+        final var initiatedValidator = null != targetValidator ? targetValidator.get() : null;
+        final var validator = Objects.requireNonNullElseGet(tValidator, () -> Objects.requireNonNullElse(initiatedValidator, DEFAULT_VALIDATOR));
+        return validator.validate(transformationTarget, messageRequest, schemaDetails);
     }
 
     public void processMessages(MessageRequest messageRequest,

@@ -17,8 +17,6 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.mux.processors.DefaultTargetValidator;
-import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
@@ -28,6 +26,9 @@ import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.grookage.leia.mux.processors.DefaultTargetValidator;
+import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
+import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.appform.jsonrules.expressions.equality.EqualsExpression;
 import lombok.SneakyThrows;
@@ -146,6 +147,13 @@ class LeiaMessageProduceClientTest {
 
     @Test
     void testTargetCriteria() {
+        final var otherClient = LeiaMessageProduceClient.builder()
+                .mapper(new ObjectMapper())
+                .refresher(schemaClient.getRefresher())
+                .schemaValidator(schemaClient.getSchemaValidator())
+                .targetValidator(JsonRuleTargetValidator::new)
+                .build();
+        otherClient.start();
         schemaDetails.getTransformationTargets()
                 .forEach(each -> each.setCriteria(EqualsExpression.builder()
                         .path("$.userName")
@@ -156,7 +164,7 @@ class LeiaMessageProduceClientTest {
                 .schemaUnits(List.of(TestSchemaUnit.builder()
                         .registeredName("testRegisteredName").build()))
                 .build();
-        schemaClient.processMessages(MessageRequest.builder()
+        otherClient.processMessages(MessageRequest.builder()
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
@@ -165,7 +173,7 @@ class LeiaMessageProduceClientTest {
             Assertions.assertEquals(2, messages.size());
         }, null);
         testSchema.setUserName("testUserForInvalidTarget");
-        schemaClient.processMessages(MessageRequest.builder()
+        otherClient.processMessages(MessageRequest.builder()
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)

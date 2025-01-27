@@ -12,8 +12,8 @@ public class JsonRuleTargetValidator implements TargetValidator {
     public boolean validate(TransformationTarget transformationTarget,
                             MessageRequest messageRequest,
                             SchemaDetails schemaDetails) {
-        if (null == transformationTarget.getCriteria()) {
-            return false;
+        if (null == transformationTarget.getCriteria()) { // If there is null, treat this NO_CRITERIA, return true!
+            return true;
         }
         return transformationTarget.getCriteria().evaluate(messageRequest.getMessage());
     }
