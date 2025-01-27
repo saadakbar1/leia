@@ -145,9 +145,9 @@ class LeiaMessageProduceClientTest {
     }
 
     @Test
-    void testTargetValidityRule() {
+    void testTargetCriteria() {
         schemaDetails.getTransformationTargets()
-                .forEach(each -> each.setValidityRule(EqualsExpression.builder()
+                .forEach(each -> each.setCriteria(EqualsExpression.builder()
                         .path("$.userName")
                         .value("testUser")
                         .build()));

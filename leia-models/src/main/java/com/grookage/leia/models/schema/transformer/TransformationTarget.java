@@ -36,7 +36,7 @@ import java.util.List;
 public class TransformationTarget {
 
     @NotNull SchemaKey schemaKey;
-    Expression validityRule;
+    Expression criteria;
     @NotEmpty List<AttributeTransformer> transformers = List.of();
     private List<String> tags = List.of();
 }
