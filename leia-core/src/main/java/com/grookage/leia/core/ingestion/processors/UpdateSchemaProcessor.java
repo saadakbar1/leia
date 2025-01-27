@@ -16,9 +16,8 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaErrorCode;
-import com.grookage.leia.core.exception.LeiaException;
-import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
@@ -47,7 +46,7 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
     @SneakyThrows
     public void process(SchemaContext context) {
         final var updateSchemaRequest = context.getContext(UpdateSchemaRequest.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
         final var storedSchema = getRepositorySupplier()
                 .get()
                 .get(SchemaKey.builder()
@@ -60,17 +59,14 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
                     updateSchemaRequest.getNamespace(),
                     updateSchemaRequest.getVersion(),
                     updateSchemaRequest.getSchemaName());
-            throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
+            throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
         storedSchema.setDescription(updateSchemaRequest.getDescription());
         storedSchema.setAttributes(updateSchemaRequest.getAttributes());
-        storedSchema.getSchemaMeta().setCreatedBy(userName);
-        storedSchema.getSchemaMeta().setCreatedByEmail(email);
-        storedSchema.getSchemaMeta().setCreatedAt(System.currentTimeMillis());
+        addHistory(context, storedSchema);
         storedSchema.setValidationType(updateSchemaRequest.getValidationType());
         storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
+        storedSchema.setData(updateSchemaRequest.getData());
         if (null != updateSchemaRequest.getTransformationTargets()) {
             storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
         }

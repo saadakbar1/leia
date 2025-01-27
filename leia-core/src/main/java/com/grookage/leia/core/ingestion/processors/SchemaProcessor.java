@@ -17,11 +17,15 @@
 package com.grookage.leia.core.ingestion.processors;
 
 import com.grookage.leia.core.ingestion.VersionIDGenerator;
+import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaHistoryItem;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 
 import java.util.function.Supplier;
@@ -36,6 +40,24 @@ public abstract class SchemaProcessor {
 
     public abstract SchemaEvent name();
 
+    @SneakyThrows
+    public void addHistory(SchemaContext context, SchemaDetails schemaDetails) {
+        final var userName = ContextUtils.getUser(context);
+        final var email = ContextUtils.getEmail(context);
+        final var userId = ContextUtils.getUserId(context);
+        final var configHistoryItem = SchemaHistoryItem.builder()
+                .configUpdaterId(userId)
+                .configUpdaterEmail(email)
+                .configUpdaterName(userName)
+                .timestamp(System.currentTimeMillis())
+                .schemaEvent(name())
+                .build();
+        schemaDetails.addHistory(configHistoryItem);
+    }
+
     public abstract void process(final SchemaContext schemaContext);
 
+    public void fire(SchemaContext context) {
+        process(context);
+    }
 }

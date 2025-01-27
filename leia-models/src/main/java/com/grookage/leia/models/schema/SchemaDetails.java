@@ -19,6 +19,7 @@ package com.grookage.leia.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Joiner;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -31,6 +32,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -39,7 +41,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SchemaDetails {
+public class SchemaDetails implements Comparable<SchemaDetails> {
     @NotBlank
     String namespace;
     @NotBlank
@@ -52,21 +54,22 @@ public class SchemaDetails {
     @NotNull
     SchemaType schemaType;
     SchemaValidationType validationType = SchemaValidationType.MATCHING;
-    @NotNull
-    SchemaMeta schemaMeta;
     @NotEmpty
     Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
-
-    @JsonIgnore
-    public boolean match(final SchemaKey thatKey) {
-        return getReferenceId().equals(thatKey.getReferenceId());
-    }
+    JsonNode data;
+    @Builder.Default
+    Set<SchemaHistoryItem> histories = new HashSet<>();
 
     @JsonIgnore
     public String getReferenceId() {
         return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+    }
+
+    @JsonIgnore
+    public String getReferenceTag() {
+        return Joiner.on(":").join(namespace, schemaName).toUpperCase(Locale.ROOT);
     }
 
     @JsonIgnore
@@ -76,5 +79,18 @@ public class SchemaDetails {
                 .namespace(namespace)
                 .version(version)
                 .build();
+    }
+
+    @Override
+    public int compareTo(SchemaDetails o) {
+        return this.version.compareTo(o.getVersion());
+    }
+
+    @JsonIgnore
+    public synchronized void addHistory(SchemaHistoryItem historyItem) {
+        if (null == histories) {
+            histories = new HashSet<>();
+        }
+        histories.add(historyItem);
     }
 }

@@ -1,113 +1,141 @@
 {
-  "namespace" : "test",
-  "schemaName" : "TEST_NESTED_RECORD",
-  "version" : "v1",
-  "description" : "Test Nested Record",
-  "schemaState" : "CREATED",
-  "schemaType" : "JSON",
-  "validationType" : "STRICT",
-  "schemaMeta" : {
-    "createdBy" : "testUser",
-    "createdByEmail" : "testEmail",
-    "createdAt" : 1733897687017,
-    "updatedBy" : null,
-    "updatedByEmail" : null,
-    "updatedAt" : 0
+  "namespace": "test",
+  "schemaName": "TEST_NESTED_RECORD",
+  "version": "v1",
+  "description": "Test Nested Record",
+  "schemaState": "CREATED",
+  "schemaType": "JSON",
+  "validationType": "STRICT",
+  "schemaMeta": {
+    "createdBy": "testUser",
+    "createdByEmail": "testEmail",
+    "createdAt": 1733897687017,
+    "updatedBy": null,
+    "updatedByEmail": null,
+    "updatedAt": 0
   },
-  "attributes" : [ {
-    "type" : "OBJECT",
-    "name" : "testData",
-    "optional" : false,
-    "qualifiers" : [ ],
-    "nestedAttributes" : [ {
-      "type" : "OBJECT",
-      "name" : "object",
-      "optional" : false,
-      "qualifiers" : [ ],
-      "nestedAttributes" : null
-    }, {
-      "type" : "STRING",
-      "name" : "accountName",
-      "optional" : false,
-      "qualifiers" : [ ]
-    }, {
-      "type" : "LONG",
-      "name" : "id",
-      "optional" : false,
-      "qualifiers" : [ ]
-    }, {
-      "type" : "ENUM",
-      "name" : "testEnum",
-      "optional" : false,
-      "qualifiers" : [ ],
-      "values" : [ "ONE", "TWO" ]
-    } ]
-  }, {
-    "type" : "STRING",
-    "name" : "accountNumber",
-    "optional" : false,
-    "qualifiers" : [ {
-      "type" : "ENCRYPTED"
-    }, {
-      "type" : "PII"
-    } ]
-  }, {
-    "type" : "ARRAY",
-    "name" : "strings",
-    "optional" : false,
-    "qualifiers" : [ ],
-    "elementAttribute" : {
-      "type" : "STRING",
-      "name" : "element",
-      "optional" : false,
-      "qualifiers" : [ ]
-    }
-  }, {
-    "type" : "STRING",
-    "name" : "accountId",
-    "optional" : true,
-    "qualifiers" : [ ]
-  }, {
-    "type" : "MAP",
-    "name" : "enumTestDataMap",
-    "optional" : false,
-    "qualifiers" : [ ],
-    "keyAttribute" : {
-      "type" : "STRING",
-      "name" : "key",
-      "optional" : false,
-      "qualifiers" : [ ],
-      "values" : [ "ONE", "TWO" ]
+  "attributes": [
+    {
+      "type": "OBJECT",
+      "name": "testData",
+      "optional": false,
+      "qualifiers": [],
+      "nestedAttributes": [
+        {
+          "type": "OBJECT",
+          "name": "object",
+          "optional": false,
+          "qualifiers": [],
+          "nestedAttributes": null
+        },
+        {
+          "type": "STRING",
+          "name": "accountName",
+          "optional": false,
+          "qualifiers": []
+        },
+        {
+          "type": "LONG",
+          "name": "id",
+          "optional": false,
+          "qualifiers": []
+        },
+        {
+          "type": "ENUM",
+          "name": "testEnum",
+          "optional": false,
+          "qualifiers": [],
+          "values": [
+            "ONE",
+            "TWO"
+          ]
+        }
+      ]
     },
-    "valueAttribute" : {
-      "type" : "OBJECT",
-      "name" : "value",
-      "optional" : false,
-      "qualifiers" : [ ],
-      "nestedAttributes" : [ {
-        "type" : "OBJECT",
-        "name" : "object",
-        "optional" : false,
-        "qualifiers" : [ ],
-        "nestedAttributes" : null
-      }, {
-        "type" : "STRING",
-        "name" : "name",
-        "optional" : false,
-        "qualifiers" : [ ]
-      }, {
-        "type" : "LONG",
-        "name" : "id",
-        "optional" : false,
-        "qualifiers" : [ ]
-      }, {
-        "type" : "ENUM",
-        "name" : "testEnum",
-        "optional" : false,
-        "qualifiers" : [ ],
-        "values" : [ "ONE", "TWO" ]
-      } ]
+    {
+      "type": "STRING",
+      "name": "accountNumber",
+      "optional": false,
+      "qualifiers": [
+        {
+          "type": "ENCRYPTED"
+        },
+        {
+          "type": "PII"
+        }
+      ]
+    },
+    {
+      "type": "ARRAY",
+      "name": "strings",
+      "optional": false,
+      "qualifiers": [],
+      "elementAttribute": {
+        "type": "STRING",
+        "name": "element",
+        "optional": false,
+        "qualifiers": []
+      }
+    },
+    {
+      "type": "STRING",
+      "name": "accountId",
+      "optional": true,
+      "qualifiers": []
+    },
+    {
+      "type": "MAP",
+      "name": "enumTestDataMap",
+      "optional": false,
+      "qualifiers": [],
+      "keyAttribute": {
+        "type": "STRING",
+        "name": "key",
+        "optional": false,
+        "qualifiers": [],
+        "values": [
+          "ONE",
+          "TWO"
+        ]
+      },
+      "valueAttribute": {
+        "type": "OBJECT",
+        "name": "value",
+        "optional": false,
+        "qualifiers": [],
+        "nestedAttributes": [
+          {
+            "type": "OBJECT",
+            "name": "object",
+            "optional": false,
+            "qualifiers": [],
+            "nestedAttributes": null
+          },
+          {
+            "type": "STRING",
+            "name": "name",
+            "optional": false,
+            "qualifiers": []
+          },
+          {
+            "type": "LONG",
+            "name": "id",
+            "optional": false,
+            "qualifiers": []
+          },
+          {
+            "type": "ENUM",
+            "name": "testEnum",
+            "optional": false,
+            "qualifiers": [],
+            "values": [
+              "ONE",
+              "TWO"
+            ]
+          }
+        ]
+      }
     }
-  } ],
-  "transformationTargets" : [ ]
+  ],
+  "transformationTargets": []
 }

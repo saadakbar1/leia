@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-bom</artifactId>
-        <version>0.0.1-RC13</version>
+        <version>0.0.1-RC14</version>
         <relativePath>../leia-bom</relativePath>
     </parent>
 
@@ -55,6 +55,7 @@
 
         <dropwizard.version>2.1.10</dropwizard.version>
         <awaitility.version>4.1.1</awaitility.version>
+        <appform.json-rules.version>1.0.12</appform.json-rules.version>
     </properties>
 
     <dependencyManagement>
@@ -138,6 +139,11 @@
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.appform.rules</groupId>
+                <artifactId>json-rules</artifactId>
+                <version>${appform.json-rules.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

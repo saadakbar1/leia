@@ -39,16 +39,12 @@ class SchemaUtilsTest {
                 return "V1234";
             }
         };
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, "testUser",
-                "testEmail", () -> generator
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, () -> generator
         );
         Assertions.assertNotNull(schemaDetails);
         Assertions.assertEquals("testNamespace", schemaDetails.getNamespace());
         Assertions.assertEquals("testSchema", schemaDetails.getSchemaName());
         Assertions.assertEquals("V1234", schemaDetails.getVersion());
-        final var schemaMeta = schemaDetails.getSchemaMeta();
-        Assertions.assertNotNull(schemaMeta);
-        Assertions.assertEquals("testUser", schemaMeta.getCreatedBy());
         final var schemaAttributes = schemaDetails.getAttributes();
         Assertions.assertNotNull(schemaAttributes);
         Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));

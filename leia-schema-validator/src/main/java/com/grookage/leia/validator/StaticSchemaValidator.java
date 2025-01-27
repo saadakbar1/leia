@@ -23,6 +23,7 @@ import com.grookage.leia.common.violation.LeiaSchemaViolation;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.utils.SchemaUtils;
 import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,7 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
 
     @SneakyThrows
     private List<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
-        final var details = supplier.get().stream()
-                .filter(each -> each.match(schemaKey)).findFirst().orElse(null);
+        final var details = SchemaUtils.getMatchingSchema(supplier.get(), schemaKey).orElse(null);
         if (null == details) {
             throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND,
                     String.format("No schema found with key: %s", schemaKey.getReferenceId()));

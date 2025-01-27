@@ -26,6 +26,7 @@ replay_pid*
 # Misc
 
 .idea
+.run/
 *.iws
 *.ipr
 *.iml

@@ -19,9 +19,11 @@ package com.grookage.leia.dw.client;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
-import com.grookage.leia.client.processor.MessageProcessor;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
+import com.grookage.leia.mux.processors.DefaultTargetValidator;
+import com.grookage.leia.mux.processors.MessageProcessor;
+import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import com.grookage.leia.validator.StaticSchemaValidator;
@@ -69,6 +71,10 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
 
+    protected Supplier<TargetValidator> getTargetRetriever(T configuration) {
+        return DefaultTargetValidator::new;
+    }
+
     @Override
     public void run(T configuration, Environment environment) {
         final var namespaceDataSource = getNamespaceDataSource(configuration);
@@ -94,7 +100,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         final var validator = getSchemaValidator(configuration, clientRefresher);
         environment.lifecycle().manage(new Managed() {
             @Override
-            public void start() throws Exception {
+            public void start() {
                 clientRefresher.start();
                 validator.start();
             }
@@ -105,10 +111,11 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .schemaValidator(validator)
                     .mapper(environment.getObjectMapper())
                     .messageProcessor(getMessageProcessor(configuration))
+                    .targetValidator(getTargetRetriever(configuration))
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override
-                public void start() throws Exception {
+                public void start() {
                     producerClient.start();
                 }
             });

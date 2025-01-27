@@ -18,7 +18,6 @@ package com.grookage.leia.core.ingestion.utils;
 
 import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaMeta;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
@@ -29,8 +28,6 @@ import java.util.function.Supplier;
 public class SchemaUtils {
 
     public SchemaDetails toSchemaDetails(final CreateSchemaRequest createSchemaRequest,
-                                         final String userName,
-                                         final String email,
                                          final Supplier<VersionIDGenerator> versionSupplier) {
         return SchemaDetails.builder()
                 .namespace(createSchemaRequest.getNamespace())
@@ -40,13 +37,9 @@ public class SchemaUtils {
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())
                 .attributes(createSchemaRequest.getAttributes())
-                .schemaMeta(SchemaMeta.builder()
-                        .createdBy(userName)
-                        .createdByEmail(email)
-                        .createdAt(System.currentTimeMillis())
-                        .build())
                 .validationType(createSchemaRequest.getValidationType())
                 .transformationTargets(createSchemaRequest.getTransformationTargets())
+                .data(createSchemaRequest.getData())
                 .build();
     }
 }

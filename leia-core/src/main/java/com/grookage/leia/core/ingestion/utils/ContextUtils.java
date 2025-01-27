@@ -16,8 +16,8 @@
 
 package com.grookage.leia.core.ingestion.utils;
 
-import com.grookage.leia.core.exception.LeiaErrorCode;
-import com.grookage.leia.core.exception.LeiaException;
+import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.user.SchemaUpdater;
 import lombok.SneakyThrows;
@@ -30,22 +30,30 @@ public class ContextUtils {
 
     private static final String USER = "USER";
     private static final String EMAIL = "EMAIL";
+    private static final String USER_ID = "USER_ID";
 
     public static void addSchemaUpdaterContext(final SchemaContext schemaContext,
                                                final SchemaUpdater schemaUpdater) {
         schemaContext.addContext(USER, schemaUpdater.name());
         schemaContext.addContext(EMAIL, schemaUpdater.email());
+        schemaContext.addContext(USER_ID, schemaUpdater.userId());
     }
 
     @SneakyThrows
     public static String getUser(final SchemaContext schemaContext) {
         return schemaContext.getValue(USER)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
     }
 
     @SneakyThrows
     public static String getEmail(final SchemaContext schemaContext) {
         return schemaContext.getValue(EMAIL)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+    }
+
+    @SneakyThrows
+    public static String getUserId(final SchemaContext schemaContext) {
+        return schemaContext.getValue(USER_ID)
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
     }
 }

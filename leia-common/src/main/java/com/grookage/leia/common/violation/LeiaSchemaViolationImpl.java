@@ -1,6 +1,5 @@
 package com.grookage.leia.common.violation;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

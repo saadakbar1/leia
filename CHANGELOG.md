@@ -2,42 +2,65 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC14]
+
+- LeiaMessageProduceClient
+    - Introduced a TargetValidator for dynamically validating transformation targets.
+    - Both the messageProcessor and the target validator can be runtime args along with initialzied values
+    - No exception on a schema not present in the client side
+- SchemaDetails :
+    - Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema
+      definitions if required
+    - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the
+      exact version.
+- TransformationTarget :
+    - Introduced a criteria to validate transformation targets based on source object
+- Multiple Version Support:
+    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the
+      necessary
+      information.
+- SchemaAttribute:
+    - Introduced a DateAttribute for explicitly validating Date
+- Aerospike Repository:
+    - Support for AS data store, along with the dw bundle
+
 ## [0.0.1-RC13]
 
-- LeiaClientBundle: Use dropwizard lifecyle to initialize the validator, refresher and producer client
-- LeiaRefresher: Add a start method to initialize data instead of doing it in constructor 
+- LeiaClientBundle: Use dropwizard lifecycle to initialize the validator, refresher and producer client
+- LeiaRefresher: Add a start method to initialize data instead of doing it in constructor
 
 ## [0.0.1-RC12]
 
 - LeiaMessageProduceClient
-  - Introduced a flag to control whether the source message should be included during multiplexing.
-  - Modified the message datatype to JsonNode from byte[] to reduce serialization overhead.
+    - Introduced a flag to control whether the source message should be included during multiplexing.
+    - Modified the message datatype to JsonNode from byte[] to reduce serialization overhead.
 
 ## [0.0.1-RC11]
 
 - MessageProcessor
-  - Introduced MessageProcessor in LeiaMessageProduceClient instead of a lambda
-  - GetMessages from LeiaMessageProducerClient is now public
+    - Introduced MessageProcessor in LeiaMessageProduceClient instead of a lambda
+    - GetMessages from LeiaMessageProducerClient is now public
 
 ## [0.0.1-RC10]
 
 - LeiaSchemaViolation
-  - Introduced SchemaViolation & ViolationContext for generating violations as part of schema validation
+    - Introduced SchemaViolation & ViolationContext for generating violations as part of schema validation
 - SchemaValidationUtils: Returns list of LeiaSchemaViolations instead of boolean
-- StaticSchemaValidator: Updated to return all schema validation violations instead of stopping at the first error occurrence
+- StaticSchemaValidator: Updated to return all schema validation violations instead of stopping at the first error
+  occurrence
 - LeiaClientMarshaller: Bug fix in serialization
 - Adds tests for `leia-schema-validator` module
 
 ## [0.0.1-RC9]
 
 - RollOverAndUpdate
-  - Introduced rollOverAndUpdate, fixing a bug of multiple approved records.
+    - Introduced rollOverAndUpdate, fixing a bug of multiple approved records.
 
 ## [0.0.1-RC8]
 
-- SchemaDetails: 
-  - Moved the nested `SchemaKey` attributes to the class level
-  - made the getReferenceId() uniform with `SchemaKey` implementation 
+- SchemaDetails:
+    - Moved the nested `SchemaKey` attributes to the class level
+    - made the getReferenceId() uniform with `SchemaKey` implementation
 - FieldUtils: Excluding non-serializable fields(static, transient, @JsonIgnore) for building the schema attributes
 - SchemaResource: Bug fix in SchemaValidation resource
 - Removed the unused `LeiaCompiledPath` class

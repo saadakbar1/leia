@@ -18,6 +18,7 @@ package com.grookage.leia.models.schema.transformer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grookage.leia.models.schema.SchemaKey;
+import io.appform.jsonrules.Expression;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +36,7 @@ import java.util.List;
 public class TransformationTarget {
 
     @NotNull SchemaKey schemaKey;
+    Expression criteria;
     @NotEmpty List<AttributeTransformer> transformers = List.of();
     private List<String> tags = List.of();
-
 }

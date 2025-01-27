@@ -16,9 +16,8 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaErrorCode;
-import com.grookage.leia.core.exception.LeiaException;
-import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
@@ -30,6 +29,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 @EqualsAndHashCode(callSuper = true)
@@ -37,6 +37,9 @@ import java.util.function.Supplier;
 @Data
 @Slf4j
 public class RejectSchemaProcessor extends SchemaProcessor {
+
+    private static final Set<SchemaState> ACCEPTABLE_STATES = Set.of(SchemaState.CREATED, SchemaState.APPROVED);
+
     @Override
     public SchemaEvent name() {
         return SchemaEvent.REJECT_SCHEMA;
@@ -46,20 +49,17 @@ public class RejectSchemaProcessor extends SchemaProcessor {
     @SneakyThrows
     public void process(SchemaContext context) {
         final var schemaKey = context.getContext(SchemaKey.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
         final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
-        if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
-            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
+        if (null == storedSchema || !ACCEPTABLE_STATES.contains(storedSchema.getSchemaState())) {
+            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {} or in acceptable states. " +
+                            "Please try updating them instead",
                     schemaKey.getNamespace(),
                     schemaKey.getVersion(),
                     schemaKey.getSchemaName());
-            throw LeiaException.error(LeiaErrorCode.NO_SCHEMA_FOUND);
+            throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
-        storedSchema.getSchemaMeta().setUpdatedBy(userName);
-        storedSchema.getSchemaMeta().setUpdatedByEmail(email);
-        storedSchema.getSchemaMeta().setUpdatedAt(System.currentTimeMillis());
+        addHistory(context, storedSchema);
         storedSchema.setSchemaState(SchemaState.REJECTED);
         getRepositorySupplier().get().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);

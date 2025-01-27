@@ -16,8 +16,8 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
@@ -78,10 +78,11 @@ class ApproveSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
         final var schemaProcessor = getSchemaProcessor();
         Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
         schemaProcessor.process(schemaContext);
         Assertions.assertEquals(SchemaState.APPROVED, schemaDetails.getSchemaState());
-        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).rollOverAndUpdate(Mockito.any(SchemaDetails.class));
+        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
     }
 }

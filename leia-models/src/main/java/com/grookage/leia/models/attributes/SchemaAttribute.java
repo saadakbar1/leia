@@ -41,6 +41,7 @@ import java.util.Set;
         @JsonSubTypes.Type(value = IntegerAttribute.class, name = "INTEGER"),
         @JsonSubTypes.Type(value = LongAttribute.class, name = "LONG"),
         @JsonSubTypes.Type(value = StringAttribute.class, name = "STRING"),
+        @JsonSubTypes.Type(value = DateAttribute.class, name = "DATE"),
         @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
         @JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
         @JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),

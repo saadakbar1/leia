@@ -16,10 +16,10 @@ class FieldUtilsTest {
     }
 
     static class BaseData {
-        @JsonIgnore
-        private String exclusion;
         static final String CONSTANT = "CONSTANT";
         String name;
+        @JsonIgnore
+        private String exclusion;
     }
 
     static class TestData extends BaseData {

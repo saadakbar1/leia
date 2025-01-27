@@ -22,7 +22,5 @@ public enum SchemaState {
 
     APPROVED,
 
-    REJECTED,
-
-    ROLLED
+    REJECTED
 }

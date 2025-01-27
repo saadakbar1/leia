@@ -1,0 +1,161 @@
+[
+  {
+    "namespace": "testNamespace",
+    "schemaName": "testSchema",
+    "version": "V1234",
+    "schemaState": "CREATED",
+    "schemaType": "JSON",
+    "schemaMeta": {
+      "createdBy": "testUser"
+    },
+    "attributes": [
+      {
+        "type": "ARRAY",
+        "name": "testAttribute",
+        "optional": true,
+        "qualifiers": [
+          {
+            "type": "PII"
+          }
+        ]
+      },
+      {
+        "type": "ENUM",
+        "name": "testAttribute",
+        "optional": true,
+        "values": [
+          "TEST_ENUM"
+        ],
+        "qualifiers": [
+          {
+            "type": "PII"
+          },
+          {
+            "type": "ENCRYPTED"
+          }
+        ]
+      }
+    ],
+    "transformationTargets": [
+      {
+        "schemaKey": {
+          "namespace": "testNamespace",
+          "schemaName": "testSchema",
+          "version": "v"
+        },
+        "transformers": [
+          {
+            "attributeName": "name",
+            "transformationPath": "$.userName"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "namespace": "testNamespace",
+    "schemaName": "testSchema",
+    "version": "V12345",
+    "schemaState": "CREATED",
+    "schemaType": "JSON",
+    "schemaMeta": {
+      "createdBy": "testUser"
+    },
+    "attributes": [
+      {
+        "type": "ARRAY",
+        "name": "testAttribute",
+        "optional": true,
+        "qualifiers": [
+          {
+            "type": "PII"
+          }
+        ]
+      },
+      {
+        "type": "ENUM",
+        "name": "testAttribute",
+        "optional": true,
+        "values": [
+          "TEST_ENUM"
+        ],
+        "qualifiers": [
+          {
+            "type": "PII"
+          },
+          {
+            "type": "ENCRYPTED"
+          }
+        ]
+      }
+    ],
+    "transformationTargets": [
+      {
+        "schemaKey": {
+          "namespace": "testNamespace",
+          "schemaName": "testSchema",
+          "version": "v"
+        },
+        "transformers": [
+          {
+            "attributeName": "name",
+            "transformationPath": "$.userName"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "namespace": "testNamespace2",
+    "schemaName": "testSchema2",
+    "version": "V123",
+    "schemaState": "CREATED",
+    "schemaType": "JSON",
+    "schemaMeta": {
+      "createdBy": "testUser"
+    },
+    "attributes": [
+      {
+        "type": "ARRAY",
+        "name": "testAttribute",
+        "optional": true,
+        "qualifiers": [
+          {
+            "type": "PII"
+          }
+        ]
+      },
+      {
+        "type": "ENUM",
+        "name": "testAttribute",
+        "optional": true,
+        "values": [
+          "TEST_ENUM"
+        ],
+        "qualifiers": [
+          {
+            "type": "PII"
+          },
+          {
+            "type": "ENCRYPTED"
+          }
+        ]
+      }
+    ],
+    "transformationTargets": [
+      {
+        "schemaKey": {
+          "namespace": "testNamespace",
+          "schemaName": "testSchema",
+          "version": "v"
+        },
+        "transformers": [
+          {
+            "attributeName": "name",
+            "transformationPath": "$.userName"
+          }
+        ]
+      }
+    ]
+  }
+]

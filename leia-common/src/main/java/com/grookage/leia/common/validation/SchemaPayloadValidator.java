@@ -174,6 +174,11 @@ public class SchemaPayloadValidator {
             }
 
             @Override
+            public Boolean accept(DateAttribute attribute) {
+                return fieldNode.isTextual();
+            }
+
+            @Override
             public Boolean accept(ArrayAttribute attribute) {
                 return fieldNode.isArray();
             }

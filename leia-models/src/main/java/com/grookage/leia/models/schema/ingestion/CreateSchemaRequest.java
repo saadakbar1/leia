@@ -16,6 +16,8 @@
 
 package com.grookage.leia.models.schema.ingestion;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
@@ -34,6 +36,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateSchemaRequest {
 
     @NotBlank
@@ -48,4 +51,5 @@ public class CreateSchemaRequest {
     private Set<SchemaAttribute> attributes;
     @Builder.Default
     private Set<TransformationTarget> transformationTargets = Set.of();
+    private JsonNode data;
 }

@@ -4,9 +4,6 @@
   "version": "V1234",
   "schemaState": "CREATED",
   "schemaType": "JSON",
-  "schemaMeta": {
-    "createdBy": "testUser"
-  },
   "attributes": [
     {
       "type": "ARRAY",

@@ -49,6 +49,11 @@ public abstract class SchemaAttributeHandler<T> implements SchemaAttributeAccept
     }
 
     @Override
+    public T accept(final DateAttribute attribute) {
+        return defaultHandler.apply(attribute);
+    }
+
+    @Override
     public T accept(final ArrayAttribute attribute) {
         return defaultHandler.apply(attribute);
     }

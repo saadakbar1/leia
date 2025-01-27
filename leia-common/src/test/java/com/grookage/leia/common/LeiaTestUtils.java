@@ -87,6 +87,12 @@ public class LeiaTestUtils {
             }
 
             @Override
+            public Void accept(DateAttribute attribute) {
+                Assertions.assertInstanceOf(DateAttribute.class, original, "Original is not DateAttribute");
+                return null;
+            }
+
+            @Override
             public Void accept(ArrayAttribute attribute) {
                 Assertions.assertInstanceOf(ArrayAttribute.class, original, "Original is not ArrayAttribute");
                 ArrayAttribute originalArray = (ArrayAttribute) original;
