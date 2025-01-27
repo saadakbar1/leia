@@ -8,18 +8,21 @@ All notable changes to this project will be documented in this file.
     - Introduced a TargetValidator for dynamically validating transformation targets.
     - Both the messageProcessor and the target validator can be runtime args along with initialzied values
     - No exception on a schema not present in the client side
-- SchemaDetails : 
+- SchemaDetails :
     - Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema
       definitions if required
-    - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the 
+    - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the
       exact version.
 - TransformationTarget :
     - Introduced a criteria to validate transformation targets based on source object
 - Multiple Version Support:
-    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the necessary
+    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the
+      necessary
       information.
 - SchemaAttribute:
     - Introduced a DateAttribute for explicitly validating Date
+- Aerospike Repository:
+    - Support for AS data store, along with the dw bundle
 
 ## [0.0.1-RC13]
 
