@@ -22,6 +22,7 @@ import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
 import com.grookage.leia.client.stubs.TestSchemaUnit;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -29,6 +30,7 @@ import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.mux.processors.DefaultTargetValidator;
 import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
 import com.grookage.leia.mux.processors.TargetValidator;
+import com.grookage.leia.mux.processors.hub.MessageProcessor;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.appform.jsonrules.expressions.equality.EqualsExpression;
 import lombok.SneakyThrows;
@@ -90,10 +92,13 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), messages -> {
-            Assertions.assertFalse(messages.isEmpty());
-            Assertions.assertEquals(2, messages.size());
-        }, null);
+                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+            @Override
+            public void processMessages(List<LeiaMessage> messages) {
+                Assertions.assertFalse(messages.isEmpty());
+                Assertions.assertEquals(2, messages.size());
+            }
+        }), null);
     }
 
     @Test
@@ -107,11 +112,14 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(false)
-                .build(), messages -> {
-            Assertions.assertFalse(messages.isEmpty());
-            Assertions.assertEquals(1, messages.size());
-            Assertions.assertEquals("testUser", messages.get(targetSchema).getMessage().get("name").asText());
-        }, null);
+                .build(), schemaKey -> Optional.of(new MessageProcessor("test") {
+            @Override
+            public void processMessages(List<LeiaMessage> messages) {
+                Assertions.assertFalse(messages.isEmpty());
+                Assertions.assertEquals(1, messages.size());
+                Assertions.assertEquals("testUser", messages.get(0).getMessage().get("name").asText());
+            }
+        }), null);
     }
 
     @Test
@@ -168,18 +176,24 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), messages -> {
-            Assertions.assertFalse(messages.isEmpty());
-            Assertions.assertEquals(2, messages.size());
-        }, null);
+                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+            @Override
+            public void processMessages(List<LeiaMessage> messages) {
+                Assertions.assertFalse(messages.isEmpty());
+                Assertions.assertEquals(2, messages.size());
+            }
+        }), null);
         testSchema.setUserName("testUserForInvalidTarget");
         otherClient.processMessages(MessageRequest.builder()
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), messages -> {
-            Assertions.assertFalse(messages.isEmpty());
-            Assertions.assertEquals(1, messages.size());
-        }, null);
+                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+            @Override
+            public void processMessages(List<LeiaMessage> messages) {
+                Assertions.assertFalse(messages.isEmpty());
+                Assertions.assertEquals(1, messages.size());
+            }
+        }), null);
     }
 }

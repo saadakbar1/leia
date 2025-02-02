@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-bom</artifactId>
-        <version>0.0.1-RC14</version>
+        <version>0.0.1-RC15</version>
         <relativePath>../leia-bom</relativePath>
     </parent>
 
@@ -45,7 +45,6 @@
         <awaitility.version>4.1.1</awaitility.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
 
-        <http.client.version>5.2.2</http.client.version>
         <mockito.version>4.2.0</mockito.version>
 
         <jackson.version>2.17.0</jackson.version>

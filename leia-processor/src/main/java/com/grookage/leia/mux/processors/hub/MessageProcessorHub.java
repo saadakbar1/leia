@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.processors;
+package com.grookage.leia.mux.processors.hub;
 
-import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.schema.SchemaKey;
 
-import java.util.Map;
+import java.util.Optional;
 
-public interface MessageProcessor {
+public interface MessageProcessorHub {
 
-    void processMessages(Map<SchemaKey, LeiaMessage> messages);
+    Optional<MessageProcessor> getMessageProcessor(final SchemaKey schemaKey);
 
 }
