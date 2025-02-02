@@ -61,6 +61,8 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     JsonNode data;
     @Builder.Default
     Set<SchemaHistoryItem> histories = new HashSet<>();
+    @Builder.Default
+    Set<String> tags = new HashSet<>();
 
     @JsonIgnore
     public String getReferenceId() {

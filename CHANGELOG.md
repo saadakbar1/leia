@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC15]
+
+- LeiaMessageProduceClient
+  - Started taking a messageProcessorHub in the client. A subset of messages could be pawned to each processor
+
 ## [0.0.1-RC14]
 
 - LeiaMessageProduceClient
