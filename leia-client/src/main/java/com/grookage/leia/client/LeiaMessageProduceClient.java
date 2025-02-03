@@ -149,13 +149,16 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         }
         final var messages = getMessages(messageRequest, retriever);
         final var processors = new HashMap<MessageProcessor, List<LeiaMessage>>();
-        messages.values().forEach(message -> {
-            final var mappedProcessor = pHub.getMessageProcessor(message.getSchemaKey()).orElse(null);
-            if (null != mappedProcessor) {
-                processors.computeIfAbsent(mappedProcessor, k -> new ArrayList<>());
-                processors.get(mappedProcessor).add(message);
-            }
-        });
+        messages.values().forEach(message ->
+                pHub.getMessageProcessors(message.getSchemaKey())
+                        .forEach(mappedProcessor -> {
+                            if (null != mappedProcessor) {
+                                processors.computeIfAbsent(mappedProcessor, k -> new ArrayList<>());
+                                processors.get(mappedProcessor).add(message);
+                            }
+                        }
+                )
+        );
         final var futures = CompletableFuture.allOf(processors.entrySet().stream()
                 .map(each -> CompletableFuture.runAsync(() -> each.getKey().processMessages(each.getValue())))
                 .toArray(CompletableFuture[]::new));

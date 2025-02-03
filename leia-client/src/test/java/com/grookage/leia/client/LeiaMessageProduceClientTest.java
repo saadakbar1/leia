@@ -92,7 +92,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
@@ -112,7 +112,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(false)
-                .build(), schemaKey -> Optional.of(new MessageProcessor("test") {
+                .build(), schemaKey -> List.of(new MessageProcessor("test") {
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
@@ -176,7 +176,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
@@ -188,7 +188,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> Optional.of(new MessageProcessor("Test") {
+                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());

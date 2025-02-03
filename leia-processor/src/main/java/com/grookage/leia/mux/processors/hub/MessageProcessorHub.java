@@ -18,10 +18,10 @@ package com.grookage.leia.mux.processors.hub;
 
 import com.grookage.leia.models.schema.SchemaKey;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface MessageProcessorHub {
 
-    Optional<MessageProcessor> getMessageProcessor(final SchemaKey schemaKey);
+    List<MessageProcessor> getMessageProcessors(final SchemaKey schemaKey);
 
 }
