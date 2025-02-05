@@ -1,0 +1,12 @@
+[
+  {
+    "schemaKey": {
+      "namespace": "testNamespace",
+      "schemaName": "testSchema",
+      "version": "V1234"
+    },
+    "message": {
+      "attr": "attr1"
+    }
+  }
+]

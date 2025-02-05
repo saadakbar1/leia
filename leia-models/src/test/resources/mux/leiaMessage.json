@@ -1,0 +1,14 @@
+{
+  "schemaKey": {
+    "namespace": "testNamespace",
+    "schemaName": "testSchema",
+    "version": "V1234"
+  },
+  "message": {
+    "attr": "attr1"
+  },
+  "tags": [
+    "backend-backend1::backend2",
+    "importance-mild::extreme"
+  ]
+}

@@ -2,11 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC17]
+
+- Introduced HttpProcessor to support sync and queued sends
+
 ## [0.0.1-RC16]
 
 - LeiaMessageProduceClient
-  - MessageProcessorHub now returns a list of processors.
-
+    - MessageProcessorHub now returns a list of processors.
 
 ## [0.0.1-RC15]
 

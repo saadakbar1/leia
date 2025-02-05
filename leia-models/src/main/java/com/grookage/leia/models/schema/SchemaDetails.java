@@ -32,9 +32,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Data
@@ -62,7 +60,7 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     @Builder.Default
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
-    Set<String> tags = new HashSet<>();
+    List<String> tags = new ArrayList<>();
 
     @JsonIgnore
     public String getReferenceId() {
