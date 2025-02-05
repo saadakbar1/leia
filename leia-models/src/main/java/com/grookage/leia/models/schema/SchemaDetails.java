@@ -19,7 +19,6 @@ package com.grookage.leia.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Joiner;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -32,9 +31,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Data
@@ -58,11 +55,10 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     Set<SchemaAttribute> attributes;
     @Builder.Default
     Set<TransformationTarget> transformationTargets = Set.of();
-    JsonNode data;
     @Builder.Default
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
-    Set<String> tags = new HashSet<>();
+    List<String> tags = new ArrayList<>();
 
     @JsonIgnore
     public String getReferenceId() {

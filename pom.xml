@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia</artifactId>
-    <version>0.0.1-RC16</version>
+    <version>0.0.1-RC17</version>
     <packaging>pom</packaging>
 
     <name>Leia</name>
@@ -43,6 +43,7 @@
         <module>leia-processor</module>
         <module>leia-aerospike</module>
         <module>leia-aerospike-dw</module>
+        <module>leia-http-processor</module>
     </modules>
 
     <distributionManagement>

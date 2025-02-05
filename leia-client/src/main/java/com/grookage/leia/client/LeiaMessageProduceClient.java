@@ -117,6 +117,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             messages.put(messageRequest.getSchemaKey(), LeiaMessage.builder()
                     .schemaKey(sourceSchemaDetails.getSchemaKey())
                     .message(messageRequest.getMessage())
+                    .tags(sourceSchemaDetails.getTags())
                     .build()
             );
         }
@@ -152,12 +153,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         messages.values().forEach(message ->
                 pHub.getMessageProcessors(message.getSchemaKey())
                         .forEach(mappedProcessor -> {
-                            if (null != mappedProcessor) {
-                                processors.computeIfAbsent(mappedProcessor, k -> new ArrayList<>());
-                                processors.get(mappedProcessor).add(message);
-                            }
-                        }
-                )
+                                    if (null != mappedProcessor) {
+                                        processors.computeIfAbsent(mappedProcessor, k -> new ArrayList<>())
+                                                .add(message);
+                                    }
+                                }
+                        )
         );
         final var futures = CompletableFuture.allOf(processors.entrySet().stream()
                 .map(each -> CompletableFuture.runAsync(() -> each.getKey().processMessages(each.getValue())))
@@ -176,27 +177,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 
     @Override
     public void start() {
-        super.getSchemaDetails().forEach(schemaDetails -> {
-            if (!super.valid(schemaDetails.getSchemaKey())) {
-                return;
-            }
-            final var transformationTargets = schemaDetails.getTransformationTargets();
-            transformationTargets.forEach(transformationTarget -> {
-                final var valid = super.valid(transformationTarget.getSchemaKey());
-                if (!valid) {
-                    log.error("The transformationSchema schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                            transformationTarget.getSchemaKey());
-                    throw new IllegalStateException("Invalid transformation schema");
-                }
-                final var paths = new HashMap<String, JsonPath>();
-                transformationTarget.getTransformers().forEach(transformer -> paths.put(transformer.getAttributeName(),
-                        JsonPath.compile(transformer.getTransformationPath())));
-                compiledPaths.put(transformationTarget.getSchemaKey(), paths);
-            });
-            if (messageProcessorDurationMs == 0) {
-                log.debug("No message processor duration has been specified. Setting it to default 10 seconds");
-                messageProcessorDurationMs = 10_000;
-            }
-        });
+        compiledPaths.putAll(
+                MessageTransformerUtils.getCompiledPaths(super.getSchemaDetails(), this::valid)
+        );
+        if (messageProcessorDurationMs == 0) {
+            log.debug("No message processor duration has been specified. Setting it to default 10 seconds");
+            messageProcessorDurationMs = 10_000;
+        }
     }
 }
