@@ -39,7 +39,6 @@ public class SchemaUtils {
                 .attributes(createSchemaRequest.getAttributes())
                 .validationType(createSchemaRequest.getValidationType())
                 .transformationTargets(createSchemaRequest.getTransformationTargets())
-                .data(createSchemaRequest.getData())
                 .build();
     }
 }
