@@ -142,13 +142,13 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     public void processMessages(MessageRequest messageRequest,
                                 MessageProcessor messageProcessor,
                                 TargetValidator retriever) {
-        final var configuredProcessor = null != messageProcessor ? messageProcessor : processorSupplier.get();
-        if (null == configuredProcessor) {
+        final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
+        if (null == processor) {
             log.error("No message processor hub supplied to process messages, call getMessages instead");
             throw new UnsupportedOperationException("No message processor hub found");
         }
         final var messages = getMessages(messageRequest, retriever).values().stream().toList();
-        configuredProcessor.processMessages(messages);
+        processor.processMessages(messages);
     }
 
     @Override
