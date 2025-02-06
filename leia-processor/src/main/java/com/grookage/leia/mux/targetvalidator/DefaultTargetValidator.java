@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.processors;
+package com.grookage.leia.mux.targetvalidator;
 
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import lombok.AllArgsConstructor;
 
-public interface TargetValidator {
-    boolean validate(TransformationTarget transformationTarget,
-                     MessageRequest messageRequest,
-                     SchemaDetails schemaDetails);
+@AllArgsConstructor
+public class DefaultTargetValidator implements TargetValidator {
+
+    @Override
+    public boolean validate(TransformationTarget transformationTarget,
+                            MessageRequest messageRequest,
+                            SchemaDetails schemaDetails) {
+        return true;
+    }
 }

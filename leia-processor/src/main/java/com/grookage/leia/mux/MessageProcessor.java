@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.exception;
+package com.grookage.leia.mux;
 
-import com.grookage.leia.models.exception.LeiaErrorCode;
-import lombok.Getter;
+import com.grookage.leia.models.mux.LeiaMessage;
 
-@Getter
-public enum LeiaHttpErrorCode implements LeiaErrorCode {
+import java.util.List;
 
-    INVALID_ENDPOINT(500),
+public interface MessageProcessor {
 
-    EVENT_SEND_FAILED(500),
+    String getName();
 
-    QUEUE_SEND_FAILED(500);
-
-    final int status;
-
-    LeiaHttpErrorCode(int status) {
-        this.status = status;
-    }
+    void processMessages(List<LeiaMessage> messages);
 }

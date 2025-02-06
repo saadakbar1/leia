@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.resolver;
+package com.grookage.leia.mux.resolver;
 
-import com.grookage.leia.http.processor.config.HttpClientConfig;
 import com.grookage.leia.models.mux.LeiaMessage;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
-public class TagBasedBackedNameResolver implements BackendNameResolver {
+@Data
+public class TagBasedNameResolver implements BackendNameResolver {
 
     private static final String BACKEND_TAG = "backend";
     private static final String TAG_SEPARATOR = "-";
 
-    private final HttpClientConfig clientConfig;
+    private final Supplier<List<String>> backends;
 
     @Override
     public List<String> getEligibleBackends(LeiaMessage leiaMessage) {
@@ -43,7 +46,8 @@ public class TagBasedBackedNameResolver implements BackendNameResolver {
         if (null == backendTag) {
             return List.of();
         }
-        final var eligibleBackends = clientConfig.getBackends();
+        final List<String> eligibleBackends = null == backends ? List.of() :
+                Objects.requireNonNullElse(backends.get(), List.of());
         final var configuredBackends = Arrays.asList(backendTag.toUpperCase(Locale.ROOT).substring(backendTag.lastIndexOf(TAG_SEPARATOR) + 1).split("\\s*::\\s*"));
         return eligibleBackends.stream()
                 .filter(configuredBackends::contains)

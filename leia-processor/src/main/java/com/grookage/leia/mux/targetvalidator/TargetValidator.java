@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.processors.hub;
+package com.grookage.leia.mux.targetvalidator;
 
-import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.mux.MessageRequest;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.transformer.TransformationTarget;
 
-import java.util.List;
-
-public interface MessageProcessorHub {
-
-    List<MessageProcessor> getMessageProcessors(final SchemaKey schemaKey);
-
+public interface TargetValidator {
+    boolean validate(TransformationTarget transformationTarget,
+                     MessageRequest messageRequest,
+                     SchemaDetails schemaDetails);
 }

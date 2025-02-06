@@ -28,6 +28,7 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.mux.executor.MessageExecutor;
 import com.leansoft.bigqueue.BigQueueImpl;
 import com.leansoft.bigqueue.IBigQueue;
 import lombok.AllArgsConstructor;
@@ -55,7 +56,7 @@ import java.util.function.UnaryOperator;
 @AllArgsConstructor
 @Slf4j
 @Getter
-public class DefaultHttpExecutor implements HttpExecutor {
+public class HttpMessageExecutor implements MessageExecutor {
 
     private final String name;
     private final HttpBackendConfig backendConfig;
@@ -65,7 +66,7 @@ public class DefaultHttpExecutor implements HttpExecutor {
     private final Retryer<String> retryer;
     private QueuedSender queuedSender;
 
-    public DefaultHttpExecutor(HttpBackendConfig backendConfig,
+    public HttpMessageExecutor(HttpBackendConfig backendConfig,
                                Supplier<String> authSupplier,
                                ObjectMapper mapper,
                                EndPointResolver endPointResolver) {

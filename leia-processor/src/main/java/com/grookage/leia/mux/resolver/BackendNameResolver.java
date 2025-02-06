@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.executor;
+package com.grookage.leia.mux.resolver;
 
 import com.grookage.leia.models.mux.LeiaMessage;
 
 import java.util.List;
 
-public interface HttpExecutor {
+public interface BackendNameResolver {
 
-    void send(List<LeiaMessage> messages);
+    List<String> getEligibleBackends(LeiaMessage leiaMessage);
+
 }
