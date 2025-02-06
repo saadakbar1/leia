@@ -50,6 +50,7 @@ public class HttpClientConfig {
     long idleConnEvictMs = 60000;
     @Builder.Default
     boolean failOnUnavailableBackend = true;
+    long messageProcessingThresholdMs = 10_000L;
     @NotEmpty
     List<HttpBackendConfig> backendConfigs;
 

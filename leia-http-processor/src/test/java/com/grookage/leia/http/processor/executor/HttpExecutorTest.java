@@ -34,7 +34,7 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @WireMockTest
-class DefaultHttpExecutorTest {
+class HttpExecutorTest {
 
     @Test
     @SneakyThrows
@@ -56,7 +56,7 @@ class DefaultHttpExecutorTest {
                 .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
                 .willReturn(aResponse()
                         .withStatus(200)));
-        final var testableExecutor = new DefaultHttpExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper(), endPointResolver);
+        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper(), endPointResolver);
         testableExecutor.send(messages);
     }
 }

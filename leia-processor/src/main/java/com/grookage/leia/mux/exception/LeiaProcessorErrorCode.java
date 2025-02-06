@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.executor;
+package com.grookage.leia.mux.exception;
 
+import com.grookage.leia.models.exception.LeiaErrorCode;
+import lombok.Getter;
 
-import java.util.Optional;
+@Getter
+public enum LeiaProcessorErrorCode implements LeiaErrorCode {
 
-public interface HttpExecutorFactory {
+    BACKENDS_NOT_FOUND(500),
 
-    Optional<HttpExecutor> getExecutor(final String backendName);
+    EXECUTOR_NOT_FOUND(500);
 
+    final int status;
+
+    LeiaProcessorErrorCode(int status) {
+        this.status = status;
+    }
 }

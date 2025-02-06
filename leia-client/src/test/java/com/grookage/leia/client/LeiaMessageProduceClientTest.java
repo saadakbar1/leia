@@ -27,10 +27,13 @@ import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
-import com.grookage.leia.mux.processors.DefaultTargetValidator;
-import com.grookage.leia.mux.processors.JsonRuleTargetValidator;
-import com.grookage.leia.mux.processors.TargetValidator;
-import com.grookage.leia.mux.processors.hub.MessageProcessor;
+import com.grookage.leia.mux.AbstractMessageProcessor;
+import com.grookage.leia.mux.executor.MessageExecutor;
+import com.grookage.leia.mux.executor.MessageExecutorFactory;
+import com.grookage.leia.mux.resolver.BackendNameResolver;
+import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
+import com.grookage.leia.mux.targetvalidator.JsonRuleTargetValidator;
+import com.grookage.leia.mux.targetvalidator.TargetValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import io.appform.jsonrules.expressions.equality.EqualsExpression;
 import lombok.SneakyThrows;
@@ -45,6 +48,8 @@ import java.util.Optional;
 class LeiaMessageProduceClientTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final BackendNameResolver nameResolver = Mockito.mock(BackendNameResolver.class);
+    private static final MessageExecutorFactory executorFactory = Mockito.mock(MessageExecutorFactory.class);
     private LeiaMessageProduceClient schemaClient;
     private SchemaKey sourceSchema;
     private SchemaKey targetSchema;
@@ -92,13 +97,23 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
+                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return false;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return false;
+            }
+
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(2, messages.size());
             }
-        }), null);
+        }, null);
     }
 
     @Test
@@ -112,14 +127,24 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(false)
-                .build(), schemaKey -> List.of(new MessageProcessor("test") {
+                .build(), new AbstractMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return false;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return false;
+            }
+
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(1, messages.size());
                 Assertions.assertEquals("testUser", messages.get(0).getMessage().get("name").asText());
             }
-        }), null);
+        }, null);
     }
 
     @Test
@@ -176,24 +201,44 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
+                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return false;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return false;
+            }
+
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(2, messages.size());
             }
-        }), null);
+        }, null);
         testSchema.setUserName("testUserForInvalidTarget");
         otherClient.processMessages(MessageRequest.builder()
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), schemaKey -> List.of(new MessageProcessor("Test") {
+                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return false;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return false;
+            }
+
             @Override
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(1, messages.size());
             }
-        }), null);
+        }, null);
     }
 }

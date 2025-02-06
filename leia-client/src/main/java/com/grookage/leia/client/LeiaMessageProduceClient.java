@@ -24,10 +24,9 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.models.utils.SchemaUtils;
-import com.grookage.leia.mux.processors.DefaultTargetValidator;
-import com.grookage.leia.mux.processors.TargetValidator;
-import com.grookage.leia.mux.processors.hub.MessageProcessor;
-import com.grookage.leia.mux.processors.hub.MessageProcessorHub;
+import com.grookage.leia.mux.MessageProcessor;
+import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
+import com.grookage.leia.mux.targetvalidator.TargetValidator;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
@@ -38,9 +37,10 @@ import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 
@@ -56,9 +56,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             .build();
     private static final TargetValidator DEFAULT_VALIDATOR = new DefaultTargetValidator();
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
-    private final Supplier<MessageProcessorHub> processorHub;
+    private final Supplier<MessageProcessor> processorSupplier;
     private final Supplier<TargetValidator> targetValidator;
-    private long messageProcessorDurationMs;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -141,38 +140,15 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     }
 
     public void processMessages(MessageRequest messageRequest,
-                                MessageProcessorHub messageProcessorHub,
+                                MessageProcessor messageProcessor,
                                 TargetValidator retriever) {
-        final var pHub = null != messageProcessorHub ? messageProcessorHub : processorHub.get();
-        if (null == pHub) {
+        final var configuredProcessor = null != messageProcessor ? messageProcessor : processorSupplier.get();
+        if (null == configuredProcessor) {
             log.error("No message processor hub supplied to process messages, call getMessages instead");
             throw new UnsupportedOperationException("No message processor hub found");
         }
-        final var messages = getMessages(messageRequest, retriever);
-        final var processors = new HashMap<MessageProcessor, List<LeiaMessage>>();
-        messages.values().forEach(message ->
-                pHub.getMessageProcessors(message.getSchemaKey())
-                        .forEach(mappedProcessor -> {
-                                    if (null != mappedProcessor) {
-                                        processors.computeIfAbsent(mappedProcessor, k -> new ArrayList<>())
-                                                .add(message);
-                                    }
-                                }
-                        )
-        );
-        final var futures = CompletableFuture.allOf(processors.entrySet().stream()
-                .map(each -> CompletableFuture.runAsync(() -> each.getKey().processMessages(each.getValue())))
-                .toArray(CompletableFuture[]::new));
-        try {
-            futures.get(messageProcessorDurationMs, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            log.error("Couldn't perform the message processor execution. It exceeded the process duration", e);
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Couldn't perform the message processor execution. It exceeded the process duration");
-        } catch (Exception e) {
-            log.error("There is an exception while trying to process messages", e);
-            throw new IllegalStateException("There is an exception while trying to process messages", e);
-        }
+        final var messages = getMessages(messageRequest, retriever).values().stream().toList();
+        configuredProcessor.processMessages(messages);
     }
 
     @Override
@@ -180,9 +156,5 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         compiledPaths.putAll(
                 MessageTransformerUtils.getCompiledPaths(super.getSchemaDetails(), this::valid)
         );
-        if (messageProcessorDurationMs == 0) {
-            log.debug("No message processor duration has been specified. Setting it to default 10 seconds");
-            messageProcessorDurationMs = 10_000;
-        }
     }
 }

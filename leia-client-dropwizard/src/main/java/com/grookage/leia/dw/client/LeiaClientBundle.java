@@ -21,9 +21,9 @@ import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
-import com.grookage.leia.mux.processors.DefaultTargetValidator;
-import com.grookage.leia.mux.processors.TargetValidator;
-import com.grookage.leia.mux.processors.hub.MessageProcessorHub;
+import com.grookage.leia.mux.MessageProcessor;
+import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
+import com.grookage.leia.mux.targetvalidator.TargetValidator;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import com.grookage.leia.validator.StaticSchemaValidator;
@@ -69,16 +69,11 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .build();
     }
 
-    protected abstract Supplier<MessageProcessorHub> getMessageProcessorHub(T configuration);
-
-    protected long getMessageProcessorDuration(T configuration) {
-        return 10_000;
-    }
+    protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
 
     protected Supplier<TargetValidator> getTargetRetriever(T configuration) {
         return DefaultTargetValidator::new;
     }
-
 
     @Override
     public void run(T configuration, Environment environment) {
@@ -115,9 +110,8 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .refresher(clientRefresher)
                     .schemaValidator(validator)
                     .mapper(environment.getObjectMapper())
-                    .processorHub(getMessageProcessorHub(configuration))
+                    .processorSupplier(getMessageProcessor(configuration))
                     .targetValidator(getTargetRetriever(configuration))
-                    .messageProcessorDurationMs(getMessageProcessorDuration(configuration))
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override

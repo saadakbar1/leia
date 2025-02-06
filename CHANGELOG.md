@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC18]
+
+- Design Cleanup: Message Processor now has a Message Executor that you can extend, and build your own backend backed
+  executors. This helps simplify the messageProcessorHub into a single message processor
+
 ## [0.0.1-RC17]
 
 - Introduced HttpProcessor to support sync and queued sends
