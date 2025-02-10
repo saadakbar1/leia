@@ -18,7 +18,6 @@ package com.grookage.leia.mux.resolver;
 
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.mux.resolver.TagBasedNameResolver;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

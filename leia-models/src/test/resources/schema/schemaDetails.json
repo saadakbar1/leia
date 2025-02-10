@@ -43,6 +43,10 @@
         {
           "attributeName": "name",
           "transformationPath": "$.userName"
+        },
+        {
+          "attributeName": "officialName",
+          "transformationPath": "~TestName"
         }
       ]
     }

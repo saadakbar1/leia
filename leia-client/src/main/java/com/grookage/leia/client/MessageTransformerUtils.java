@@ -16,6 +16,8 @@
 
 package com.grookage.leia.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.jayway.jsonpath.JsonPath;
@@ -30,6 +32,8 @@ import java.util.function.Predicate;
 @UtilityClass
 @Slf4j
 public class MessageTransformerUtils {
+
+    private static final String LITERAL = "~";
 
     public static Map<SchemaKey, Map<String, JsonPath>> getCompiledPaths(List<SchemaDetails> schemas,
                                                                          Predicate<SchemaKey> schemaPredicate) {
@@ -47,11 +51,24 @@ public class MessageTransformerUtils {
                     throw new IllegalStateException("Invalid transformation schema");
                 }
                 final var paths = new HashMap<String, JsonPath>();
-                transformationTarget.getTransformers().forEach(transformer -> paths.put(transformer.getAttributeName(),
-                        JsonPath.compile(transformer.getTransformationPath())));
+                transformationTarget.getTransformers()
+                        .forEach(transformer -> {
+                            if (!transformer.getTransformationPath().startsWith(LITERAL)) {
+                                paths.put(transformer.getAttributeName(),
+                                        JsonPath.compile(transformer.getTransformationPath()));
+                            }
+                        });
                 compiledPaths.put(transformationTarget.getSchemaKey(), paths);
             });
         });
         return compiledPaths;
+    }
+
+    public static boolean text(String transformationPath) {
+        return transformationPath.startsWith(LITERAL);
+    }
+
+    public static JsonNode toTextNode(String attributeValue) {
+        return new TextNode(attributeValue.substring(attributeValue.lastIndexOf(LITERAL) + 1));
     }
 }

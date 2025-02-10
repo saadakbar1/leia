@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.executor;
+package com.grookage.leia.http.processor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.grookage.leia.http.processor.config.HttpBackendConfig;
 import com.grookage.leia.http.processor.config.HttpClientConfig;
-import com.grookage.leia.http.processor.endpoint.DefaultEndPointResolver;
+import com.grookage.leia.http.processor.config.LeiaHttpEndPoint;
 import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.ResourceHelper;
@@ -30,11 +31,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @WireMockTest
-class HttpExecutorTest {
+class HttpMessageExecutorTest {
 
     @Test
     @SneakyThrows
@@ -44,9 +46,9 @@ class HttpExecutorTest {
         Assertions.assertNotNull(clientConfig);
         final var backend = clientConfig.getBackendConfigs().stream().findFirst().orElse(null);
         Assertions.assertNotNull(backend);
-        backend.setPort(wireMockRuntimeInfo.getHttpPort());
+        final var port = wireMockRuntimeInfo.getHttpPort();
+        backend.setPort(port);
         backend.setUri("/ingest");
-        final var endPointResolver = new DefaultEndPointResolver();
         final var messages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
         });
         Assertions.assertNotNull(messages);
@@ -56,7 +58,17 @@ class HttpExecutorTest {
                 .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
                 .willReturn(aResponse()
                         .withStatus(200)));
-        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper(), endPointResolver);
+        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+            @Override
+            public Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig) {
+                return Optional.of(LeiaHttpEndPoint.builder()
+                        .host("127.0.0.1")
+                        .port(port)
+                        .secure(backendConfig.isSecure())
+                        .uri(backendConfig.getUri())
+                        .build());
+            }
+        };
         testableExecutor.send(messages);
     }
 }

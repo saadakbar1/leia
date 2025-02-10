@@ -37,17 +37,17 @@ import java.util.concurrent.TimeUnit;
 
 @Data
 @Slf4j
-public abstract class AbstractMessageProcessor implements MessageProcessor {
+public class DefaultMessageProcessor implements MessageProcessor {
 
     private final String name;
     private final long processingThresholdMs;
     private final BackendNameResolver backendNameResolver;
     private final MessageExecutorFactory executorFactory;
 
-    protected AbstractMessageProcessor(String name,
-                                       long processingThresholdMs,
-                                       BackendNameResolver backendNameResolver,
-                                       MessageExecutorFactory executorFactory) {
+    protected DefaultMessageProcessor(String name,
+                                      long processingThresholdMs,
+                                      BackendNameResolver backendNameResolver,
+                                      MessageExecutorFactory executorFactory) {
         Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
         Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
         this.name = name;
@@ -56,9 +56,13 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
         this.executorFactory = executorFactory;
     }
 
-    protected abstract boolean validBackends(List<String> backends);
+    protected boolean validBackends(List<String> backends) {
+        return null != backends && !backends.isEmpty();
+    }
 
-    protected abstract boolean validExecutor(MessageExecutor executor);
+    protected boolean validExecutor(MessageExecutor executor) {
+        return null != executor;
+    }
 
     private Map<MessageExecutor, List<LeiaMessage>> getExecutorMapping(List<LeiaMessage> messages) {
         final var executorMapping = new HashMap<MessageExecutor, List<LeiaMessage>>();
@@ -117,7 +121,7 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        final var thatKey = (AbstractMessageProcessor) obj;
+        final var thatKey = (DefaultMessageProcessor) obj;
         return (thatKey.getName().equalsIgnoreCase(this.getName()));
     }
 }

@@ -16,7 +16,6 @@
 
 package com.grookage.leia.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
@@ -80,11 +79,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         final var responseObject = JsonNodeFactory.instance.objectNode();
         final var sourceContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         transformationTarget.getTransformers().forEach(transformer -> {
-            final var jsonPath = getJsonPath(transformationTarget.getSchemaKey(), transformer.getAttributeName())
-                    .orElse(null);
-            if (null != jsonPath) {
-                final JsonNode attribute = sourceContext.read(jsonPath);
-                responseObject.set(transformer.getAttributeName(), attribute);
+            if (MessageTransformerUtils.text(transformer.getTransformationPath())) {
+                responseObject.set(transformer.getAttributeName(), MessageTransformerUtils.toTextNode(transformer.getTransformationPath()));
+            } else {
+                getJsonPath(transformationTarget.getSchemaKey(), transformer.getAttributeName())
+                        .ifPresent(jsonPath -> responseObject.set(transformer.getAttributeName(), sourceContext.read(jsonPath)));
             }
         });
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.

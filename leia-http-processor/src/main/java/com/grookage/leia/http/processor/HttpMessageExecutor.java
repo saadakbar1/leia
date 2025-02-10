@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor.executor;
+package com.grookage.leia.http.processor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import com.github.rholder.retry.*;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
-import com.grookage.leia.http.processor.endpoint.EndPointResolver;
+import com.grookage.leia.http.processor.config.LeiaHttpEndPoint;
 import com.grookage.leia.http.processor.exception.LeiaHttpErrorCode;
 import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
@@ -41,6 +41,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.net.URIBuilder;
 
 import java.nio.file.Files;
@@ -48,6 +49,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -56,20 +58,18 @@ import java.util.function.UnaryOperator;
 @AllArgsConstructor
 @Slf4j
 @Getter
-public class HttpMessageExecutor implements MessageExecutor {
+public abstract class HttpMessageExecutor implements MessageExecutor {
 
     private final String name;
     private final HttpBackendConfig backendConfig;
     private final Supplier<String> authSupplier;
     private final ObjectMapper mapper;
-    private final EndPointResolver endPointResolver;
     private final Retryer<String> retryer;
     private QueuedSender queuedSender;
 
-    public HttpMessageExecutor(HttpBackendConfig backendConfig,
-                               Supplier<String> authSupplier,
-                               ObjectMapper mapper,
-                               EndPointResolver endPointResolver) {
+    protected HttpMessageExecutor(HttpBackendConfig backendConfig,
+                                  Supplier<String> authSupplier,
+                                  ObjectMapper mapper) {
         this.name = backendConfig.getBackendName();
         this.backendConfig = backendConfig;
         this.authSupplier = authSupplier;
@@ -81,7 +81,6 @@ public class HttpMessageExecutor implements MessageExecutor {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(backendConfig.getRetryCount()))
                 .withBlockStrategy(BlockStrategies.threadSleepStrategy())
                 .build();
-        this.endPointResolver = endPointResolver;
         if (backendConfig.getBackendType() == BackendType.QUEUED) {
             this.queuedSender = new QueuedSender(backendConfig, mapper, messages -> {
                 executeRequest(messages);
@@ -90,12 +89,14 @@ public class HttpMessageExecutor implements MessageExecutor {
         }
     }
 
+    public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
+
     @SneakyThrows
     public void executeRequest(List<LeiaMessage> messages) {
         try {
             retryer.call(() -> {
                 final var requestData = HttpRequestUtils.toHttpEntity(messages, backendConfig);
-                final var endPoint = endPointResolver.getEndPoint(backendConfig, null).orElse(null);
+                final var endPoint = getEndPoint(backendConfig).orElse(null);
                 if (null == endPoint) {
                     log.debug("No valid end point found for backendConfig {}", backendConfig);
                     throw LeiaException.error(LeiaHttpErrorCode.INVALID_ENDPOINT);
@@ -110,9 +111,14 @@ public class HttpMessageExecutor implements MessageExecutor {
                                 : endPoint.getPort())
                         .setPath(endPoint.getUri())
                         .build();
-                final var request = Request.post(httpUrl)
+                var request = Request.post(httpUrl)
                         .body(new ByteArrayEntity(mapper.writeValueAsBytes(requestData), ContentType.APPLICATION_JSON))
                         .addHeader("Authorization", authSupplier.get());
+                if (backendConfig.headersProvided()) {
+                    request = request.setHeaders(backendConfig.getHeaders()
+                            .entrySet().stream().map(each -> new BasicHeader(each.getKey(), each.getValue()))
+                            .toArray(BasicHeader[]::new));
+                }
                 final var response = HttpClientUtils.getExecutor().execute(request).handleResponse(httpResponse -> {
                     final var code = httpResponse.getCode();
                     if (code >= HttpStatus.SC_REDIRECTION) {

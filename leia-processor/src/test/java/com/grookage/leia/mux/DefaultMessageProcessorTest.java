@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.http.processor;
+package com.grookage.leia.mux;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.grookage.leia.http.processor.config.HttpClientConfig;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
@@ -32,14 +31,12 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.Optional;
 
-class HttpMessageProcessorTest {
+class DefaultMessageProcessorTest {
 
     @Test
     @SneakyThrows
     void testHttpMessageProcessor() {
-        final var clientConfig = ResourceHelper.getResource("httpClientConfig.json", HttpClientConfig.class);
-        Assertions.assertNotNull(clientConfig);
-        final var resolver = new TagBasedNameResolver(clientConfig::getBackends);
+        final var resolver = new TagBasedNameResolver(() -> List.of("BACKEND1"));
         final var httpExecutor = Mockito.mock(MessageExecutor.class);
         final var executorFactory = new MessageExecutorFactory() {
             @Override
@@ -49,11 +46,32 @@ class HttpMessageProcessorTest {
         };
         final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
         });
-        final var httpMessageProcessor = new HttpMessageProcessor(clientConfig, resolver, executorFactory);
-        Assertions.assertThrows(LeiaException.class, () -> httpMessageProcessor.processMessages(leiaMessages));
+        final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return false;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return false;
+            }
+        };
+        Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages));
         leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(List.of("backend-backend1::backend2",
                 "importance-mild::extreme")));
-        httpMessageProcessor.processMessages(leiaMessages);
+        final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+            @Override
+            protected boolean validBackends(List<String> backends) {
+                return true;
+            }
+
+            @Override
+            protected boolean validExecutor(MessageExecutor executor) {
+                return true;
+            }
+        };
+        messageProcessor1.processMessages(leiaMessages);
         Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
     }
 }
