@@ -2,10 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC19]
+
+- Design cleanup: Removed unnecessary factories for executorFactory, made DefaultMessageProcessor concrete from abstract
+
 ## [0.0.1-RC18]
 
 - Design Cleanup: Message Processor now has a Message Executor that you can extend, and build your own backend backed
   executors. This helps simplify the messageProcessorHub into a single message processor
+- Introduced a static literal to transformation target path starting with ~
 
 ## [0.0.1-RC17]
 

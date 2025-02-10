@@ -27,7 +27,7 @@ import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
-import com.grookage.leia.mux.AbstractMessageProcessor;
+import com.grookage.leia.mux.DefaultMessageProcessor;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.resolver.BackendNameResolver;
@@ -97,7 +97,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+                .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
             protected boolean validBackends(List<String> backends) {
                 return false;
@@ -112,6 +112,10 @@ class LeiaMessageProduceClientTest {
             public void processMessages(List<LeiaMessage> messages) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(2, messages.size());
+                final var testMessage = messages.stream()
+                        .filter(each -> each.getSchemaKey().getVersion().equalsIgnoreCase("v")).findFirst().orElse(null);
+                Assertions.assertNotNull(testMessage);
+                Assertions.assertEquals("TestName", testMessage.getMessage().get("officialName").asText());
             }
         }, null);
     }
@@ -127,7 +131,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(false)
-                .build(), new AbstractMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
+                .build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
             @Override
             protected boolean validBackends(List<String> backends) {
                 return false;
@@ -201,7 +205,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+                .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
             protected boolean validBackends(List<String> backends) {
                 return false;
@@ -223,7 +227,7 @@ class LeiaMessageProduceClientTest {
                 .schemaKey(sourceSchema)
                 .message(mapper.valueToTree(testSchema))
                 .includeSource(true)
-                .build(), new AbstractMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+                .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
             protected boolean validBackends(List<String> backends) {
                 return false;

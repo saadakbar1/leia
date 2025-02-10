@@ -16,13 +16,15 @@
 
 package com.grookage.leia.http.processor.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -34,8 +36,9 @@ public class HttpBackendConfig {
     String backendId;
     String host;
     int port;
-    boolean secure = true;
+    boolean secure;
     String uri;
+    String requestEnv;
     @NotEmpty
     String hasher;
     @Builder.Default
@@ -46,15 +49,11 @@ public class HttpBackendConfig {
     String queuePath = "leia-messages";
     @Builder.Default
     int queueThreshold = 5;
+    @Builder.Default
+    Map<String, String> headers = new HashMap<>();
 
-    public Optional<LeiaHttpEndPoint> getEndPoint() {
-        return Optional.of(
-                LeiaHttpEndPoint.builder()
-                        .uri(this.getUri())
-                        .host(this.getHost())
-                        .port(this.getPort())
-                        .secure(this.isSecure())
-                        .build()
-        );
+    @JsonIgnore
+    public boolean headersProvided() {
+        return null != headers && !headers.isEmpty();
     }
 }
