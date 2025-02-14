@@ -17,10 +17,16 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.transformer.AttributeTransformer;
+import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,5 +76,32 @@ public class MessageTransformerUtils {
 
     public static JsonNode toTextNode(String attributeValue) {
         return new TextNode(attributeValue.substring(attributeValue.lastIndexOf(LITERAL) + 1));
+    }
+
+    public static JsonNode transformMessage(DocumentContext sourceContext,
+                                            TransformationTarget transformationTarget,
+                                            Map<String, JsonPath> compiledPaths,
+                                            ObjectMapper mapper) {
+        final var responseObject = JsonNodeFactory.instance.objectNode();
+        transformationTarget.getTransformers().forEach(transformer -> {
+            if (text(transformer.getTransformationPath())) {
+                responseObject.set(transformer.getAttributeName(), toTextNode(transformer.getTransformationPath()));
+            } else {
+                final var jsonPath = compiledPaths.get(transformer.getAttributeName());
+                if (null != jsonPath) {
+                    responseObject.set(transformer.getAttributeName(),jsonPathValue(sourceContext, transformer, jsonPath, mapper));
+                }
+            }
+        });
+        return responseObject;
+    }
+
+    @SneakyThrows
+    private static JsonNode jsonPathValue(DocumentContext sourceContext,
+                                          AttributeTransformer transformer,
+                                          JsonPath jsonPath,
+                                          ObjectMapper mapper) {
+        final JsonNode value = sourceContext.read(jsonPath);
+        return transformer.isSerialize() ? new TextNode(mapper.writeValueAsString(value)) : value;
     }
 }
