@@ -16,7 +16,9 @@
 
 package com.grookage.leia.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -35,6 +37,7 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,16 +79,9 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (null == registeredKlass) {
             return Optional.empty();
         }
-        final var responseObject = JsonNodeFactory.instance.objectNode();
         final var sourceContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
-        transformationTarget.getTransformers().forEach(transformer -> {
-            if (MessageTransformerUtils.text(transformer.getTransformationPath())) {
-                responseObject.set(transformer.getAttributeName(), MessageTransformerUtils.toTextNode(transformer.getTransformationPath()));
-            } else {
-                getJsonPath(transformationTarget.getSchemaKey(), transformer.getAttributeName())
-                        .ifPresent(jsonPath -> responseObject.set(transformer.getAttributeName(), sourceContext.read(jsonPath)));
-            }
-        });
+        final var responseObject = MessageTransformerUtils.transformMessage(sourceContext, transformationTarget,
+                getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
         return Optional.of(
                 LeiaMessage.builder()
@@ -96,9 +92,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         );
     }
 
-    private Optional<JsonPath> getJsonPath(SchemaKey schemaKey, String attributeName) {
-        return compiledPaths.containsKey(schemaKey) ?
-                Optional.ofNullable(compiledPaths.get(schemaKey).get(attributeName)) : Optional.empty();
+    private Map<String, JsonPath> getJsonPaths(SchemaKey schemaKey) {
+        return compiledPaths.containsKey(schemaKey) ? compiledPaths.get(schemaKey) : Map.of();
     }
 
     public Map<SchemaKey, LeiaMessage> getMessages(MessageRequest messageRequest,

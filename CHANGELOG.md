@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC20]
+
+- AttributeTransformer: Introduced a flag in to serialize the attribute value
+
 ## [0.0.1-RC19]
 
 - Design cleanup: Removed unnecessary factories for executorFactory, made DefaultMessageProcessor concrete from abstract

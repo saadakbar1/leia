@@ -33,4 +33,5 @@ public class AttributeTransformer {
 
     @NotEmpty String attributeName;
     @NotEmpty String transformationPath;
+    boolean serialize;
 }
