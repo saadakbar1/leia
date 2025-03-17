@@ -24,6 +24,7 @@ import com.grookage.leia.mux.exception.LeiaProcessorErrorCode;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.resolver.BackendNameResolver;
+import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,8 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final BackendNameResolver backendNameResolver;
 	private final MessageExecutorFactory executorFactory;
 
-	public DefaultMessageProcessor(String name,
+	@Builder
+	protected DefaultMessageProcessor(String name,
 								   long processingThresholdMs,
 								   BackendNameResolver backendNameResolver,
 								   MessageExecutorFactory executorFactory) {
