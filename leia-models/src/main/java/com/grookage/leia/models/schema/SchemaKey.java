@@ -19,6 +19,7 @@ package com.grookage.leia.models.schema;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Joiner;
+import com.grookage.leia.models.SchemaConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,17 +43,17 @@ public class SchemaKey {
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(":").join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
     @JsonIgnore
     public String getReferenceTag() {
-        return Joiner.on(":").join(namespace, schemaName).toUpperCase(Locale.ROOT);
+        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName).toUpperCase(Locale.ROOT);
     }
 
     @JsonIgnore
     public boolean latest() {
-        return null != version && version.equalsIgnoreCase("latest");
+        return null != version && version.equalsIgnoreCase(SchemaConstants.LATEST_VERSION);
     }
 
     @Override
