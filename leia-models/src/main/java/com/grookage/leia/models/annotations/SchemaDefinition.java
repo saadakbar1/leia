@@ -1,5 +1,6 @@
 package com.grookage.leia.models.annotations;
 
+import com.grookage.leia.models.SchemaConstants;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
 
@@ -15,7 +16,7 @@ public @interface SchemaDefinition {
 
     String namespace();
 
-    String version();
+    String version() default SchemaConstants.LATEST_VERSION;
 
     String description() default "";
 
