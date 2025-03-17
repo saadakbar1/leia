@@ -11,17 +11,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SchemaDefinition {
-	String name();
+    String name();
 
-	String namespace();
+    String namespace();
 
-	String version() default "latest";
+    String version() default "latest";
 
-	String description() default "";
+    String description() default "";
 
-	SchemaType type() default SchemaType.JSON;
+    SchemaType type() default SchemaType.JSON;
 
-	SchemaValidationType validation() default SchemaValidationType.MATCHING;
+    SchemaValidationType validation() default SchemaValidationType.MATCHING;
 
-	Class<?>[] transformationTargets() default {};
+    Class<?>[] transformationTargets() default {};
 }
