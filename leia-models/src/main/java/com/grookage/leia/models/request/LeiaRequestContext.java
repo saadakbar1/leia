@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.ingestion;
+package com.grookage.leia.models.request;
 
-@FunctionalInterface
-public interface VersionIDGenerator {
-    String generateVersionId(String prefix);
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+public class LeiaRequestContext {
+
+    private boolean ignoreCache;
 }

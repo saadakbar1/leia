@@ -42,7 +42,7 @@ public class RepositorySupplier implements LeiaSupplier<SchemaRegistry> {
     @Override
     public SchemaRegistry get() {
         final var schemaDetails = rSupplier.get().getSchemas(
-                Set.of(), Set.of());
+                Set.of(), Set.of(), Set.of());
         final var registry = new SchemaRegistry();
         schemaDetails.forEach(registry::add);
         return registry;

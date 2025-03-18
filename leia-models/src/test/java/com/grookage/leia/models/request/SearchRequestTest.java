@@ -21,12 +21,12 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class NamespaceRequestTest {
+class SearchRequestTest {
 
     @Test
     @SneakyThrows
     void testNamespaceRequest() {
-        final var namespaceRequest = ResourceHelper.getResource("request/namespaceRequest.json", NamespaceRequest.class);
+        final var namespaceRequest = ResourceHelper.getResource("request/namespaceRequest.json", SearchRequest.class);
         Assertions.assertNotNull(namespaceRequest);
         Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
     }

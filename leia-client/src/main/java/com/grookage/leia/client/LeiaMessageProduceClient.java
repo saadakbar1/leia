@@ -16,9 +16,6 @@
 
 package com.grookage.leia.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -37,7 +34,6 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;

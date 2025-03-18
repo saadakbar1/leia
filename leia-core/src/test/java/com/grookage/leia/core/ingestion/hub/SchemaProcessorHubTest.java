@@ -16,7 +16,6 @@
 
 package com.grookage.leia.core.ingestion.hub;
 
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.repository.SchemaRepository;
 import org.junit.jupiter.api.Assertions;
@@ -28,22 +27,12 @@ class SchemaProcessorHubTest {
     @Test
     void testSchemaProcessorHub() {
         final var schemaRepository = Mockito.mock(SchemaRepository.class);
-        final var generator = new VersionIDGenerator() {
-            @Override
-            public String generateVersionId(String prefix) {
-                return "V1234";
-            }
-        };
+
         final var hub = SchemaProcessorHub.of()
                 .withRepositoryResolver(() -> schemaRepository)
-                .wtihVersionSupplier(() -> generator)
                 .build();
         Assertions.assertNotNull(hub.getProcessor(SchemaEvent.CREATE_SCHEMA).orElse(null));
         Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
-                .wtihVersionSupplier(() -> generator)
-                .build());
-        Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
-                .withRepositoryResolver(() -> schemaRepository)
                 .build());
     }
 }

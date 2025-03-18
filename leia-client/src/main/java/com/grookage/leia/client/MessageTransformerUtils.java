@@ -89,7 +89,7 @@ public class MessageTransformerUtils {
             } else {
                 final var jsonPath = compiledPaths.get(transformer.getAttributeName());
                 if (null != jsonPath) {
-                    responseObject.set(transformer.getAttributeName(),jsonPathValue(sourceContext, transformer, jsonPath, mapper));
+                    responseObject.set(transformer.getAttributeName(), jsonPathValue(sourceContext, transformer, jsonPath, mapper));
                 }
             }
         });

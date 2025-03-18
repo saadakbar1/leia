@@ -46,16 +46,6 @@ public class SchemaKey {
         return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
     }
 
-    @JsonIgnore
-    public String getReferenceTag() {
-        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName).toUpperCase(Locale.ROOT);
-    }
-
-    @JsonIgnore
-    public boolean latest() {
-        return null != version && version.equalsIgnoreCase(SchemaConstants.LATEST_VERSION);
-    }
-
     @Override
     public int hashCode() {
         return this.getReferenceId().hashCode();

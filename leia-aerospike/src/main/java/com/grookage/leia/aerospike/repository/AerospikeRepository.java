@@ -67,11 +67,11 @@ public class AerospikeRepository extends AbstractSchemaRepository {
     }
 
     @Override
-    public List<SchemaDetails> getSchemas(Set<String> namespaces, Set<SchemaState> schemaStates) {
-        return aerospikeManager.getRecords(namespaces.stream().toList(), List.of(),
+    public List<SchemaDetails> getSchemas(Set<String> namespaces,
+                                          Set<String> schemaNames,
+                                          Set<SchemaState> schemaStates) {
+        return aerospikeManager.getRecords(namespaces, schemaNames,
                         schemaStates.stream().map(Enum::name).toList())
                 .stream().map(this::toConfigDetails).toList();
     }
-
-
 }

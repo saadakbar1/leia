@@ -23,7 +23,8 @@ import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.exception.LeiaException;
-import com.grookage.leia.models.request.NamespaceRequest;
+import com.grookage.leia.models.request.LeiaRequestContext;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.request.ValidateSchemaRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -35,10 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -55,39 +53,40 @@ public class SchemaResource {
 
     private final SchemaRetriever schemaRetriever;
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/details")
-    public GenericResponse<SchemaDetails> getSchemaDetails(@Valid final SchemaKey schemaKey) {
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaRetriever.getSchemaDetails(schemaKey).orElse(null))
+    private LeiaRequestContext toRequestContext(final boolean ignoreCache) {
+        return LeiaRequestContext.builder()
+                .ignoreCache(ignoreCache)
                 .build();
     }
 
     @POST
     @Timed
     @ExceptionMetered
-    @Path("/details/current")
-    public List<SchemaDetails> getCurrentSchemaDetails(@Valid final NamespaceRequest namespaceRequest) {
-        return schemaRetriever.getCurrentSchemaDetails(namespaceRequest.getNamespaces());
+    @Path("/details")
+    public GenericResponse<SchemaDetails> getSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
+                                                           @Valid final SchemaKey schemaKey) {
+        return GenericResponse.<SchemaDetails>builder()
+                .success(true)
+                .data(schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), schemaKey).orElse(null))
+                .build();
     }
 
     @POST
     @Timed
     @ExceptionMetered
     @Path("/details/all")
-    public List<SchemaDetails> getAllSchemaDetails(@Valid final NamespaceRequest namespaceRequest) {
-        return schemaRetriever.getAllSchemaDetails(namespaceRequest.getNamespaces());
+    public List<SchemaDetails> getAllSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
+                                                   @Valid final SearchRequest searchRequest) {
+        return schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), searchRequest);
     }
 
     @POST
     @Timed
     @ExceptionMetered
     @Path("/details/validate")
-    public GenericResponse<List<String>> validateSchema(@Valid final ValidateSchemaRequest validateSchemaRequest) {
-        final var schemaDetails = schemaRetriever.getSchemaDetails(validateSchemaRequest.getSchemaKey())
+    public GenericResponse<List<String>> validateSchema(@QueryParam("ignoreCache") boolean ignoreCache,
+                                                        @Valid final ValidateSchemaRequest validateSchemaRequest) {
+        final var schemaDetails = schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), validateSchemaRequest.getSchemaKey())
                 .orElseThrow(() -> LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND));
         final var validationErrors = SchemaPayloadValidator.validate(validateSchemaRequest.getJsonNode(),
                 schemaDetails.getValidationType(),
@@ -100,7 +99,5 @@ public class SchemaResource {
         return GenericResponse.<List<String>>builder()
                 .data(validationErrors)
                 .build();
-
     }
-
 }

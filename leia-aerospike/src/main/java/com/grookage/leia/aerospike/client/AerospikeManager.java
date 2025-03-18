@@ -86,9 +86,9 @@ public class AerospikeManager {
     }
 
     @SneakyThrows
-    public List<AerospikeRecord> getRecords(final List<String> namespaces,
-                                            final List<String> schemaNames,
-                                            final List<String> schemaStates) {
+    public List<AerospikeRecord> getRecords(final Collection<String> namespaces,
+                                            final Collection<String> schemaNames,
+                                            final Collection<String> schemaStates) {
         final var queryStatement = new Statement();
         queryStatement.setNamespace(namespace);
         queryStatement.setSetName(AerospikeStorageConstants.SCHEMA_SET);

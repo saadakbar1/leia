@@ -19,8 +19,9 @@ package com.grookage.leia.client.refresher;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
 import com.grookage.leia.client.datasource.NamespaceDataSource;
-import com.grookage.leia.models.request.NamespaceRequest;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
 import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
@@ -31,6 +32,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"deprecation", "KotlinInternalInJava"})
@@ -51,7 +53,7 @@ public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
     @Override
     protected String url() {
-        return "/v1/schema/details/current";
+        return "/v1/schema/details/all";
     }
 
     @Override
@@ -59,8 +61,9 @@ public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
     protected Request getRequest(String url) {
         final var requestBody = RequestBody.create(
                 okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                MapperUtils.mapper().writeValueAsString(NamespaceRequest.builder()
+                MapperUtils.mapper().writeValueAsString(SearchRequest.builder()
                         .namespaces(namespaceDataSource.getNamespaces())
+                        .states(Set.of(SchemaState.APPROVED))
                         .build()));
         final var requestBuilder = new Request.Builder()
                 .url(endPoint(url))

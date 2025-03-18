@@ -16,14 +16,12 @@
 
 package com.grookage.leia.models.schema;
 
-import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
@@ -41,14 +39,7 @@ public class SchemaRegistry {
         return Optional.ofNullable(schemas.get(schemaKey));
     }
 
-    public List<SchemaDetails> getSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.getNamespace()) &&
-                        each.getSchemaState() == SchemaState.APPROVED)
-                .toList();
-    }
-
-    public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
-        return schemas.values().stream().filter(each -> namespaces.contains(each.getNamespace()))
-                .toList();
+    public Collection<SchemaDetails> getSchemaDetails() {
+        return schemas.values();
     }
 }
