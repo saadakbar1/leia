@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.1-RC22]
+
+- API Enhancement:
+  - Added an API to filter response data based on `schemaState`
+
 ## [0.0.1-RC21]
 
 - SchemaDefinition: Default version now points to "latest" approved schema so client's don't have to maintain version

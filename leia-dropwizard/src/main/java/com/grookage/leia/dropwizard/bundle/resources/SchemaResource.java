@@ -27,6 +27,7 @@ import com.grookage.leia.models.request.NamespaceRequest;
 import com.grookage.leia.models.request.ValidateSchemaRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,12 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 @Getter
@@ -80,6 +79,21 @@ public class SchemaResource {
     @Path("/details/all")
     public List<SchemaDetails> getAllSchemaDetails(@Valid final NamespaceRequest namespaceRequest) {
         return schemaRetriever.getAllSchemaDetails(namespaceRequest.getNamespaces());
+    }
+
+    @POST
+    @Timed
+    @ExceptionMetered
+    @Path("/details/all/{schemaState}")
+    public List<SchemaDetails> getAllSchemaDetailsByState(@PathParam("schemaState") String schemaState, @Valid final NamespaceRequest namespaceRequest)
+    {
+
+        List<SchemaDetails>allSchemas=schemaRetriever.getAllSchemaDetails(namespaceRequest.getNamespaces());
+
+        return allSchemas.stream()
+                .filter(schema -> schema.getSchemaState() == SchemaState.valueOf(schemaState.toUpperCase()))
+                .collect(Collectors.toList());
+
     }
 
     @POST
