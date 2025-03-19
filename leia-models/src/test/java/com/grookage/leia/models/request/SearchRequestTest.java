@@ -26,7 +26,7 @@ class SearchRequestTest {
     @Test
     @SneakyThrows
     void testNamespaceRequest() {
-        final var namespaceRequest = ResourceHelper.getResource("request/namespaceRequest.json", SearchRequest.class);
+        final var namespaceRequest = ResourceHelper.getResource("request/searchRequest.json", SearchRequest.class);
         Assertions.assertNotNull(namespaceRequest);
         Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
     }
