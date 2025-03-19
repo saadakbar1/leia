@@ -16,7 +16,6 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +25,6 @@ import java.util.function.Supplier;
 
 public abstract class SchemaProcessorTest {
 
-    @Getter
-    private static final Supplier<VersionIDGenerator> generator = () -> prefix -> "V1234";
     @Getter
     private static Supplier<SchemaRepository> repositorySupplier;
     private static SchemaProcessor schemaProcessor;

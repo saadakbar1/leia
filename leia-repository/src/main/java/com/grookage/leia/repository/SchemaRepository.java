@@ -35,6 +35,6 @@ public interface SchemaRepository {
     Optional<SchemaDetails> get(final SchemaKey schemaKey);
 
     List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                   final Set<String> schemaNames,
                                    final Set<SchemaState> schemaStates);
-
 }

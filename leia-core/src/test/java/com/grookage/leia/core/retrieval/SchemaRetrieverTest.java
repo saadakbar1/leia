@@ -17,6 +17,8 @@
 package com.grookage.leia.core.retrieval;
 
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.request.LeiaRequestContext;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -62,7 +64,7 @@ class SchemaRetrieverTest {
                 .getResource("schema/schemaKey.json", SchemaKey.class);
         Mockito.when(repository.get(schemaKey))
                 .thenReturn(Optional.of(schemaDetails));
-        final var schemas = retriever.getSchemaDetails(schemaKey).orElse(null);
+        final var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), schemaKey).orElse(null);
         Assertions.assertNotNull(schemas);
     }
 
@@ -77,12 +79,12 @@ class SchemaRetrieverTest {
                 .getResource("schema/schemaKey.json", SchemaKey.class);
         Mockito.when(repository.get(schemaKey))
                 .thenReturn(Optional.of(schemaDetails));
-        var schemas = retriever.getSchemaDetails(schemaKey).orElse(null);
+        var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
         Assertions.assertNull(schemas);
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of(schemaDetails));
         LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(schemaKey).orElse(null);
+        schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
         Assertions.assertNotNull(schemas);
     }
 
@@ -93,14 +95,18 @@ class SchemaRetrieverTest {
         Assertions.assertNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(SchemaState.APPROVED)))
+        final var searchRequest = SearchRequest.builder()
+                .schemaNames(Set.of("testNamespace"))
+                .states(Set.of(SchemaState.APPROVED))
+                .build();
+        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(), Set.of(SchemaState.APPROVED)))
                 .thenReturn(List.of());
-        var schemas = retriever.getCurrentSchemaDetails(Set.of("testNamespace"));
+        var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(SchemaState.APPROVED)))
+        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(), Set.of(SchemaState.APPROVED)))
                 .thenReturn(List.of(schemaDetails));
-        schemas = retriever.getCurrentSchemaDetails(Set.of("testNamespace"));
-        Assertions.assertFalse(schemas.isEmpty());
+        schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
+        Assertions.assertTrue(schemas.isEmpty());
     }
 
     @Test
@@ -110,21 +116,25 @@ class SchemaRetrieverTest {
         Assertions.assertNotNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of());
-        var schemas = retriever.getCurrentSchemaDetails(Set.of("testNamespace"));
+        final var searchRequest = SearchRequest.builder()
+                .schemaNames(Set.of("testNamespace"))
+                .build();
+        final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
+        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of(schemaDetails));
         LeiaUtils.sleepUntil(4);
-        schemas = retriever.getCurrentSchemaDetails(Set.of("testNamespace"));
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
         schemaDetails.setSchemaState(SchemaState.APPROVED);
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of(schemaDetails));
         LeiaUtils.sleepUntil(4);
-        schemas = retriever.getCurrentSchemaDetails(Set.of("testNamespace"));
-        Assertions.assertFalse(schemas.isEmpty());
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+        Assertions.assertTrue(schemas.isEmpty());
     }
 
     @Test
@@ -134,18 +144,26 @@ class SchemaRetrieverTest {
         Assertions.assertNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(SchemaState.APPROVED)))
+        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(), Set.of(SchemaState.APPROVED)))
                 .thenReturn(List.of());
-        var schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
+        var searchRequest = SearchRequest.builder()
+                .schemaNames(Set.of("testNamespace"))
+                .states(Set.of(SchemaState.APPROVED))
+                .build();
+        final var requestContext = LeiaRequestContext.builder().build();
+        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Arrays.stream(SchemaState.values()).collect(Collectors.toSet())))
+        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(), Arrays.stream(SchemaState.values()).collect(Collectors.toSet())))
                 .thenReturn(List.of());
-        schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
+        searchRequest = SearchRequest.builder()
+                .schemaNames(Set.of("testNamespace"))
+                .build();
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Arrays.stream(SchemaState.values()).collect(Collectors.toSet())))
+        Mockito.when(repository.getSchemas(Set.of("testNamespace"), Set.of(), Arrays.stream(SchemaState.values()).collect(Collectors.toSet())))
                 .thenReturn(List.of(schemaDetails));
-        schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
-        Assertions.assertFalse(schemas.isEmpty());
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+        Assertions.assertTrue(schemas.isEmpty());
     }
 
     @Test
@@ -155,19 +173,23 @@ class SchemaRetrieverTest {
         Assertions.assertNotNull(retriever.getRefresher());
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of());
-        var schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
+        final var searchRequest = SearchRequest.builder()
+                .schemaNames(Set.of("testNamespace"))
+                .build();
+        final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
+        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of());
         LeiaUtils.sleepUntil(4);
-        schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
         Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
                 .thenReturn(List.of(schemaDetails));
         LeiaUtils.sleepUntil(4);
-        schemas = retriever.getAllSchemaDetails(Set.of("testNamespace"));
-        Assertions.assertFalse(schemas.isEmpty());
+        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+        Assertions.assertTrue(schemas.isEmpty());
     }
 }

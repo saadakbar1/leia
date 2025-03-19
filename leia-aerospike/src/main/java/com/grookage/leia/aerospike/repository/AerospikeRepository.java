@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -67,11 +68,11 @@ public class AerospikeRepository extends AbstractSchemaRepository {
     }
 
     @Override
-    public List<SchemaDetails> getSchemas(Set<String> namespaces, Set<SchemaState> schemaStates) {
-        return aerospikeManager.getRecords(namespaces.stream().toList(), List.of(),
-                        schemaStates.stream().map(Enum::name).toList())
+    public List<SchemaDetails> getSchemas(Set<String> namespaces,
+                                          Set<String> schemaNames,
+                                          Set<SchemaState> schemaStates) {
+        return aerospikeManager.getRecords(namespaces, schemaNames,
+                        schemaStates.stream().map(Enum::name).collect(Collectors.toSet()))
                 .stream().map(this::toConfigDetails).toList();
     }
-
-
 }

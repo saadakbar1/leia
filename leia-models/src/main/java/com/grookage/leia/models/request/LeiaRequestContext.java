@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package com.grookage.leia.models.request;
 
-import com.grookage.leia.models.ResourceHelper;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-class NamespaceRequestTest {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+public class LeiaRequestContext {
 
-    @Test
-    @SneakyThrows
-    void testNamespaceRequest() {
-        final var namespaceRequest = ResourceHelper.getResource("request/namespaceRequest.json", NamespaceRequest.class);
-        Assertions.assertNotNull(namespaceRequest);
-        Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
-    }
+    private boolean ignoreCache;
 }

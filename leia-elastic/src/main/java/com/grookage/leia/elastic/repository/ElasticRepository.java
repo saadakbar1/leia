@@ -139,16 +139,21 @@ public class ElasticRepository extends AbstractSchemaRepository {
     @Override
     @SneakyThrows
     public List<SchemaDetails> getSchemas(final Set<String> namespaces,
+                                          final Set<String> schemaNames,
                                           final Set<SchemaState> schemaStates) {
         final var namespaceQuery = namespaces.isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
                 ))._toQuery();
+        final var schemaNameQuery = schemaNames.isEmpty() ?
+                MatchAllQuery.of(q -> q)._toQuery() :
+                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getNormalizedValues(schemaNames))
+                ))._toQuery();
         final var stateQuery = schemaStates.isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(SCHEMA_STATE)
                         .terms(t -> t.value(getNormalizedValues(schemaStates.stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, stateQuery)))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, schemaNameQuery, stateQuery)))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)

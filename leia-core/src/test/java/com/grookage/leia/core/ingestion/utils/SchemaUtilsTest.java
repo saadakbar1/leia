@@ -16,7 +16,6 @@
 
 package com.grookage.leia.core.ingestion.utils;
 
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.DataType;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
@@ -33,14 +32,7 @@ class SchemaUtilsTest {
                 "schema/createSchemaRequest.json",
                 CreateSchemaRequest.class
         );
-        final var generator = new VersionIDGenerator() {
-            @Override
-            public String generateVersionId(String prefix) {
-                return "V1234";
-            }
-        };
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, () -> generator
-        );
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);
         Assertions.assertNotNull(schemaDetails);
         Assertions.assertEquals("testNamespace", schemaDetails.getNamespace());
         Assertions.assertEquals("testSchema", schemaDetails.getSchemaName());
