@@ -16,6 +16,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +28,7 @@ class SchemaBuilderTest {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)
                 .orElse(null);
         Assertions.assertNotNull(schemaCreateRequest);
-        Assertions.assertEquals(5, schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(7, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
         Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
         Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
@@ -34,6 +36,7 @@ class SchemaBuilderTest {
         Assertions.assertEquals(SchemaType.JSON, schemaCreateRequest.getSchemaType());
         Assertions.assertEquals(SchemaValidationType.MATCHING, schemaCreateRequest.getValidationType());
         Assertions.assertEquals(schemaAttributes.size(), schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(2, schemaCreateRequest.getTags().size());
     }
 
     @Test
@@ -46,7 +49,7 @@ class SchemaBuilderTest {
     void testSchemaAttributes_WithPrimitiveClass() {
         final var schemaAttributeSet = SchemaBuilder.getSchemaAttributes(PrimitiveTestClass.class);
         Assertions.assertNotNull(schemaAttributeSet);
-        Assertions.assertEquals(2, schemaAttributeSet.size());
+        Assertions.assertEquals(9, schemaAttributeSet.size());
         final var nameAttribute = new StringAttribute("name", true, new HashSet<>());
         LeiaTestUtils.assertEquals(nameAttribute, LeiaTestUtils.filter(schemaAttributeSet, "name").orElse(null));
         final var idAttribute = new IntegerAttribute("id", false, new HashSet<>());
@@ -182,6 +185,13 @@ class SchemaBuilderTest {
         @Optional
         String name;
         int id;
+        char c;
+        short s;
+        long l;
+        byte b;
+        double d;
+        boolean bl;
+        float f;
     }
 
     @SchemaDefinition(
@@ -190,7 +200,8 @@ class SchemaBuilderTest {
             version = TestRecord.VERSION,
             description = TestRecord.DESCRIPTION,
             type = SchemaType.JSON,
-            validation = SchemaValidationType.MATCHING
+            validation = SchemaValidationType.MATCHING,
+            tags = {"foxtrot", "audit"}
     )
     static class TestRecord {
         static final String NAME = "TEST_RECORD";
@@ -207,7 +218,6 @@ class SchemaBuilderTest {
 //        @Optional
 //        String accountId;
         BiGenericStub<String, Integer> biGenericStub;
-
     }
 
     static class TestObject {

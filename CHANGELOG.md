@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - Introduced a search request and cleaned up searchable schemas
 - Fixed necessary tests, made the changes to clientSupplier during retrieval as well
 - Added an ignoreCache at a resource level to make sure we control where to fetch the data from
+- Added support for missing primitive classes(short & char) for SchemaAttributes
+- Date attribute will now recognize most commonly used DateTime representations
+- Supporting "tags" in schemaDefinition and CreateSchemaRequest
 
 ## [0.0.1-RC21]
 

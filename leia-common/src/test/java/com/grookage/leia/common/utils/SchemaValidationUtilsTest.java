@@ -47,6 +47,9 @@ class SchemaValidationUtilsTest {
         final var byteAttribute = new ByteAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Byte.class, byteAttribute));
 
+        final var characterAttribute = new CharacterAttribute("testAttribute", true, null);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Character.class, characterAttribute));
+
         final var doubleAttribute = new DoubleAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Double.class, doubleAttribute));
 
@@ -61,6 +64,9 @@ class SchemaValidationUtilsTest {
 
         final var longAttribute = new LongAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, longAttribute));
+
+        final var shortAttribute = new ShortAttribute("testAttribute", true, null);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Short.class, shortAttribute));
 
         final var stringAttribute = new StringAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(String.class, stringAttribute));
