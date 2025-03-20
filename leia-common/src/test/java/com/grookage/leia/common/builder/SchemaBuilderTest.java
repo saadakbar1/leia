@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class SchemaBuilderTest {
@@ -36,6 +35,7 @@ class SchemaBuilderTest {
         Assertions.assertEquals(SchemaType.JSON, schemaCreateRequest.getSchemaType());
         Assertions.assertEquals(SchemaValidationType.MATCHING, schemaCreateRequest.getValidationType());
         Assertions.assertEquals(schemaAttributes.size(), schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(2, schemaCreateRequest.getTags().size());
     }
 
     @Test
@@ -199,7 +199,8 @@ class SchemaBuilderTest {
             version = TestRecord.VERSION,
             description = TestRecord.DESCRIPTION,
             type = SchemaType.JSON,
-            validation = SchemaValidationType.MATCHING
+            validation = SchemaValidationType.MATCHING,
+            tags = {"foxtrot", "audit"}
     )
     static class TestRecord {
         static final String NAME = "TEST_RECORD";

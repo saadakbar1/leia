@@ -50,6 +50,7 @@ public class SchemaBuilder {
                 .schemaType(schemaDefinition.type())
                 .validationType(schemaDefinition.validation())
                 .attributes(getSchemaAttributes(klass))
+                .tags(Arrays.asList(schemaDefinition.tags()))
                 .build()
         );
     }

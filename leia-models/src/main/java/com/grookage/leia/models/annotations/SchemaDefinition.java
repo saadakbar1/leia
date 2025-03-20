@@ -23,5 +23,7 @@ public @interface SchemaDefinition {
 
     SchemaValidationType validation() default SchemaValidationType.MATCHING;
 
+    String[] tags() default {};
+
     Class<?>[] transformationTargets() default {};
 }
