@@ -12,9 +12,13 @@ import java.util.Map;
 @Data
 @Builder
 @Jacksonized
-public class BiGenericStub<R, U> {
-    GenericResponse<R> tGenericResponse;
+public class GenericStub<R, U> {
+    GenericResponse<R> rGenericResponse;
     U data;
     R key;
     Range<R> tRange;
+    List<R> rList;
+    Map<U,R> urMap;
+    R[] rArray;
+
 }

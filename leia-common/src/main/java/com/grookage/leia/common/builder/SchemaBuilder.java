@@ -16,11 +16,17 @@
 
 package com.grookage.leia.common.builder;
 
+import com.grookage.leia.common.utils.BuilderUtils;
 import com.grookage.leia.common.utils.FieldUtils;
-import com.grookage.leia.common.utils.QualifierUtils;
 import com.grookage.leia.common.utils.SchemaConstants;
 import com.grookage.leia.models.annotations.SchemaDefinition;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.DateAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
@@ -31,9 +37,30 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The SchemaBuilder class is responsible for generating schema definitions
+ * from Java classes using annotations and reflection.
+ * <p>
+ * It supports complex types, including:
+ * <ul>
+ *     <li>Primitive types (int, double, boolean, etc.)</li>
+ *     <li>Boxed types (Integer, Double, Boolean, etc.)</li>
+ *     <li>Collections (List, Set, etc.)</li>
+ *     <li>Generic classes and parameterized types</li>
+ *     <li>Custom POJOs</li>
+ * </ul>
+ * <p>
+ * The generated schema is used to create a {@link CreateSchemaRequest}.
+ */
 @UtilityClass
 public class SchemaBuilder {
 
@@ -59,39 +86,22 @@ public class SchemaBuilder {
     public Set<SchemaAttribute> getSchemaAttributes(final Class<?> klass) {
         return FieldUtils.getAllFields(klass)
                 .stream()
-                .map(SchemaBuilder::schemaAttribute)
+                .map(field -> schemaAttribute(field, new HashMap<>()))
                 .collect(Collectors.toSet());
     }
 
-    private SchemaAttribute schemaAttribute(final Field field) {
-        return schemaAttribute(
-                field.getGenericType(),
-                field.getName(),
-                QualifierUtils.getQualifiers(field),
-                isOptional(field)
-        );
-    }
-
     private SchemaAttribute schemaAttribute(final Field field,
-                                            Map<TypeVariable<?>, Type> typeVariableTypeMap) {
-        Type type = resolveType(field.getGenericType(), typeVariableTypeMap);
-        if (type instanceof ParameterizedType parameterizedType) {
-            return handleParameterizedType(parameterizedType, field.getName(), QualifierUtils.getQualifiers(field), isOptional(field), typeVariableTypeMap);
-        }
-
-        return schemaAttribute(type, field.getName(), QualifierUtils.getQualifiers(field), isOptional(field));
+                                            final Map<TypeVariable<?>, Type> typeVariableMap) {
+        Type type = resolveType(field.getGenericType(), typeVariableMap);
+        return schemaAttribute(type, field.getName(), BuilderUtils.getQualifiers(field),
+                BuilderUtils.isOptional(field), typeVariableMap);
     }
 
-    private Type resolveType(Type type, Map<TypeVariable<?>, Type> typeVariableMap) {
-        if (type instanceof TypeVariable<?> typeVariable) {
-            return typeVariableMap.getOrDefault(typeVariable, Object.class);
-        }
-        return type;
-    }
     private SchemaAttribute schemaAttribute(final Type type,
                                             final String name,
                                             final Set<QualifierInfo> qualifiers,
-                                            final boolean optional) {
+                                            final boolean optional,
+                                            final Map<TypeVariable<?>, Type> typeVariableMap) {
         // Handle Class instances (eg. String, Enum classes, Complex POJO Objects etc.)
         if (type instanceof Class<?> klass) {
             return schemaAttribute(klass, name, qualifiers, optional);
@@ -99,12 +109,12 @@ public class SchemaBuilder {
 
         // Handle ParameterizedType (e.g., List<String>, Map<String, Integer>)
         if (type instanceof ParameterizedType parameterizedType) {
-            return handleParameterizedType(parameterizedType, name, qualifiers, optional, new HashMap<>());
+            return handleParameterizedType(parameterizedType, name, qualifiers, optional, typeVariableMap);
         }
 
         // Handle GenericArrayType (e.g., T[], List<T[]>)
         if (type instanceof GenericArrayType genericArrayType) {
-            return schemaAttribute(genericArrayType, name, qualifiers, optional);
+            return handleGenericArray(genericArrayType, name, qualifiers, optional, typeVariableMap);
         }
 
         throw new UnsupportedOperationException("Unsupported field type: " + type.getTypeName());
@@ -116,19 +126,21 @@ public class SchemaBuilder {
                                                     final boolean optional,
                                                     final Map<TypeVariable<?>, Type> parent) {
         final var rawType = (Class<?>) parameterizedType.getRawType();
+
         // Handle List<T> or Set<T>
         if (ClassUtils.isAssignable(rawType, Collection.class)) {
-            return handleCollection(parameterizedType, name, qualifiers, optional);
+            return handleCollection(parameterizedType, name, qualifiers, optional, parent);
         }
 
         // Handle Map<T,R>
         if (ClassUtils.isAssignable(rawType, Map.class)) {
-            return handleMap(parameterizedType, name, qualifiers, optional);
+            return handleMap(parameterizedType, name, qualifiers, optional, parent);
         }
-        // Capture generic type variables before processing fields
-        final var typeVariableMapping = getTypeVariableMap(rawType, parameterizedType, parent);
 
+        // handle Class<T1,T2> etc.
         // Extract and convert fields with resolved types
+        // Capture generic type variables of the class from the parent context
+        final var typeVariableMapping = getTypeVariableMap(rawType, parameterizedType, parent);
         final var fieldAttributes = FieldUtils.getAllFields(rawType)
                 .stream()
                 .map(field -> schemaAttribute(field, typeVariableMapping)) // Resolves TypeVariable<T>
@@ -140,42 +152,46 @@ public class SchemaBuilder {
     private SchemaAttribute handleMap(final ParameterizedType parameterizedType,
                                       final String name,
                                       final Set<QualifierInfo> qualifiers,
-                                      final boolean optional) {
-        final var keyType = parameterizedType.getActualTypeArguments()[0];
-        final var valueType = parameterizedType.getActualTypeArguments()[1];
+                                      final boolean optional,
+                                      final Map<TypeVariable<?>, Type> typeVariableMapping) {
+        final var keyType = resolveType(parameterizedType.getActualTypeArguments()[0], typeVariableMapping);
+        final var valueType = resolveType(parameterizedType.getActualTypeArguments()[1], typeVariableMapping);
         return new MapAttribute(
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(keyType, "key", QualifierUtils.getQualifiers(keyType), isOptional(keyType)),
-                schemaAttribute(valueType, "value", QualifierUtils.getQualifiers(valueType), isOptional(valueType))
+                schemaAttribute(keyType, "key", BuilderUtils.getQualifiers(keyType), BuilderUtils.isOptional(keyType), typeVariableMapping),
+                schemaAttribute(valueType, "value", BuilderUtils.getQualifiers(valueType), BuilderUtils.isOptional(valueType), typeVariableMapping)
         );
     }
 
     private SchemaAttribute handleCollection(final ParameterizedType parameterizedType,
                                              final String name,
-                                             final Set<QualifierInfo> qualifiers, boolean optional) {
-        final var elementType = parameterizedType.getActualTypeArguments()[0];
+                                             final Set<QualifierInfo> qualifiers,
+                                             final boolean optional,
+                                             final Map<TypeVariable<?>, Type> typeVariableMapping) {
+        final var elementType = resolveType(parameterizedType.getActualTypeArguments()[0], typeVariableMapping);
         return new ArrayAttribute(
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(elementType, ELEMENT, QualifierUtils.getQualifiers(elementType),
-                        isOptional(elementType))
+                schemaAttribute(elementType, ELEMENT, BuilderUtils.getQualifiers(elementType),
+                        BuilderUtils.isOptional(elementType), typeVariableMapping)
         );
     }
 
-    private SchemaAttribute schemaAttribute(final GenericArrayType genericArrayType,
-                                            final String name,
-                                            final Set<QualifierInfo> qualifiers,
-                                            final boolean optional) {
-        final var componentType = genericArrayType.getGenericComponentType();
+    private SchemaAttribute handleGenericArray(final GenericArrayType genericArrayType,
+                                               final String name,
+                                               final Set<QualifierInfo> qualifiers,
+                                               final boolean optional,
+                                               final Map<TypeVariable<?>, Type> typeVariableMapping) {
+        final var componentType = resolveType(genericArrayType.getGenericComponentType(), typeVariableMapping);
         return new ArrayAttribute(
                 name,
                 optional,
                 qualifiers,
-                schemaAttribute(componentType, ELEMENT, QualifierUtils.getQualifiers(componentType),
-                        isOptional(componentType))
+                schemaAttribute(componentType, ELEMENT, BuilderUtils.getQualifiers(componentType), BuilderUtils.isOptional(componentType),
+                        typeVariableMapping)
         );
     }
 
@@ -189,12 +205,12 @@ public class SchemaBuilder {
         }
 
         if (klass.isEnum()) {
-            return new EnumAttribute(name, optional, qualifiers, getEnumValues(klass));
+            return new EnumAttribute(name, optional, qualifiers, BuilderUtils.getEnumValues(klass));
         }
 
         // Handle int, Integer, long, Long, boolean  etc.
         if (klass.isPrimitive() || SchemaConstants.BOXED_PRIMITIVES.contains(klass)) {
-            return handlePrimitive(klass, name, qualifiers, optional);
+            return BuilderUtils.buildPrimitiveAttribute(klass, name, qualifiers, optional);
         }
 
         // Handle String[], Object[] etc.
@@ -204,8 +220,8 @@ public class SchemaBuilder {
                     name,
                     optional,
                     qualifiers,
-                    schemaAttribute(componentType, ELEMENT, QualifierUtils.getQualifiers(componentType),
-                            isOptional(componentType))
+                    schemaAttribute(componentType, ELEMENT, BuilderUtils.getQualifiers(componentType),
+                            BuilderUtils.isOptional(componentType))
             );
         }
 
@@ -232,65 +248,12 @@ public class SchemaBuilder {
         return new ObjectAttribute(name, optional, qualifiers, schemaAttributes);
     }
 
-    private SchemaAttribute handlePrimitive(final Class<?> klass,
-                                            final String name,
-                                            final Set<QualifierInfo> qualifiers,
-                                            final boolean optional) {
-        if (klass == Integer.class || klass == int.class) {
-            return new IntegerAttribute(name, optional, qualifiers);
-        }
-        if (klass == Boolean.class || klass == boolean.class) {
-            return new BooleanAttribute(name, optional, qualifiers);
-        }
-        if (klass == Double.class || klass == double.class) {
-            return new DoubleAttribute(name, optional, qualifiers);
-        }
-        if (klass == Long.class || klass == long.class) {
-            return new LongAttribute(name, optional, qualifiers);
-        }
-        if (klass == Float.class || klass == float.class) {
-            return new FloatAttribute(name, optional, qualifiers);
-        }
-        if (klass == Short.class || klass == short.class) {
-            return new ShortAttribute(name, optional, qualifiers);
-        }
-        if (klass == Character.class || klass == char.class) {
-            return new CharacterAttribute(name, optional, qualifiers);
-        }
-        if (klass == Byte.class || klass == byte.class) {
-            return new ByteAttribute(name, optional, qualifiers);
-        }
-
-        throw new UnsupportedOperationException("Unsupported primitive class type: " + klass.getName());
-
-    }
-
-    private Set<String> getEnumValues(final Class<?> klass) {
-        return Arrays.stream(klass.getEnumConstants())
-                .map(enumConstant -> ((Enum<?>) enumConstant).name())
-                .collect(Collectors.toSet());
-    }
-
-    private boolean isOptional(final Type type) {
-        if (type instanceof Class<?> klass) {
-            return isOptional(klass);
-        }
-        return false;
-    }
-
-    private boolean isOptional(final Class<?> klass) {
-        return klass.isAnnotationPresent(com.grookage.leia.models.annotations.attribute.Optional.class);
-    }
-
-    private boolean isOptional(final Field field) {
-        return field.isAnnotationPresent(com.grookage.leia.models.annotations.attribute.Optional.class);
-    }
 
     private Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> rawType,
                                                           final ParameterizedType parameterizedType,
                                                           final Map<TypeVariable<?>, Type> parentTypeVariableMap) {
-        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
-        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        final var typeParameters = rawType.getTypeParameters();
+        final var actualTypeArguments = parameterizedType.getActualTypeArguments();
 
         Map<TypeVariable<?>, Type> typeVariableMap = new HashMap<>();
         for (int i = 0; i < typeParameters.length; i++) {
@@ -298,5 +261,12 @@ public class SchemaBuilder {
             typeVariableMap.put(typeParameters[i], resolvedType);
         }
         return typeVariableMap;
+    }
+
+    private Type resolveType(Type type, Map<TypeVariable<?>, Type> typeVariableMap) {
+        if (type instanceof TypeVariable<?> typeVariable) {
+            return typeVariableMap.getOrDefault(typeVariable, Object.class);
+        }
+        return type;
     }
 }

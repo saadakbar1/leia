@@ -3,6 +3,7 @@ package com.grookage.leia.common.utils;
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.PIIData;
+import com.grookage.leia.common.stubs.TestGenericStub;
 import com.grookage.leia.common.violation.ViolationContext;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.*;
@@ -28,6 +29,19 @@ class SchemaValidationUtilsTest {
         schemaDetails.setValidationType(SchemaValidationType.STRICT);
         Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
     }
+
+    @SneakyThrows
+    @Test
+    void testGenericClass() {
+        final var schemaDetails = ResourceHelper
+                .getResource("validGenericSchema.json", SchemaDetails.class);
+        Assertions.assertNotNull(schemaDetails);
+        final var violations = SchemaValidationUtils.valid(schemaDetails, TestGenericStub.class);
+        Assertions.assertTrue(violations.isEmpty());
+//        schemaDetails.setValidationType(SchemaValidationType.STRICT);
+//        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
+    }
+
 
     @Test
     @SneakyThrows
@@ -175,6 +189,7 @@ class SchemaValidationUtilsTest {
                 .toList();
         Assertions.assertEquals(1, piiDataViolations.size());
     }
+
 
     enum TestEnum {
         TEST_ENUM
