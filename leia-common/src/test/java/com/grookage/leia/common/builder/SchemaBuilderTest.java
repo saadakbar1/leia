@@ -2,6 +2,7 @@ package com.grookage.leia.common.builder;
 
 import com.grookage.leia.common.LeiaTestUtils;
 import com.grookage.leia.common.stubs.*;
+import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.annotations.attribute.Optional;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
@@ -197,14 +198,16 @@ class SchemaBuilderTest {
         static final String VERSION = "v1";
         static final String DESCRIPTION = "Test Record";
 
-        int id;
-        String name;
-        @PII
-        @Encrypted
-        String accountNumber;
-        long ttl;
-        @Optional
-        String accountId;
+//        int id;
+//        String name;
+//        @PII
+//        @Encrypted
+//        String accountNumber;
+//        long ttl;
+//        @Optional
+//        String accountId;
+        BiGenericStub<String, Integer> biGenericStub;
+
     }
 
     static class TestObject {

@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,22 @@ public class SchemaBuilder {
         );
     }
 
+    private SchemaAttribute schemaAttribute(final Field field,
+                                            Map<TypeVariable<?>, Type> typeVariableTypeMap) {
+        Type type = resolveType(field.getGenericType(), typeVariableTypeMap);
+        if (type instanceof ParameterizedType parameterizedType) {
+            return handleParameterizedType(parameterizedType, field.getName(), QualifierUtils.getQualifiers(field), isOptional(field), typeVariableTypeMap);
+        }
+
+        return schemaAttribute(type, field.getName(), QualifierUtils.getQualifiers(field), isOptional(field));
+    }
+
+    private Type resolveType(Type type, Map<TypeVariable<?>, Type> typeVariableMap) {
+        if (type instanceof TypeVariable<?> typeVariable) {
+            return typeVariableMap.getOrDefault(typeVariable, Object.class);
+        }
+        return type;
+    }
     private SchemaAttribute schemaAttribute(final Type type,
                                             final String name,
                                             final Set<QualifierInfo> qualifiers,
@@ -80,7 +97,7 @@ public class SchemaBuilder {
 
         // Handle ParameterizedType (e.g., List<String>, Map<String, Integer>)
         if (type instanceof ParameterizedType parameterizedType) {
-            return schemaAttribute(parameterizedType, name, qualifiers, optional);
+            return handleParameterizedType(parameterizedType, name, qualifiers, optional, new HashMap<>());
         }
 
         // Handle GenericArrayType (e.g., T[], List<T[]>)
@@ -91,10 +108,11 @@ public class SchemaBuilder {
         throw new UnsupportedOperationException("Unsupported field type: " + type.getTypeName());
     }
 
-    private SchemaAttribute schemaAttribute(final ParameterizedType parameterizedType,
-                                            final String name,
-                                            final Set<QualifierInfo> qualifiers,
-                                            final boolean optional) {
+    private SchemaAttribute handleParameterizedType(final ParameterizedType parameterizedType,
+                                                    final String name,
+                                                    final Set<QualifierInfo> qualifiers,
+                                                    final boolean optional,
+                                                    final Map<TypeVariable<?>, Type> parent) {
         final var rawType = (Class<?>) parameterizedType.getRawType();
         // Handle List<T> or Set<T>
         if (ClassUtils.isAssignable(rawType, Collection.class)) {
@@ -105,7 +123,16 @@ public class SchemaBuilder {
         if (ClassUtils.isAssignable(rawType, Map.class)) {
             return handleMap(parameterizedType, name, qualifiers, optional);
         }
-        throw new UnsupportedOperationException("Unsupported field type: " + parameterizedType.getTypeName());
+        // Capture generic type variables before processing fields
+        final var typeVariableMapping = getTypeVariableMap(rawType, parameterizedType, parent);
+
+        // Extract and convert fields with resolved types
+        final var fieldAttributes = FieldUtils.getAllFields(rawType)
+                .stream()
+                .map(field -> schemaAttribute(field, typeVariableMapping)) // Resolves TypeVariable<T>
+                .collect(Collectors.toSet());
+
+        return new ObjectAttribute(name, optional, qualifiers, fieldAttributes);
     }
 
     private SchemaAttribute handleMap(final ParameterizedType parameterizedType,
@@ -242,5 +269,19 @@ public class SchemaBuilder {
 
     private boolean isOptional(final Field field) {
         return field.isAnnotationPresent(com.grookage.leia.models.annotations.attribute.Optional.class);
+    }
+
+    private Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> rawType,
+                                                          final ParameterizedType parameterizedType,
+                                                          final Map<TypeVariable<?>, Type> parentTypeVariableMap) {
+        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+        Map<TypeVariable<?>, Type> typeVariableMap = new HashMap<>();
+        for (int i = 0; i < typeParameters.length; i++) {
+            Type resolvedType = resolveType(actualTypeArguments[i], parentTypeVariableMap);
+            typeVariableMap.put(typeParameters[i], resolvedType);
+        }
+        return typeVariableMap;
     }
 }
