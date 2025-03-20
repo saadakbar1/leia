@@ -17,21 +17,20 @@
 package com.grookage.leia.core.retrieval;
 
 import com.google.common.base.Preconditions;
+import com.grookage.leia.models.request.LeiaRequestContext;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.engine.SchemaState;
+import com.grookage.leia.models.utils.CollectionUtils;
 import com.grookage.leia.repository.SchemaRepository;
 import com.grookage.leia.repository.config.CacheConfig;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -60,27 +59,40 @@ public class SchemaRetriever {
         }
     }
 
-    public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
-        if (null != cacheConfig && cacheConfig.isEnabled()) {
+    private boolean useRepositoryCache(final LeiaRequestContext requestContext) {
+        return null != requestContext && !requestContext.isIgnoreCache()
+                && null != cacheConfig && cacheConfig.isEnabled();
+    }
+
+    public Optional<SchemaDetails> getSchemaDetails(final LeiaRequestContext requestContext,
+                                                    final SchemaKey schemaKey) {
+        if (useRepositoryCache(requestContext)) {
             return this.refresher.getData().getSchemaDetails(schemaKey);
         } else {
             return repositorySupplier.get().get(schemaKey);
         }
     }
 
-    public List<SchemaDetails> getCurrentSchemaDetails(final Set<String> namespaces) {
-        if (null != cacheConfig && cacheConfig.isEnabled()) {
-            return this.refresher.getData().getSchemaDetails(namespaces);
-        } else {
-            return repositorySupplier.get().getSchemas(namespaces, Set.of(SchemaState.APPROVED));
-        }
+    private boolean match(SchemaDetails schemaDetails, SearchRequest searchRequest) {
+        final var schemaKey = schemaDetails.getSchemaKey();
+        final var namespaceMatch = CollectionUtils.isNullOrEmpty(searchRequest.getNamespaces()) ||
+                searchRequest.getNamespaces().contains(schemaKey.getNamespace());
+        final var schemaNameMatch = CollectionUtils.isNullOrEmpty(searchRequest.getSchemaNames()) ||
+                searchRequest.getSchemaNames().contains(schemaKey.getSchemaName());
+        final var schemaStateMatch = CollectionUtils.isNullOrEmpty(searchRequest.getStates()) ||
+                searchRequest.getStates().contains(schemaDetails.getSchemaState());
+        return namespaceMatch && schemaNameMatch && schemaStateMatch;
     }
 
-    public List<SchemaDetails> getAllSchemaDetails(final Set<String> namespaces) {
-        if (null != cacheConfig && cacheConfig.isEnabled()) {
-            return this.refresher.getData().getAllSchemaDetails(namespaces);
+    public List<SchemaDetails> getSchemaDetails(final LeiaRequestContext requestContext,
+                                                final SearchRequest searchRequest) {
+        if (useRepositoryCache(requestContext)) {
+            return refresher.getData().getSchemaDetails().stream()
+                    .filter(each -> match(each, searchRequest))
+                    .toList();
         } else {
-            return repositorySupplier.get().getSchemas(namespaces, Arrays.stream(SchemaState.values()).collect(Collectors.toSet()));
+            return repositorySupplier.get().getSchemas(searchRequest.getNamespaces(),
+                    searchRequest.getSchemaNames(), searchRequest.getStates());
         }
     }
 }

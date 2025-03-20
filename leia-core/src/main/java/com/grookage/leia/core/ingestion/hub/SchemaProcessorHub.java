@@ -18,7 +18,6 @@ package com.grookage.leia.core.ingestion.hub;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.core.ingestion.processors.*;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.engine.SchemaEventVisitor;
@@ -35,7 +34,6 @@ public class SchemaProcessorHub {
 
     private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
     private Supplier<SchemaRepository> repositorySupplier;
-    private Supplier<VersionIDGenerator> versionSupplier;
 
     private SchemaProcessorHub() {
 
@@ -50,14 +48,8 @@ public class SchemaProcessorHub {
         return this;
     }
 
-    public SchemaProcessorHub wtihVersionSupplier(Supplier<VersionIDGenerator> versionSupplier) {
-        this.versionSupplier = versionSupplier;
-        return this;
-    }
-
     public SchemaProcessorHub build() {
         Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
-        Preconditions.checkNotNull(versionSupplier, "Version ID Generator can't be null");
         Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
         return this;
     }
@@ -68,7 +60,6 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaCreate() {
                 return CreateSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
-                        .versionSupplier(versionSupplier)
                         .build();
             }
 
@@ -76,7 +67,6 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaUpdate() {
                 return UpdateSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
-                        .versionSupplier(versionSupplier)
                         .build();
             }
 
@@ -84,7 +74,6 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaApprove() {
                 return ApproveSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
-                        .versionSupplier(versionSupplier)
                         .build();
             }
 
@@ -92,7 +81,6 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaReject() {
                 return RejectSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
-                        .versionSupplier(versionSupplier)
                         .build();
             }
         }));

@@ -34,7 +34,6 @@ class RejectSchemaProcessorTest extends SchemaProcessorTest {
     SchemaProcessor getSchemaProcessor() {
         return RejectSchemaProcessor.builder()
                 .repositorySupplier(getRepositorySupplier())
-                .versionSupplier(getGenerator())
                 .build();
     }
 

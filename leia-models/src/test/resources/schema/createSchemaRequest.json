@@ -1,6 +1,7 @@
 {
   "namespace": "testNamespace",
   "schemaName": "testSchema",
+  "versionId": "V1234",
   "schemaType": "JSON",
   "attributes": [
     {

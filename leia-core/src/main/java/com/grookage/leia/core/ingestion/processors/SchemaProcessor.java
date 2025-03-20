@@ -16,7 +16,6 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.core.ingestion.utils.ContextUtils;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaHistoryItem;
@@ -36,7 +35,6 @@ import java.util.function.Supplier;
 public abstract class SchemaProcessor {
 
     private final Supplier<SchemaRepository> repositorySupplier;
-    private final Supplier<VersionIDGenerator> versionSupplier;
 
     public abstract SchemaEvent name();
 

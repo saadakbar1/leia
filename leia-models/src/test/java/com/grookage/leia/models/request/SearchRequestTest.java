@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.ingestion;
+package com.grookage.leia.models.request;
 
-@FunctionalInterface
-public interface VersionIDGenerator {
-    String generateVersionId(String prefix);
+import com.grookage.leia.models.ResourceHelper;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+class SearchRequestTest {
+
+    @Test
+    @SneakyThrows
+    void testNamespaceRequest() {
+        final var namespaceRequest = ResourceHelper.getResource("request/searchRequest.json", SearchRequest.class);
+        Assertions.assertNotNull(namespaceRequest);
+        Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
+    }
 }

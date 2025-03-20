@@ -42,6 +42,8 @@ import java.util.Set;
 public class CreateSchemaRequest {
 
     @NotBlank
+    private String versionId;
+    @NotBlank
     private String schemaName;
     @NotNull
     private SchemaType schemaType;

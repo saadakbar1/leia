@@ -18,7 +18,6 @@ package com.grookage.leia.dropwizard.bundle;
 
 import com.google.common.base.Preconditions;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
@@ -43,6 +42,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 @NoArgsConstructor
 @Getter
 public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdater> implements ConfiguredBundle<T> {
@@ -56,8 +56,6 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     protected abstract CacheConfig getCacheConfig(T configuration);
 
     protected abstract Supplier<SchemaRepository> getRepositorySupplier(T configuration);
-
-    protected abstract Supplier<VersionIDGenerator> getVersionSupplier();
 
     protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
 
@@ -81,7 +79,6 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
         final var schemaProcessorHub = SchemaProcessorHub.of()
                 .withRepositoryResolver(repositorySupplier)
-                .wtihVersionSupplier(getVersionSupplier())
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)

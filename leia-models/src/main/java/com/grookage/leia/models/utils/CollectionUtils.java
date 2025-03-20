@@ -16,22 +16,14 @@
 
 package com.grookage.leia.models.utils;
 
-import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
 import lombok.experimental.UtilityClass;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
 
 @UtilityClass
-public class SchemaUtils {
+public class CollectionUtils {
 
-    public Optional<SchemaDetails> getMatchingSchema(
-            final List<SchemaDetails> allSchemas,
-            final SchemaKey schemaKey
-    ) {
-        return allSchemas.stream()
-                .filter(each -> each.getReferenceId().equals(schemaKey.getReferenceId()))
-                .findFirst();
+    public boolean isNullOrEmpty(Collection<?> collection) {
+        return null == collection || collection.isEmpty();
     }
 }

@@ -16,23 +16,19 @@
 
 package com.grookage.leia.core.ingestion.utils;
 
-import com.grookage.leia.core.ingestion.VersionIDGenerator;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
 
-import java.util.function.Supplier;
-
 @UtilityClass
 public class SchemaUtils {
 
-    public SchemaDetails toSchemaDetails(final CreateSchemaRequest createSchemaRequest,
-                                         final Supplier<VersionIDGenerator> versionSupplier) {
+    public SchemaDetails toSchemaDetails(final CreateSchemaRequest createSchemaRequest) {
         return SchemaDetails.builder()
                 .namespace(createSchemaRequest.getNamespace())
                 .schemaName(createSchemaRequest.getSchemaName())
-                .version(versionSupplier.get().generateVersionId("V"))
+                .version(createSchemaRequest.getVersionId())
                 .schemaState(SchemaState.CREATED)
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())

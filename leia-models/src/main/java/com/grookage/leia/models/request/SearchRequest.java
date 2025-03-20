@@ -17,6 +17,7 @@
 package com.grookage.leia.models.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +30,12 @@ import java.util.Set;
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NamespaceRequest {
+public class SearchRequest {
 
+    @Builder.Default
     private Set<String> namespaces = Set.of();
+    @Builder.Default
+    private Set<String> schemaNames = Set.of();
+    @Builder.Default
+    private Set<SchemaState> states = Set.of();
 }

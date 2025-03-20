@@ -10,15 +10,13 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.Statement;
 import com.grookage.leia.aerospike.storage.AerospikeRecord;
 import com.grookage.leia.aerospike.storage.AerospikeStorageConstants;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Getter
@@ -86,9 +84,9 @@ public class AerospikeManager {
     }
 
     @SneakyThrows
-    public List<AerospikeRecord> getRecords(final List<String> namespaces,
-                                            final List<String> schemaNames,
-                                            final List<String> schemaStates) {
+    public List<AerospikeRecord> getRecords(final Set<String> namespaces,
+                                            final Set<String> schemaNames,
+                                            final Set<String> schemaStates) {
         final var queryStatement = new Statement();
         queryStatement.setNamespace(namespace);
         queryStatement.setSetName(AerospikeStorageConstants.SCHEMA_SET);
