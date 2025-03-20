@@ -44,6 +44,16 @@ public abstract class SchemaAttributeHandler<T> implements SchemaAttributeAccept
     }
 
     @Override
+    public T accept(ShortAttribute attribute) {
+        return defaultHandler.apply(attribute);
+    }
+
+    @Override
+    public T accept(CharacterAttribute attribute) {
+        return defaultHandler.apply(attribute);
+    }
+
+    @Override
     public T accept(final StringAttribute attribute) {
         return defaultHandler.apply(attribute);
     }

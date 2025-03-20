@@ -144,6 +144,12 @@ public class SchemaPayloadValidator {
             }
 
             @Override
+            public Boolean accept(CharacterAttribute attribute) {
+                // A CharacterAttribute must be a single character, not a full string
+                return fieldNode.isTextual() && fieldNode.asText().length() == 1;
+            }
+
+            @Override
             public Boolean accept(DoubleAttribute attribute) {
                 return fieldNode.isDouble() || fieldNode.isFloat() || fieldNode.isInt();
             }
@@ -169,13 +175,18 @@ public class SchemaPayloadValidator {
             }
 
             @Override
+            public Boolean accept(ShortAttribute attribute) {
+                return fieldNode.isShort() || fieldNode.isInt();
+            }
+
+            @Override
             public Boolean accept(StringAttribute attribute) {
                 return fieldNode.isTextual();
             }
 
             @Override
             public Boolean accept(DateAttribute attribute) {
-                return fieldNode.isTextual();
+                return fieldNode.isTextual() || fieldNode.isLong() || fieldNode.isInt();
             }
 
             @Override
