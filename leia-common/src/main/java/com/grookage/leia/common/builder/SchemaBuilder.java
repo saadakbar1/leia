@@ -18,6 +18,7 @@ package com.grookage.leia.common.builder;
 
 import com.grookage.leia.common.utils.FieldUtils;
 import com.grookage.leia.common.utils.QualifierUtils;
+import com.grookage.leia.common.utils.SchemaConstants;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
@@ -49,6 +50,7 @@ public class SchemaBuilder {
                 .schemaType(schemaDefinition.type())
                 .validationType(schemaDefinition.validation())
                 .attributes(getSchemaAttributes(klass))
+                .tags(Arrays.asList(schemaDefinition.tags()))
                 .build()
         );
     }
@@ -163,8 +165,8 @@ public class SchemaBuilder {
             return new EnumAttribute(name, optional, qualifiers, getEnumValues(klass));
         }
 
-        // Handle int, long, boolean etc.
-        if (klass.isPrimitive()) {
+        // Handle int, Integer, long, Long, boolean  etc.
+        if (klass.isPrimitive() || SchemaConstants.BOXED_PRIMITIVES.contains(klass)) {
             return handlePrimitive(klass, name, qualifiers, optional);
         }
 
@@ -194,6 +196,10 @@ public class SchemaBuilder {
             return new ObjectAttribute(name, optional, qualifiers, null);
         }
 
+        if (SchemaConstants.SUPPORTED_DATE_CLASSES.contains(klass)) {
+            return new DateAttribute(name, optional, qualifiers);
+        }
+
         // Handling custom defined POJO's
         final var schemaAttributes = getSchemaAttributes(klass);
         return new ObjectAttribute(name, optional, qualifiers, schemaAttributes);
@@ -217,6 +223,15 @@ public class SchemaBuilder {
         }
         if (klass == Float.class || klass == float.class) {
             return new FloatAttribute(name, optional, qualifiers);
+        }
+        if (klass == Short.class || klass == short.class) {
+            return new ShortAttribute(name, optional, qualifiers);
+        }
+        if (klass == Character.class || klass == char.class) {
+            return new CharacterAttribute(name, optional, qualifiers);
+        }
+        if (klass == Byte.class || klass == byte.class) {
+            return new ByteAttribute(name, optional, qualifiers);
         }
 
         throw new UnsupportedOperationException("Unsupported primitive class type: " + klass.getName());

@@ -36,11 +36,15 @@ public enum DataType {
 
     LONG(Long.class),
 
+    SHORT(Short.class),
+
     BOOLEAN(Boolean.class),
 
     BYTES(Byte.class),
 
-    DATE(Date.class),
+    CHARACTER(Character.class),
+
+    DATE(Object.class),
 
     ARRAY(Collection.class),
 
