@@ -1,9 +1,7 @@
 package com.grookage.leia.common.context;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.ParameterizedType;
@@ -18,12 +16,12 @@ import java.util.Map;
 public class TypeVariableContext {
     private final Map<TypeVariable<?>, Type> typeVariableMap = new HashMap<>();
 
-    public void addMapping(final TypeVariable<?> variable,
-                           final Type type) {
+    public void add(final TypeVariable<?> variable,
+                    final Type type) {
         typeVariableMap.put(variable, type);
     }
 
-    public Type resolveType(Type type) {
+    public Type resolveType(final Type type) {
         if (type instanceof TypeVariable<?> typeVariable) {
             return typeVariableMap.getOrDefault(typeVariable, Object.class);
         }
@@ -38,7 +36,7 @@ public class TypeVariableContext {
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 
         for (int i = 0; i < typeParameters.length; i++) {
-            newContext.addMapping(typeParameters[i], parentContext.resolveType(actualTypeArguments[i]));
+            newContext.add(typeParameters[i], parentContext.resolveType(actualTypeArguments[i]));
         }
         return newContext;
     }

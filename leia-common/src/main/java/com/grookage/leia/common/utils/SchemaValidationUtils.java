@@ -203,7 +203,7 @@ public class SchemaValidationUtils {
         return attribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
             @Override
             public Boolean accept(ArrayAttribute attribute) {
-                return klass.isArray() || org.apache.commons.lang3.ClassUtils.isAssignable(klass, Collection.class);
+                return klass.isArray() || ClassUtils.isAssignable(klass, Collection.class);
             }
 
             @Override

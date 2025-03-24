@@ -120,12 +120,12 @@ public class SchemaBuilder {
         final var rawType = (Class<?>) parameterizedType.getRawType();
 
         // Handle List<T> or Set<T>
-        if (org.apache.commons.lang3.ClassUtils.isAssignable(rawType, Collection.class)) {
+        if (ClassUtils.isAssignable(rawType, Collection.class)) {
             return handleCollection(parameterizedType, name, qualifiers, optional, typeVariableContext);
         }
 
         // Handle Map<T,R>
-        if (org.apache.commons.lang3.ClassUtils.isAssignable(rawType, Map.class)) {
+        if (ClassUtils.isAssignable(rawType, Map.class)) {
             return handleMap(parameterizedType, name, qualifiers, optional, typeVariableContext);
         }
 

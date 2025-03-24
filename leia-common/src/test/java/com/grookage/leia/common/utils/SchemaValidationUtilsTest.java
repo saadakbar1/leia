@@ -5,19 +5,7 @@ import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.PIIData;
 import com.grookage.leia.common.stubs.TestGenericStub;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.CharacterAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.EnumAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.ShortAttribute;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.SneakyThrows;
@@ -49,8 +37,6 @@ class SchemaValidationUtilsTest {
         Assertions.assertNotNull(schemaDetails);
         final var violations = SchemaValidationUtils.valid(schemaDetails, TestGenericStub.class);
         Assertions.assertTrue(violations.isEmpty());
-//        schemaDetails.setValidationType(SchemaValidationType.STRICT);
-//        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
     }
 
 

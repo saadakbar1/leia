@@ -15,6 +15,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ class SchemaBuilderTest {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)
                 .orElse(null);
         Assertions.assertNotNull(schemaCreateRequest);
-        Assertions.assertEquals(5, schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(7, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
         Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
         Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
@@ -260,6 +262,8 @@ class SchemaBuilderTest {
         long ttl;
         @Optional
         String accountId;
+        Date date;
+        LocalDateTime localDateTime;
     }
 
     static class TestObject {
