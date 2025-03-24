@@ -16,7 +16,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.print.attribute.standard.MediaSize;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -48,29 +50,22 @@ public class AerospikeManager {
     @SneakyThrows
     private Collection<Bin> getBins(final AerospikeRecord aerospikeRecord) {
         final var bins = new ArrayList<Bin>();
-        bins.add(new Bin(AerospikeStorageConstants.DEFAULT_BIN, MapperUtils.mapper().writeValueAsBytes(aerospikeRecord)));
+        bins.add(new Bin(AerospikeStorageConstants.DEFAULT_BIN, AerospikeClientUtils.compress(
+                MapperUtils.mapper().writeValueAsBytes(aerospikeRecord)))
+        );
         bins.add(new Bin(AerospikeStorageConstants.NAMESPACE_BIN, aerospikeRecord.getNamespace()));
         bins.add(new Bin(AerospikeStorageConstants.SCHEMA_STATE_BIN, aerospikeRecord.getSchemaState().name()));
         bins.add(new Bin(AerospikeStorageConstants.SCHEMA_BIN, aerospikeRecord.getSchemaName()));
         return bins;
     }
 
-    private void save(AerospikeRecord aerospikeRecord,
-                      RecordExistsAction recordExistsAction) {
+    public void save(AerospikeRecord aerospikeRecord) {
         final var key = getKey(aerospikeRecord.getReferenceId());
         final var bins = getBins(aerospikeRecord).toArray(Bin[]::new);
         final var writePolicy = new WritePolicy(client.getWritePolicyDefault());
-        writePolicy.recordExistsAction = recordExistsAction;
+        writePolicy.recordExistsAction = RecordExistsAction.UPDATE;
         writePolicy.sendKey = true;
         client.put(writePolicy, key, bins);
-    }
-
-    public void create(AerospikeRecord aerospikeRecord) {
-        save(aerospikeRecord, RecordExistsAction.CREATE_ONLY);
-    }
-
-    public void update(AerospikeRecord aerospikeRecord) {
-        save(aerospikeRecord, RecordExistsAction.REPLACE);
     }
 
     @SneakyThrows
@@ -78,39 +73,60 @@ public class AerospikeManager {
         final var recordKey = getKey(key);
         final var storedRecord = getRecord(recordKey, AerospikeStorageConstants.DEFAULT_BIN);
         if (null == storedRecord) return Optional.empty();
-        final var aerospikeRecord = storedRecord.getString(AerospikeStorageConstants.DEFAULT_BIN);
+        final var aerospikeRecord = storedRecord.getBytes(AerospikeStorageConstants.DEFAULT_BIN);
         if (null == aerospikeRecord) return Optional.empty();
-        return Optional.ofNullable(MapperUtils.mapper().readValue(aerospikeRecord, AerospikeRecord.class));
+        return Optional.ofNullable(MapperUtils.mapper().readValue(
+                AerospikeClientUtils.retrieve(aerospikeRecord),
+                AerospikeRecord.class)
+        );
+    }
+
+    private void augmentExpressions(final String binName,
+                                    final Set<String> comparators,
+                                    final List<Exp> searchableExpressions) {
+        final var expressions = comparators.stream().map(comparator -> Exp.eq(Exp.stringBin(binName), Exp.val(comparator)))
+                .toList();
+        if (!expressions.isEmpty()) {
+            if (expressions.size() == 1) {
+                searchableExpressions.add(expressions.get(0));
+            } else {
+                searchableExpressions.add(Exp.or(expressions.toArray(Exp[]::new)));
+            }
+        }
     }
 
     @SneakyThrows
     public List<AerospikeRecord> getRecords(final Set<String> namespaces,
                                             final Set<String> schemaNames,
                                             final Set<String> schemaStates) {
+
         final var queryStatement = new Statement();
         queryStatement.setNamespace(namespace);
+        queryStatement.setBinNames(AerospikeStorageConstants.DEFAULT_BIN);
         queryStatement.setSetName(AerospikeStorageConstants.SCHEMA_SET);
         queryStatement.setMaxRecords(10000);
         final var queryPolicy = client.copyQueryPolicyDefault();
         final var searchableExpressions = new ArrayList<Exp>();
-        namespaces.forEach(each ->
-                searchableExpressions.add(Exp.eq(Exp.stringBin(AerospikeStorageConstants.NAMESPACE_BIN), Exp.val(each))));
-        schemaNames.forEach(cName ->
-                searchableExpressions.add(Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_BIN), Exp.val(cName))));
-        schemaStates.forEach(sName ->
-                searchableExpressions.add(Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_STATE_BIN), Exp.val(sName))));
+        augmentExpressions(AerospikeStorageConstants.NAMESPACE_BIN, namespaces, searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.SCHEMA_BIN, schemaNames, searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.SCHEMA_STATE_BIN, schemaStates, searchableExpressions);
         if (!searchableExpressions.isEmpty()) {
-            queryPolicy.filterExp = Exp.build(Exp.and(searchableExpressions.toArray(Exp[]::new)));
+            if (searchableExpressions.size() == 1) {
+                queryPolicy.setFilterExp(Exp.build(searchableExpressions.get(0)));
+            } else {
+                queryPolicy.setFilterExp(Exp.build(Exp.and(searchableExpressions.toArray(Exp[]::new))));
+            }
         }
         final var aerospikeRecords = new ArrayList<AerospikeRecord>();
-        try (var rs = client.query(queryPolicy, queryStatement)) {
+        try (final var rs = client.query(queryPolicy, queryStatement)) {
             while (rs.next()) {
                 final var storageRecord = rs.getRecord();
                 if (null != storageRecord) {
-                    final var binRecord = storageRecord.getString(AerospikeStorageConstants.DEFAULT_BIN);
+                    final var binRecord = storageRecord.getBytes(AerospikeStorageConstants.DEFAULT_BIN);
                     if (null != binRecord) {
                         aerospikeRecords.add(
-                                MapperUtils.mapper().readValue(binRecord, AerospikeRecord.class)
+                                MapperUtils.mapper().readValue(AerospikeClientUtils.retrieve(binRecord),
+                                        AerospikeRecord.class)
                         );
                     }
                 }
@@ -119,7 +135,7 @@ public class AerospikeManager {
         return aerospikeRecords;
     }
 
-    public boolean exists(final String namespace,
+    public boolean exists(final String configNamespace,
                           final String schemaName,
                           final String schemaState) {
         final var queryStatement = new Statement();
@@ -127,17 +143,18 @@ public class AerospikeManager {
         queryStatement.setSetName(AerospikeStorageConstants.SCHEMA_SET);
         final var queryPolicy = client.copyQueryPolicyDefault();
         queryPolicy.filterExp = Exp.build(Exp.and(
-                Exp.eq(Exp.stringBin(AerospikeStorageConstants.NAMESPACE_BIN), Exp.val(namespace)),
+                Exp.eq(Exp.stringBin(AerospikeStorageConstants.NAMESPACE_BIN), Exp.val(configNamespace)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_BIN), Exp.val(schemaName)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_STATE_BIN), Exp.val(schemaState))
         ));
-        final var resultSet = client.query(queryPolicy, queryStatement);
-        var resultCount = 0;
-        while (resultSet.next()) {
-            if (null != resultSet.getRecord()) {
-                resultCount++;
+        try (final var resultSet = client.query(queryPolicy, queryStatement)) {
+            var resultCount = 0;
+            while (resultSet.next()) {
+                if (null != resultSet.getRecord()) {
+                    resultCount++;
+                }
             }
+            return resultCount > 0;
         }
-        return resultCount > 0;
     }
 }

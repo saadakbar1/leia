@@ -53,12 +53,12 @@ public class AerospikeRepository extends AbstractSchemaRepository {
 
     @Override
     public void create(SchemaDetails configDetails) {
-        aerospikeManager.create(toStorageRecord(configDetails));
+        aerospikeManager.save(toStorageRecord(configDetails));
     }
 
     @Override
     public void update(SchemaDetails configDetails) {
-        aerospikeManager.update(toStorageRecord(configDetails));
+        aerospikeManager.save(toStorageRecord(configDetails));
     }
 
     @Override
