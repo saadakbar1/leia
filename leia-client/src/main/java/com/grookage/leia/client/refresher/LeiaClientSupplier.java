@@ -18,13 +18,13 @@ package com.grookage.leia.client.refresher;
 
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
+import com.grookage.korg.config.KorgHttpConfiguration;
+import com.grookage.korg.suppliers.KorgHttpSupplier;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
-import com.grookage.leia.provider.config.LeiaHttpConfiguration;
-import com.grookage.leia.provider.suppliers.LeiaHttpSupplier;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -37,13 +37,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings({"deprecation", "KotlinInternalInJava"})
 @Getter
-public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
+public class LeiaClientSupplier extends KorgHttpSupplier<List<SchemaDetails>> {
 
     private final Supplier<LeiaClientRequest> clientRequestSupplier;
     private final Supplier<String> authHeaderSupplier;
 
     @Builder
-    public LeiaClientSupplier(LeiaHttpConfiguration httpConfiguration,
+    public LeiaClientSupplier(KorgHttpConfiguration httpConfiguration,
                               Supplier<LeiaClientRequest> clientRequestSupplier,
                               Supplier<String> authHeaderSupplier) {
         super(httpConfiguration, LeiaClientMarshaller.getInstance(), "getClientNamespaces");

@@ -17,6 +17,7 @@
 package com.grookage.leia.dw.client;
 
 import com.google.common.base.Preconditions;
+import com.grookage.korg.config.KorgHttpConfiguration;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
@@ -24,7 +25,6 @@ import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
-import com.grookage.leia.provider.config.LeiaHttpConfiguration;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import com.grookage.leia.validator.StaticSchemaValidator;
 import io.dropwizard.Configuration;
@@ -54,7 +54,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract boolean withProducerClient(T configuration);
 
-    protected abstract LeiaHttpConfiguration getHttpConfiguration(T configuration);
+    protected abstract KorgHttpConfiguration getHttpConfiguration(T configuration);
 
     protected abstract Set<String> getPackageRoots(T configuration);
 

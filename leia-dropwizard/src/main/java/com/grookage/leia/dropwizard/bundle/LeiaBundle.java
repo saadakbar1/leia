@@ -23,7 +23,6 @@ import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
 import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
 import com.grookage.leia.dropwizard.bundle.mapper.LeiaExceptionMapper;
-import com.grookage.leia.dropwizard.bundle.mapper.LeiaRefresherMapper;
 import com.grookage.leia.dropwizard.bundle.permissions.PermissionValidator;
 import com.grookage.leia.dropwizard.bundle.resolvers.SchemaUpdaterResolver;
 import com.grookage.leia.dropwizard.bundle.resources.IngestionResource;
@@ -102,7 +101,6 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
         environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver, permissionResolver));
         environment.jersey().register(new SchemaResource(schemaRetriever));
         environment.jersey().register(new LeiaExceptionMapper());
-        environment.jersey().register(new LeiaRefresherMapper());
     }
 
     @Override

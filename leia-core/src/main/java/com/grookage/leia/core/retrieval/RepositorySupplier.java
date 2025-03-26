@@ -16,16 +16,16 @@
 
 package com.grookage.leia.core.retrieval;
 
+import com.grookage.korg.suppliers.KorgSupplier;
 import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaRegistry;
-import com.grookage.leia.provider.suppliers.LeiaSupplier;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.function.Supplier;
 
 @AllArgsConstructor
-public class RepositorySupplier implements LeiaSupplier<SchemaRegistry> {
+public class RepositorySupplier implements KorgSupplier<SchemaRegistry> {
 
     private final Supplier<SchemaRepository> rSupplier;
 

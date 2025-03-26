@@ -35,6 +35,7 @@ import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.elastic.client.ElasticClientManager;
 import com.grookage.leia.elastic.config.ElasticConfig;
+import com.grookage.leia.elastic.storage.StoredElasticRecord;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -42,21 +43,19 @@ import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
 public class ElasticRepository implements SchemaRepository {
 
     private static final String SCHEMA_INDEX = "schema_registry";
-    private static final String NAMESPACE = "schemaKey.namespace";
-    private static final String ORG = "schemaKey.orgId";
-    private static final String TENANT = "schemaKey.tenantId";
-    private static final String SCHEMA_NAME = "schemaKey.schemaName";
-    private static final String VERSION = "schemaKey.version";
-    private static final String SCHEMA_STATE = "schemaKey.schemaState";
+    private static final String NAMESPACE = "namespace";
+    private static final String ORG = "orgId";
+    private static final String TENANT = "tenantId";
+    private static final String SCHEMA_NAME = "schemaName";
+    private static final String VERSION = "version";
+    private static final String SCHEMA_STATE = "schemaState";
     private final ElasticsearchClient client;
     private final ElasticConfig elasticConfig;
 
@@ -66,11 +65,6 @@ public class ElasticRepository implements SchemaRepository {
         this.elasticConfig = elasticConfig;
         this.client = new ElasticClientManager(elasticConfig).getElasticClient();
         this.initialize();
-    }
-
-    /* Fields and values are being lower-cased, before adding as clauses, since elasticsearch deals with lowercase only */
-    private List<FieldValue> getNormalizedValues(Set<String> terms) {
-        return terms.stream().map(FieldValue::of).toList();
     }
 
     @SneakyThrows
@@ -89,25 +83,63 @@ public class ElasticRepository implements SchemaRepository {
         }
     }
 
+    private FieldValue getFieldValue(final String value) {
+        return FieldValue.of(value.toLowerCase(Locale.ROOT));
+    }
+
+    private List<FieldValue> getFieldValues(final Set<String> values) {
+        return values.stream().map(this::getFieldValue).toList();
+    }
+
+    private StoredElasticRecord toStorageRecord(final SchemaDetails schemaDetails) {
+        final var schemaKey = schemaDetails.getSchemaKey();
+        return StoredElasticRecord.builder()
+                .orgId(schemaKey.getOrgId())
+                .namespace(schemaKey.getNamespace())
+                .tenantId(schemaKey.getTenantId())
+                .schemaName(schemaKey.getSchemaName())
+                .type(schemaKey.getType())
+                .version(schemaKey.getVersion())
+                .schemaState(schemaDetails.getSchemaState())
+                .schemaType(schemaDetails.getSchemaType())
+                .description(schemaDetails.getDescription())
+                .validationType(schemaDetails.getValidationType())
+                .attributes(schemaDetails.getAttributes())
+                .transformationTargets(schemaDetails.getTransformationTargets())
+                .histories(schemaDetails.getHistories())
+                .tags(schemaDetails.getTags())
+                .build();
+    }
+
+    private SchemaDetails toSchemaDetails(final StoredElasticRecord storedElasticRecord) {
+        return SchemaDetails.builder()
+                .schemaKey(storedElasticRecord.getSchemaKey())
+                .schemaState(storedElasticRecord.getSchemaState())
+                .schemaType(storedElasticRecord.getSchemaType())
+                .description(storedElasticRecord.getDescription())
+                .validationType(storedElasticRecord.getValidationType())
+                .attributes(storedElasticRecord.getAttributes())
+                .transformationTargets(storedElasticRecord.getTransformationTargets())
+                .histories(storedElasticRecord.getHistories())
+                .tags(storedElasticRecord.getTags())
+                .build();
+    }
     @Override
     @SneakyThrows
     public boolean createdRecordExists(SchemaKey schemaKey) {
-        final var orgQuery = TermQuery.of(p -> p.field(ORG).value(schemaKey.getOrgId()))._toQuery();
-        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(schemaKey.getNamespace()))._toQuery();
-        final var tenantQuery = TermQuery.of(p -> p.field(TENANT).value(schemaKey.getTenantId()))._toQuery();
-        final var schemaQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(schemaKey.getSchemaName()))._toQuery();
-        final var schemaStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(SchemaState.CREATED.name()))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(
-                orgQuery, namespaceQuery,
-                tenantQuery, schemaQuery, schemaStateQuery)
-        ))._toQuery();
-        final var searchResponse = client.search(SearchRequest.of(
-                        s -> s.query(searchQuery)
-                                .requestCache(true)
-                                .index(List.of(SCHEMA_INDEX))
-                                .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
-                                .timeout(elasticConfig.getTimeout())),
-                SchemaDetails.class
+        final var orgQuery = TermQuery.of(p -> p.field(ORG).value(getFieldValue(schemaKey.getOrgId())))._toQuery();
+        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(getFieldValue(schemaKey.getNamespace())))._toQuery();
+        final var tenantQuery = TermQuery.of(p -> p.field(TENANT).value(getFieldValue(schemaKey.getTenantId())))._toQuery();
+        final var schemaQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(getFieldValue(schemaKey.getSchemaName())))._toQuery();
+        final var schemaStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(getFieldValue(SchemaState.CREATED.name())))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(orgQuery, namespaceQuery, tenantQuery, schemaQuery, schemaStateQuery
+        )))._toQuery();
+        final var searchResponse = client.search(SearchRequest.of(s -> s.query(searchQuery)
+                        .requestCache(true)
+                        .index(List.of(SCHEMA_INDEX))
+                        .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
+                        .timeout(elasticConfig.getTimeout())),
+                StoredElasticRecord.class
         );
         return !searchResponse.hits().hits().isEmpty();
     }
@@ -115,7 +147,8 @@ public class ElasticRepository implements SchemaRepository {
     @Override
     @SneakyThrows
     public void create(SchemaDetails schema) {
-        final var createDocument = new IndexRequest.Builder<>().document(schema)
+        final var createDocument = new IndexRequest.Builder<>()
+                .document(toStorageRecord(schema))
                 .index(SCHEMA_INDEX)
                 .refresh(Refresh.WaitFor)
                 .id(schema.getReferenceId())
@@ -130,18 +163,18 @@ public class ElasticRepository implements SchemaRepository {
         final var updateRequest = new UpdateRequest.Builder<>()
                 .index(SCHEMA_INDEX)
                 .id(schema.getReferenceId())
-                .doc(schema)
+                .doc(toStorageRecord(schema))
                 .refresh(Refresh.WaitFor)
                 .timeout(Time.of(s -> s.time(elasticConfig.getTimeout())))
                 .build();
-        client.update(updateRequest, SchemaDetails.class);
+        client.update(updateRequest, StoredElasticRecord.class);
     }
 
     @Override
     @SneakyThrows
     public Optional<SchemaDetails> get(SchemaKey schemaKey) {
-        final var getResponse = client.get(GetRequest.of(request -> request.index(SCHEMA_INDEX).id(schemaKey.getReferenceId())), SchemaDetails.class);
-        return Optional.ofNullable(getResponse.source());
+        final var getResponse = client.get(GetRequest.of(request -> request.index(SCHEMA_INDEX).id(schemaKey.getReferenceId())), StoredElasticRecord.class);
+        return Optional.ofNullable(getResponse.source()).map(this::toSchemaDetails);
     }
 
     @Override
@@ -149,22 +182,22 @@ public class ElasticRepository implements SchemaRepository {
     public List<SchemaDetails> getSchemas(final com.grookage.leia.models.request.SearchRequest searchRequest) {
         final var orgQuery = searchRequest.getOrgs().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(ORG).terms(t -> t.value(getNormalizedValues(searchRequest.getOrgs()))))._toQuery();
+                TermsQuery.of(q -> q.field(ORG).terms(t -> t.value(getFieldValues(searchRequest.getOrgs()))))._toQuery();
         final var tenantQuery = searchRequest.getTenants().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(TENANT).terms(t -> t.value(getNormalizedValues(searchRequest.getTenants()))))._toQuery();
+                TermsQuery.of(q -> q.field(TENANT).terms(t -> t.value(getFieldValues(searchRequest.getTenants()))))._toQuery();
         final var namespaceQuery = searchRequest.getNamespaces().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(searchRequest.getNamespaces()))
+                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getFieldValues(searchRequest.getNamespaces()))
                 ))._toQuery();
         final var schemaNameQuery = searchRequest.getSchemaNames().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getNormalizedValues(searchRequest.getSchemaNames()))
+                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getFieldValues(searchRequest.getSchemaNames()))
                 ))._toQuery();
         final var stateQuery = searchRequest.getStates().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(SCHEMA_STATE)
-                        .terms(t -> t.value(getNormalizedValues(searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
+                        .terms(t -> t.value(getFieldValues(searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
         final var searchQuery = BoolQuery.of(q -> q.must(List.of(
                 orgQuery, namespaceQuery, tenantQuery, schemaNameQuery, stateQuery))
         )._toQuery();
@@ -174,8 +207,11 @@ public class ElasticRepository implements SchemaRepository {
                                 .index(List.of(SCHEMA_INDEX))
                                 .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
                                 .timeout(elasticConfig.getTimeout())),
-                SchemaDetails.class
+                StoredElasticRecord.class
         );
-        return searchResponse.hits().hits().stream().map(Hit::source).toList();
+        return searchResponse.hits()
+                .hits()
+                .stream()
+                .map(each -> toSchemaDetails(Objects.requireNonNull(each.source()))).toList();
     }
 }
