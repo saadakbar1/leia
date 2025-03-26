@@ -51,6 +51,9 @@ class RepositoryRefresherTest {
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
+                .orgId("testOrg")
+                .type("default")
+                .tenantId("tenantId")
                 .build()).orElse(null);
         Assertions.assertNotNull(schema);
     }

@@ -49,10 +49,10 @@ public class CreateSchemaProcessor extends SchemaProcessor {
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
         final var recordExists = getRepositorySupplier()
                 .get()
-                .createdRecordExists(createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
+                .createdRecordExists(createSchemaRequest.getSchemaKey());
         if (recordExists) {
-            log.error("There are already stored schemas present with namespace {} and schemaName {}. Please try updating them instead",
-                    createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
+            log.error("There are already stored schemas present with schemaKey {}. Please try updating them instead",
+                    createSchemaRequest.getSchemaKey());
             throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
         }
         final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);

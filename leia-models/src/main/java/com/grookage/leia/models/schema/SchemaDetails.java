@@ -19,8 +19,6 @@ package com.grookage.leia.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.common.base.Joiner;
-import com.grookage.leia.models.SchemaConstants;
 import com.grookage.leia.models.attributes.SchemaAttribute;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
@@ -29,23 +27,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Data
 @Builder
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SchemaDetails implements Comparable<SchemaDetails> {
-    @NotBlank
-    String namespace;
-    @NotBlank
-    String schemaName;
-    @NotBlank
-    String version;
+public class SchemaDetails {
     String description;
     @NotNull
     SchemaState schemaState;
@@ -60,29 +55,13 @@ public class SchemaDetails implements Comparable<SchemaDetails> {
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
     List<String> tags = new ArrayList<>();
+    @NotNull
+    @Valid
+    private SchemaKey schemaKey;
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
-    }
-
-    @JsonIgnore
-    public String getReferenceTag() {
-        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName).toUpperCase(Locale.ROOT);
-    }
-
-    @JsonIgnore
-    public SchemaKey getSchemaKey() {
-        return SchemaKey.builder()
-                .schemaName(schemaName)
-                .namespace(namespace)
-                .version(version)
-                .build();
-    }
-
-    @Override
-    public int compareTo(SchemaDetails o) {
-        return this.version.compareTo(o.getVersion());
+        return schemaKey.getReferenceId();
     }
 
     @JsonIgnore

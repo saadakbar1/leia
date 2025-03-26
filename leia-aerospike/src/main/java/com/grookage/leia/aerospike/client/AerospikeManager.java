@@ -10,13 +10,12 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.Statement;
 import com.grookage.leia.aerospike.storage.AerospikeRecord;
 import com.grookage.leia.aerospike.storage.AerospikeStorageConstants;
-import com.grookage.leia.models.schema.engine.SchemaState;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.utils.MapperUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,9 +52,12 @@ public class AerospikeManager {
         bins.add(new Bin(AerospikeStorageConstants.DEFAULT_BIN, AerospikeClientUtils.compress(
                 MapperUtils.mapper().writeValueAsBytes(aerospikeRecord)))
         );
-        bins.add(new Bin(AerospikeStorageConstants.NAMESPACE_BIN, aerospikeRecord.getNamespace()));
+        final var schemaKey = aerospikeRecord.getSchemaKey();
+        bins.add(new Bin(AerospikeStorageConstants.NAMESPACE_BIN, schemaKey.getNamespace()));
         bins.add(new Bin(AerospikeStorageConstants.SCHEMA_STATE_BIN, aerospikeRecord.getSchemaState().name()));
-        bins.add(new Bin(AerospikeStorageConstants.SCHEMA_BIN, aerospikeRecord.getSchemaName()));
+        bins.add(new Bin(AerospikeStorageConstants.SCHEMA_BIN, schemaKey.getSchemaName()));
+        bins.add(new Bin(AerospikeStorageConstants.ORG_BIN, schemaKey.getOrgId()));
+        bins.add(new Bin(AerospikeStorageConstants.TENANT_BIN, schemaKey.getTenantId()));
         return bins;
     }
 
@@ -96,10 +98,7 @@ public class AerospikeManager {
     }
 
     @SneakyThrows
-    public List<AerospikeRecord> getRecords(final Set<String> namespaces,
-                                            final Set<String> schemaNames,
-                                            final Set<String> schemaStates) {
-
+    public List<AerospikeRecord> getRecords(SearchRequest searchRequest) {
         final var queryStatement = new Statement();
         queryStatement.setNamespace(namespace);
         queryStatement.setBinNames(AerospikeStorageConstants.DEFAULT_BIN);
@@ -107,9 +106,12 @@ public class AerospikeManager {
         queryStatement.setMaxRecords(10000);
         final var queryPolicy = client.copyQueryPolicyDefault();
         final var searchableExpressions = new ArrayList<Exp>();
-        augmentExpressions(AerospikeStorageConstants.NAMESPACE_BIN, namespaces, searchableExpressions);
-        augmentExpressions(AerospikeStorageConstants.SCHEMA_BIN, schemaNames, searchableExpressions);
-        augmentExpressions(AerospikeStorageConstants.SCHEMA_STATE_BIN, schemaStates, searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.NAMESPACE_BIN, searchRequest.getNamespaces(), searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.SCHEMA_BIN, searchRequest.getSchemaNames(), searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.SCHEMA_STATE_BIN, searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet()),
+                searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.ORG_BIN, searchRequest.getOrgs(), searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.TENANT_BIN, searchRequest.getTenants(), searchableExpressions);
         if (!searchableExpressions.isEmpty()) {
             if (searchableExpressions.size() == 1) {
                 queryPolicy.setFilterExp(Exp.build(searchableExpressions.get(0)));
@@ -135,7 +137,8 @@ public class AerospikeManager {
         return aerospikeRecords;
     }
 
-    public boolean exists(final String configNamespace,
+    public boolean exists(final String orgId,
+                          final String configNamespace,
                           final String schemaName,
                           final String schemaState) {
         final var queryStatement = new Statement();
@@ -143,6 +146,7 @@ public class AerospikeManager {
         queryStatement.setSetName(AerospikeStorageConstants.SCHEMA_SET);
         final var queryPolicy = client.copyQueryPolicyDefault();
         queryPolicy.filterExp = Exp.build(Exp.and(
+                Exp.eq(Exp.stringBin(AerospikeStorageConstants.ORG_BIN), Exp.val(orgId)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.NAMESPACE_BIN), Exp.val(configNamespace)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_BIN), Exp.val(schemaName)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_STATE_BIN), Exp.val(schemaState))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2024-2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,23 @@
 package com.grookage.leia.client.datasource;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 @AllArgsConstructor
-public class NamespaceDataSource {
+@Data
+@Builder
+public class LeiaClientRequest {
 
-    private final Supplier<Set<String>> namespaceSupplier;
+    @Builder.Default
+    private final Set<String> tenants = Set.of();
+    @Builder.Default
+    private final Set<String> orgs = Set.of();
+    @Builder.Default
+    private final Set<String> namespaces = Set.of();
+    @Builder.Default
+    private final Set<String> schemaNames = Set.of();
 
-    public Set<String> getNamespaces() {
-        return namespaceSupplier.get();
-    }
 }

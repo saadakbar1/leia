@@ -17,9 +17,15 @@ public @interface SchemaDefinition {
 
     String version();
 
+    String orgId();
+
+    String tenantId();
+
+    String type();
+
     String description() default "";
 
-    SchemaType type() default SchemaType.JSON;
+    SchemaType schemaType() default SchemaType.JSON;
 
     SchemaValidationType validation() default SchemaValidationType.MATCHING;
 

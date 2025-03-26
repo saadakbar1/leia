@@ -1,5 +1,8 @@
 {
   "namespace": "testNamespace",
   "schemaName": "testSchema",
-  "version": "V1234"
+  "version": "V1234",
+  "orgId": "testOrg",
+  "tenantId": "tenantId",
+  "type": "default"
 }

@@ -26,7 +26,9 @@ public class AerospikeClientUtils {
     private static final List<String> BIN_INDEXES =
             List.of(AerospikeStorageConstants.SCHEMA_BIN,
                     AerospikeStorageConstants.SCHEMA_STATE_BIN,
-                    AerospikeStorageConstants.NAMESPACE_BIN);
+                    AerospikeStorageConstants.NAMESPACE_BIN,
+                    AerospikeStorageConstants.ORG_BIN,
+                    AerospikeStorageConstants.TENANT_BIN);
 
     /*
       Having to do this to have control at the code level, and also checkIndex doesn't exist.

@@ -40,8 +40,8 @@ class IngestionRequestTest {
         Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
         Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.ENUM));
         Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
-        Assertions.assertEquals("testNamespace", createSchemaRequest.getNamespace());
-        Assertions.assertEquals("testSchema", createSchemaRequest.getSchemaName());
+        Assertions.assertEquals("testNamespace", createSchemaRequest.getSchemaKey().getNamespace());
+        Assertions.assertEquals("testSchema", createSchemaRequest.getSchemaKey().getSchemaName());
         Assertions.assertSame(SchemaValidationType.MATCHING, createSchemaRequest.getValidationType());
         Assertions.assertSame(SchemaType.JSON, createSchemaRequest.getSchemaType());
 
@@ -55,8 +55,8 @@ class IngestionRequestTest {
         Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
         Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ENUM));
         Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
-        Assertions.assertEquals("testNamespace", updateSchemaRequest.getNamespace());
-        Assertions.assertEquals("testSchema", updateSchemaRequest.getSchemaName());
+        Assertions.assertEquals("testNamespace", updateSchemaRequest.getSchemaKey().getNamespace());
+        Assertions.assertEquals("testSchema", updateSchemaRequest.getSchemaKey().getSchemaName());
         Assertions.assertSame(SchemaValidationType.STRICT, updateSchemaRequest.getValidationType());
         Assertions.assertSame(SchemaType.JSON, updateSchemaRequest.getSchemaType());
 

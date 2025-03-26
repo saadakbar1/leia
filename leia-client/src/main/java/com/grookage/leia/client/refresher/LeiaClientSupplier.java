@@ -18,7 +18,7 @@ package com.grookage.leia.client.refresher;
 
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
-import com.grookage.leia.client.datasource.NamespaceDataSource;
+import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -39,15 +39,15 @@ import java.util.function.Supplier;
 @Getter
 public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
 
-    private final NamespaceDataSource namespaceDataSource;
+    private final Supplier<LeiaClientRequest> clientRequestSupplier;
     private final Supplier<String> authHeaderSupplier;
 
     @Builder
     public LeiaClientSupplier(LeiaHttpConfiguration httpConfiguration,
-                              NamespaceDataSource namespaceDataSource,
+                              Supplier<LeiaClientRequest> clientRequestSupplier,
                               Supplier<String> authHeaderSupplier) {
         super(httpConfiguration, LeiaClientMarshaller.getInstance(), "getClientNamespaces");
-        this.namespaceDataSource = namespaceDataSource;
+        this.clientRequestSupplier = clientRequestSupplier;
         this.authHeaderSupplier = authHeaderSupplier;
     }
 
@@ -59,10 +59,14 @@ public class LeiaClientSupplier extends LeiaHttpSupplier<List<SchemaDetails>> {
     @Override
     @SneakyThrows
     protected Request getRequest(String url) {
+        final var clientRequest = clientRequestSupplier.get();
         final var requestBody = RequestBody.create(
                 okhttp3.MediaType.parse("application/json; charset=utf-8"),
                 MapperUtils.mapper().writeValueAsString(SearchRequest.builder()
-                        .namespaces(namespaceDataSource.getNamespaces())
+                        .namespaces(clientRequest.getNamespaces())
+                        .tenants(clientRequest.getTenants())
+                        .orgs(clientRequest.getOrgs())
+                        .schemaNames(clientRequest.getSchemaNames())
                         .states(Set.of(SchemaState.APPROVED))
                         .build()));
         final var requestBuilder = new Request.Builder()

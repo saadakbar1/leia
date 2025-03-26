@@ -18,7 +18,7 @@ package com.grookage.leia.dw.client;
 
 import com.google.common.base.Preconditions;
 import com.grookage.leia.client.LeiaMessageProduceClient;
-import com.grookage.leia.client.datasource.NamespaceDataSource;
+import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.mux.MessageProcessor;
@@ -36,12 +36,13 @@ import lombok.Getter;
 import java.util.Set;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 @Getter
 public abstract class LeiaClientBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
     private LeiaMessageProduceClient producerClient;
 
-    protected abstract NamespaceDataSource getNamespaceDataSource(T configuration);
+    protected abstract Supplier<LeiaClientRequest> getClientRequestSupplier(T configuration);
 
     protected int getRefreshIntervalSeconds(T configuration) {
         return 30;
@@ -77,8 +78,8 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     @Override
     public void run(T configuration, Environment environment) {
-        final var namespaceDataSource = getNamespaceDataSource(configuration);
-        Preconditions.checkNotNull(namespaceDataSource, "Namespace data source can't be null");
+        final var clientRequestSupplier = getClientRequestSupplier(configuration);
+        Preconditions.checkNotNull(clientRequestSupplier, "Request Supplier can't be null");
         final var httpConfiguration = getHttpConfiguration(configuration);
         Preconditions.checkNotNull(httpConfiguration, "Http Configuration can't be null");
         final var packageRoots = getPackageRoots(configuration);
@@ -90,7 +91,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .supplier(
                         LeiaClientSupplier.builder()
                                 .httpConfiguration(httpConfiguration)
-                                .namespaceDataSource(namespaceDataSource)
+                                .clientRequestSupplier(clientRequestSupplier)
                                 .authHeaderSupplier(getAuthHeaderSupplier(configuration))
                                 .build()
                 )

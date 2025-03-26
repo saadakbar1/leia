@@ -1,7 +1,12 @@
 {
-  "namespace": "testNamespace",
-  "schemaName": "testSchema",
-  "versionId": "V1234",
+  "schemaKey": {
+    "namespace": "testNamespace",
+    "schemaName": "testSchema",
+    "version": "V1234",
+    "orgId": "testOrg",
+    "tenantId": "tenantId",
+    "type": "default"
+  },
   "schemaType": "JSON",
   "attributes": [
     {

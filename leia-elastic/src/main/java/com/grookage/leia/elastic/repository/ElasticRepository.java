@@ -38,7 +38,7 @@ import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
-import com.grookage.leia.repository.AbstractSchemaRepository;
+import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -48,12 +48,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-public class ElasticRepository extends AbstractSchemaRepository {
+public class ElasticRepository implements SchemaRepository {
+
     private static final String SCHEMA_INDEX = "schema_registry";
-    private static final String NAMESPACE = "namespace";
-    private static final String SCHEMA_NAME = "schemaName";
-    private static final String VERSION = "version";
-    private static final String SCHEMA_STATE = "schemaState";
+    private static final String NAMESPACE = "schemaKey.namespace";
+    private static final String ORG = "schemaKey.orgId";
+    private static final String TENANT = "schemaKey.tenantId";
+    private static final String SCHEMA_NAME = "schemaKey.schemaName";
+    private static final String VERSION = "schemaKey.version";
+    private static final String SCHEMA_STATE = "schemaKey.schemaState";
     private final ElasticsearchClient client;
     private final ElasticConfig elasticConfig;
 
@@ -88,11 +91,16 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public boolean createdRecordExists(String namespace, String schemaName) {
-        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(namespace))._toQuery();
-        final var configQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(schemaName))._toQuery();
-        final var configStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(SchemaState.CREATED.name()))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, configQuery, configStateQuery)))._toQuery();
+    public boolean createdRecordExists(SchemaKey schemaKey) {
+        final var orgQuery = TermQuery.of(p -> p.field(ORG).value(schemaKey.getOrgId()))._toQuery();
+        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(schemaKey.getNamespace()))._toQuery();
+        final var tenantQuery = TermQuery.of(p -> p.field(TENANT).value(schemaKey.getTenantId()))._toQuery();
+        final var schemaQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(schemaKey.getSchemaName()))._toQuery();
+        final var schemaStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(SchemaState.CREATED.name()))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(
+                orgQuery, namespaceQuery,
+                tenantQuery, schemaQuery, schemaStateQuery)
+        ))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)
@@ -138,22 +146,28 @@ public class ElasticRepository extends AbstractSchemaRepository {
 
     @Override
     @SneakyThrows
-    public List<SchemaDetails> getSchemas(final Set<String> namespaces,
-                                          final Set<String> schemaNames,
-                                          final Set<SchemaState> schemaStates) {
-        final var namespaceQuery = namespaces.isEmpty() ?
+    public List<SchemaDetails> getSchemas(final com.grookage.leia.models.request.SearchRequest searchRequest) {
+        final var orgQuery = searchRequest.getOrgs().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(namespaces))
-                ))._toQuery();
-        final var schemaNameQuery = schemaNames.isEmpty() ?
+                TermsQuery.of(q -> q.field(ORG).terms(t -> t.value(getNormalizedValues(searchRequest.getOrgs()))))._toQuery();
+        final var tenantQuery = searchRequest.getTenants().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getNormalizedValues(schemaNames))
+                TermsQuery.of(q -> q.field(TENANT).terms(t -> t.value(getNormalizedValues(searchRequest.getTenants()))))._toQuery();
+        final var namespaceQuery = searchRequest.getNamespaces().isEmpty() ?
+                MatchAllQuery.of(q -> q)._toQuery() :
+                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getNormalizedValues(searchRequest.getNamespaces()))
                 ))._toQuery();
-        final var stateQuery = schemaStates.isEmpty() ?
+        final var schemaNameQuery = searchRequest.getSchemaNames().isEmpty() ?
+                MatchAllQuery.of(q -> q)._toQuery() :
+                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getNormalizedValues(searchRequest.getSchemaNames()))
+                ))._toQuery();
+        final var stateQuery = searchRequest.getStates().isEmpty() ?
                 MatchAllQuery.of(q -> q)._toQuery() :
                 TermsQuery.of(q -> q.field(SCHEMA_STATE)
-                        .terms(t -> t.value(getNormalizedValues(schemaStates.stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, schemaNameQuery, stateQuery)))._toQuery();
+                        .terms(t -> t.value(getNormalizedValues(searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(
+                orgQuery, namespaceQuery, tenantQuery, schemaNameQuery, stateQuery))
+        )._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)

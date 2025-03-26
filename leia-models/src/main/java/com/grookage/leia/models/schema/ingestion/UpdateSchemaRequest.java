@@ -19,6 +19,7 @@ package com.grookage.leia.models.schema.ingestion;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
@@ -27,8 +28,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Builder
@@ -38,12 +39,8 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateSchemaRequest {
 
-    @NotBlank
-    private String namespace;
-    @NotBlank
-    private String schemaName;
-    @NotBlank
-    private String version;
+    @NotNull
+    private SchemaKey schemaKey;
     private String description;
     private SchemaValidationType validationType;
     private SchemaType schemaType;
