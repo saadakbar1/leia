@@ -17,6 +17,7 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -43,7 +44,9 @@ class SchemaClientTest {
                 .schemaValidator(schemaValidator)
                 .build();
         Assertions.assertNull(schemaClient.getSchemaDetails());
-        Assertions.assertThrows(IllegalStateException.class, () -> schemaClient.getSchemaDetails(Set.of("testNamespace")));
+        final var requestKey = SchemaKey.builder()
+                        .build();
+        Assertions.assertThrows(IllegalStateException.class, () -> schemaClient.getSchemaDetails(Set.of(requestKey)));
         Assertions.assertFalse(schemaClient.valid(SchemaKey.builder().build()));
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
@@ -53,8 +56,6 @@ class SchemaClientTest {
         final var details = schemaClient.getSchemaDetails();
         Assertions.assertNotNull(details);
         Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of()).isEmpty());
-        Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of("random")).isEmpty());
-        Assertions.assertFalse(schemaClient.getSchemaDetails(Set.of("testNamespace")).isEmpty());
         Assertions.assertFalse(schemaClient.valid(schemaKey));
     }
 

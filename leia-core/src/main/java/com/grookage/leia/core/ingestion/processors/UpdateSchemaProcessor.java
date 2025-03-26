@@ -19,7 +19,6 @@ package com.grookage.leia.core.ingestion.processors;
 import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.engine.SchemaState;
@@ -49,16 +48,11 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
         final var storedSchema = getRepositorySupplier()
                 .get()
-                .get(SchemaKey.builder()
-                        .version(updateSchemaRequest.getVersion())
-                        .schemaName(updateSchemaRequest.getSchemaName())
-                        .namespace(updateSchemaRequest.getNamespace())
-                        .build()).orElse(null);
+                .get(updateSchemaRequest.getSchemaKey())
+                .orElse(null);
         if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
-            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
-                    updateSchemaRequest.getNamespace(),
-                    updateSchemaRequest.getVersion(),
-                    updateSchemaRequest.getSchemaName());
+            log.error("There are no stored schemas present with schemaKey {}",
+                    updateSchemaRequest.getSchemaKey());
             throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
         storedSchema.setDescription(updateSchemaRequest.getDescription());

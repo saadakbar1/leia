@@ -35,15 +35,26 @@ import java.util.Locale;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaKey {
     @NotBlank
+    private String orgId;
+    @NotBlank
     private String namespace;
+    @NotBlank
+    private String tenantId;
     @NotBlank
     private String schemaName;
     @NotBlank
     private String version;
+    @NotBlank
+    private String type;
 
     @JsonIgnore
     public String getReferenceId() {
-        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(namespace, schemaName, version).toUpperCase(Locale.ROOT);
+        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(orgId,
+                namespace,
+                tenantId,
+                schemaName,
+                version
+        ).toUpperCase(Locale.ROOT);
     }
 
     @Override

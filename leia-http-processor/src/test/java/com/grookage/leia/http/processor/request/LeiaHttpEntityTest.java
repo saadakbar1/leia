@@ -40,6 +40,6 @@ class LeiaHttpEntityTest {
         });
         final var httpEntity = HttpRequestUtils.toHttpEntity(leiaMessages, backend);
         Assertions.assertEquals(1, httpEntity.getEntities().size());
-        httpEntity.getEntities().stream().findFirst().ifPresent(leiaMessageEntity -> Assertions.assertEquals("bfb829caa11461db4cd939fff913da20", leiaMessageEntity.getSignature()));
+        httpEntity.getEntities().stream().findFirst().ifPresent(leiaMessageEntity -> Assertions.assertEquals("5aed308f0de68dc585bbd09581e5ddca", leiaMessageEntity.getSignature()));
     }
 }

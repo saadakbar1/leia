@@ -19,6 +19,7 @@ package com.grookage.leia.core.ingestion.processors;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.SneakyThrows;
@@ -46,7 +47,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
                 CreateSchemaRequest.class
         );
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
@@ -70,7 +71,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 }

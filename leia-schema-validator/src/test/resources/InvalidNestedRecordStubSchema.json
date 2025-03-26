@@ -1,7 +1,12 @@
 {
-  "namespace": "test",
-  "schemaName": "TEST_NESTED_RECORD",
-  "version": "v1",
+  "schemaKey": {
+    "namespace": "test",
+    "schemaName": "TEST_NESTED_RECORD",
+    "version": "v1",
+    "orgId": "testOrg",
+    "tenantId": "tenantId",
+    "type": "default"
+  },
   "description": "Test Nested Record",
   "schemaState": "CREATED",
   "schemaType": "JSON",

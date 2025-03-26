@@ -12,15 +12,20 @@ import com.grookage.leia.models.schema.SchemaValidationType;
         namespace = TestRecordStub.NAMESPACE,
         version = TestRecordStub.VERSION,
         description = TestRecordStub.DESCRIPTION,
-        type = SchemaType.JSON,
-        validation = SchemaValidationType.STRICT
+        schemaType = SchemaType.JSON,
+        validation = SchemaValidationType.STRICT,
+        orgId = TestRecordStub.ORG,
+        tenantId = TestRecordStub.TENANT,
+        type = TestRecordStub.TYPE
 )
 public class TestRecordStub {
     static final String NAME = "TEST_RECORD";
     static final String NAMESPACE = "test";
     static final String VERSION = "v1";
     static final String DESCRIPTION = "Test Record";
-
+    static final String ORG = "testOrg";
+    static final String TENANT = "tenantId";
+    static final String TYPE = "type";
     int id;
     String name;
     @PII

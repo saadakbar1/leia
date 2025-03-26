@@ -31,7 +31,10 @@ import java.util.Set;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SearchRequest {
-
+    @Builder.Default
+    private Set<String> orgs = Set.of();
+    @Builder.Default
+    private Set<String> tenants = Set.of();
     @Builder.Default
     private Set<String> namespaces = Set.of();
     @Builder.Default

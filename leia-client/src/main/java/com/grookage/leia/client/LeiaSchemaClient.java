@@ -26,7 +26,7 @@ public interface LeiaSchemaClient {
 
     List<SchemaDetails> getSchemaDetails();
 
-    List<SchemaDetails> getSchemaDetails(final Set<String> namespaces);
+    List<SchemaDetails> getSchemaDetails(final Set<SchemaKey> schemas);
 
     boolean valid(SchemaKey schemaKey);
 
