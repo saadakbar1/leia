@@ -117,7 +117,7 @@ class SchemaBuilderTest {
         final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new EncryptedQualifier()));
         testPIIDataAttributes.add(piiNameAttribute);
         testPIIDataAttributes.add(accountNumberAttribute);
-        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(new PIIQualifier()),
+        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(),
                 new ObjectAttribute("element", false, Set.of(new PIIQualifier()), testPIIDataAttributes));
         LeiaTestUtils.assertEquals(piiDataListAttribute, LeiaTestUtils.filter(schemaAttributes, "piiDataList").orElse(null));
 

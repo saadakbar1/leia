@@ -4,21 +4,14 @@ import com.grookage.leia.models.annotations.attribute.Optional;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
 import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
 import com.grookage.leia.models.annotations.attribute.qualifiers.ShortLived;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.CharacterAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.ShortAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.EncryptedQualifier;
 import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.qualifiers.ShortLivedQualifier;
 import lombok.experimental.UtilityClass;
 
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -67,11 +60,8 @@ public class BuilderUtils {
                 .collect(Collectors.toSet());
     }
 
-    public boolean isOptional(final Type type) {
-        if (type instanceof Class<?> klass) {
-            return isOptional(klass);
-        }
-        return false;
+    public boolean isOptional(final AnnotatedType annotatedType) {
+        return annotatedType.isAnnotationPresent(Optional.class);
     }
 
     public boolean isOptional(final Class<?> klass) {
@@ -82,11 +72,19 @@ public class BuilderUtils {
         return field.isAnnotationPresent(Optional.class);
     }
 
-    public Set<QualifierInfo> getQualifiers(final Type type) {
-        if (type instanceof Class<?> klass) {
-            return getQualifiers(klass);
+    public Set<QualifierInfo> getQualifiers(final AnnotatedType annotatedType) {
+        Set<QualifierInfo> qualifiers = new HashSet<>();
+        if (annotatedType.isAnnotationPresent(Encrypted.class)) {
+            qualifiers.add(new EncryptedQualifier());
         }
-        return new HashSet<>();
+        if (annotatedType.isAnnotationPresent(PII.class)) {
+            qualifiers.add(new PIIQualifier());
+        }
+        if (annotatedType.isAnnotationPresent(ShortLived.class)) {
+            final var shortLived = annotatedType.getAnnotation(ShortLived.class);
+            qualifiers.add(new ShortLivedQualifier(shortLived.ttlSeconds()));
+        }
+        return qualifiers;
     }
 
     public Set<QualifierInfo> getQualifiers(final Field field) {

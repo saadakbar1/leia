@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.AnnotatedTypeVariable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -14,26 +17,26 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 public class TypeVariableContext {
-    private final Map<TypeVariable<?>, Type> typeVariableMap = new HashMap<>();
+    private final Map<TypeVariable<?>, AnnotatedType> typeVariableMap = new HashMap<>();
 
     public void add(final TypeVariable<?> variable,
-                    final Type type) {
+                    final AnnotatedType type) {
         typeVariableMap.put(variable, type);
     }
 
-    public Type resolveType(final Type type) {
-        if (type instanceof TypeVariable<?> typeVariable) {
-            return typeVariableMap.getOrDefault(typeVariable, Object.class);
+    public AnnotatedType resolveType(final AnnotatedType type) {
+        if (type instanceof AnnotatedTypeVariable annotatedTypeVariable) {
+            return typeVariableMap.get(annotatedTypeVariable.getType());
         }
         return type;
     }
 
     public static TypeVariableContext from(final Class<?> rawType,
-                                           final ParameterizedType parameterizedType,
+                                           final AnnotatedParameterizedType annotatedParameterizedType,
                                            final TypeVariableContext parentContext) {
         final var newContext = new TypeVariableContext();
         TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
-        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        AnnotatedType[] actualTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
 
         for (int i = 0; i < typeParameters.length; i++) {
             newContext.add(typeParameters[i], parentContext.resolveType(actualTypeArguments[i]));
