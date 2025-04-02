@@ -30,6 +30,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
@@ -58,7 +59,7 @@ class DefaultMessageProcessorTest {
             }
         };
         Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages));
-        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(List.of("backend-backend1::backend2",
+        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2",
                 "importance-mild::extreme")));
         final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override

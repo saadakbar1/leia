@@ -38,6 +38,7 @@ import lombok.val;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -72,8 +73,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         final var targetSchema = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), transformationTarget.getSchemaKey())
                 .orElse(null);
         if (null == targetSchema) {
-            log.error("No schema found for target schemaKey {}", messageRequest.getSchemaKey());
-            throw new UnsupportedOperationException("No valid schema found for target schemaKey " + messageRequest.getSchemaKey().getReferenceId());
+            log.error("No schema found for target schemaKey {}", transformationTarget.getSchemaKey());
+            throw new UnsupportedOperationException("No valid schema found for target schemaKey " + transformationTarget.getSchemaKey().getReferenceId());
         }
         final var registeredKlass = getSchemaValidator()
                 .getKlass(transformationTarget.getSchemaKey()).orElse(null);
@@ -85,7 +86,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                 getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
         val tags = Stream.of(targetSchema.getTags(), transformationTarget.getTags())
-                .flatMap(Collection::stream).toList();
+                .flatMap(Collection::stream).collect(Collectors.toSet());
         return Optional.of(
                 LeiaMessage.builder()
                         .schemaKey(transformationTarget.getSchemaKey())
