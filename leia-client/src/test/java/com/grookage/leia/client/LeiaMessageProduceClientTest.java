@@ -109,7 +109,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -144,7 +144,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(false)
                 .build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -218,7 +218,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -240,7 +240,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 

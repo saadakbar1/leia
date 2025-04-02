@@ -37,7 +37,7 @@ class DefaultMessageProcessorTest {
     @Test
     @SneakyThrows
     void testHttpMessageProcessor() {
-        final var resolver = new TagBasedNameResolver(() -> List.of("BACKEND1"));
+        final var resolver = new TagBasedNameResolver(() -> Set.of("BACKEND1"));
         final var httpExecutor = Mockito.mock(MessageExecutor.class);
         final var executorFactory = new MessageExecutorFactory() {
             @Override
@@ -49,7 +49,7 @@ class DefaultMessageProcessorTest {
         });
         final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -63,7 +63,7 @@ class DefaultMessageProcessorTest {
                 "importance-mild::extreme")));
         final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return true;
             }
 
