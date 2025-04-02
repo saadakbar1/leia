@@ -69,11 +69,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         if (!validTarget(messageRequest, sourceSchema, transformationTarget, tValidator)) {
             return Optional.empty();
         }
-        final var schemaDetails = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), messageRequest.getSchemaKey())
+        final var targetSchema = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), transformationTarget.getSchemaKey())
                 .orElse(null);
-        if (null == schemaDetails) {
-            log.error("No schema found for schemaKey {}", messageRequest.getSchemaKey());
-            throw new UnsupportedOperationException("No valid schema found for schemaKey " + messageRequest.getSchemaKey().getReferenceId());
+        if (null == targetSchema) {
+            log.error("No schema found for target schemaKey {}", messageRequest.getSchemaKey());
+            throw new UnsupportedOperationException("No valid schema found for target schemaKey " + messageRequest.getSchemaKey().getReferenceId());
         }
         final var registeredKlass = getSchemaValidator()
                 .getKlass(transformationTarget.getSchemaKey()).orElse(null);
@@ -84,7 +84,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         final var responseObject = MessageTransformerUtils.transformMessage(sourceContext, transformationTarget,
                 getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
-        val tags = Stream.of(schemaDetails.getTags(), transformationTarget.getTags())
+        val tags = Stream.of(targetSchema.getTags(), transformationTarget.getTags())
                 .flatMap(Collection::stream).toList();
         return Optional.of(
                 LeiaMessage.builder()
