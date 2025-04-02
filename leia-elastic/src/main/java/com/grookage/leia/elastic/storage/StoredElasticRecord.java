@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.models.schema;
-
+package com.grookage.leia.elastic.storage;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.schema.SchemaHistoryItem;
+import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.SchemaType;
+import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import lombok.AllArgsConstructor;
@@ -27,7 +30,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -40,7 +43,19 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SchemaDetails {
+public class StoredElasticRecord {
+    @NotBlank
+    private String orgId;
+    @NotBlank
+    private String namespace;
+    @NotBlank
+    private String tenantId;
+    @NotBlank
+    private String schemaName;
+    @NotBlank
+    private String version;
+    @NotBlank
+    private String type;
     String description;
     @NotNull
     SchemaState schemaState;
@@ -55,20 +70,16 @@ public class SchemaDetails {
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
     List<String> tags = new ArrayList<>();
-    @NotNull
-    @Valid
-    private SchemaKey schemaKey;
 
     @JsonIgnore
-    public String getReferenceId() {
-        return schemaKey.getReferenceId();
-    }
-
-    @JsonIgnore
-    public synchronized void addHistory(SchemaHistoryItem historyItem) {
-        if (null == histories) {
-            histories = new HashSet<>();
-        }
-        histories.add(historyItem);
+    public SchemaKey getSchemaKey() {
+        return SchemaKey.builder()
+                .orgId(orgId)
+                .namespace(namespace)
+                .tenantId(tenantId)
+                .schemaName(schemaName)
+                .version(version)
+                .type(type)
+                .build();
     }
 }

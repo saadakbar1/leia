@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia</artifactId>
-        <version>0.0.1-RC33</version>
+        <version>0.0.1-RC24</version>
     </parent>
 
     <artifactId>leia-bom</artifactId>
@@ -82,11 +82,6 @@
             <dependency>
                 <groupId>com.grookage.leia</groupId>
                 <artifactId>leia-dropwizard-es</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.grookage.leia</groupId>
-                <artifactId>leia-refresher</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

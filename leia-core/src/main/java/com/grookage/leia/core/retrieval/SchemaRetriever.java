@@ -91,8 +91,7 @@ public class SchemaRetriever {
                     .filter(each -> match(each, searchRequest))
                     .toList();
         } else {
-            return repositorySupplier.get().getSchemas(searchRequest.getNamespaces(),
-                    searchRequest.getSchemaNames(), searchRequest.getStates());
+            return repositorySupplier.get().getSchemas(searchRequest);
         }
     }
 }

@@ -16,11 +16,11 @@
 
 package com.grookage.leia.core.retrieval;
 
+import com.grookage.korg.refresher.AbstractKorgRefresher;
 import com.grookage.leia.models.schema.SchemaRegistry;
-import com.grookage.leia.provider.refresher.AbstractLeiaRefresher;
 import lombok.Builder;
 
-public class RepositoryRefresher extends AbstractLeiaRefresher<SchemaRegistry> {
+public class RepositoryRefresher extends AbstractKorgRefresher<SchemaRegistry> {
 
     @Builder
     protected RepositoryRefresher(final RepositorySupplier supplier,

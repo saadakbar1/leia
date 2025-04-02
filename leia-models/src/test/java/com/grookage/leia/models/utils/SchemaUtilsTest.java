@@ -39,10 +39,13 @@ class SchemaUtilsTest {
         var schemaKey = SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
-                .version("v1234") //This is not a typo. This is to test equalsIgnoreCase
+                .version("v1234")
+                .orgId("testOrg")
+                .tenantId("tenantId")
+                .type("default")
                 .build();
         var matchingSchema = SchemaUtils.getMatchingSchema(allSchemas, schemaKey).orElse(null);
         Assertions.assertNotNull(matchingSchema);
-        Assertions.assertEquals("V1234", matchingSchema.getVersion());
+        Assertions.assertEquals("V1234", matchingSchema.getSchemaKey().getVersion());
     }
 }

@@ -17,9 +17,9 @@
 package com.grookage.leia.client.refresher;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.grookage.korg.marshal.Marshaller;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.utils.MapperUtils;
-import com.grookage.leia.provider.marshal.Marshaller;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 

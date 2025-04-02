@@ -42,6 +42,7 @@ public class HttpRequestUtils {
                 messages.stream()
                         .map(each ->
                                 new LeiaMessageEntity(getMessageSignature(each, backendConfig.getHasher()),
+                                        backendConfig.getBackendName(),
                                         each))
                         .toList());
     }

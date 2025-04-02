@@ -22,6 +22,7 @@ import com.grookage.leia.common.utils.SchemaConstants;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.ClassUtils;
@@ -43,11 +44,18 @@ public class SchemaBuilder {
             return Optional.empty();
         }
         final var schemaDefinition = klass.getAnnotation(SchemaDefinition.class);
-        return Optional.of(CreateSchemaRequest.builder()
-                .schemaName(schemaDefinition.name())
+        final var schemaKey = SchemaKey.builder()
                 .namespace(schemaDefinition.namespace())
+                .schemaName(schemaDefinition.name())
+                .orgId(schemaDefinition.orgId())
+                .tenantId(schemaDefinition.tenantId())
+                .version(schemaDefinition.version())
+                .type(schemaDefinition.type())
+                .build();
+        return Optional.of(CreateSchemaRequest.builder()
+                .schemaKey(schemaKey)
                 .description(schemaDefinition.description())
-                .schemaType(schemaDefinition.type())
+                .schemaType(schemaDefinition.schemaType())
                 .validationType(schemaDefinition.validation())
                 .attributes(getSchemaAttributes(klass))
                 .tags(Arrays.asList(schemaDefinition.tags()))

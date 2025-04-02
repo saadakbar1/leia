@@ -71,6 +71,9 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
                         .schemaName(annotation.name())
                         .version(annotation.version())
                         .namespace(annotation.namespace())
+                        .orgId(annotation.orgId())
+                        .tenantId(annotation.tenantId())
+                        .type(annotation.type())
                         .build();
                 klassRegistry.putIfAbsent(schemaKey, annotatedClass);
                 final var schemaViolations = validate(schemaKey, annotatedClass);

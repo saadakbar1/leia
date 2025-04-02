@@ -64,11 +64,17 @@ class LeiaMessageProduceClientTest {
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
+                .orgId("testOrg")
+                .type("default")
+                .tenantId("tenantId")
                 .build();
         targetSchema = SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("v")
+                .orgId("testOrg")
+                .type("default")
+                .tenantId("tenantId")
                 .build();
         schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
