@@ -44,8 +44,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.grookage.leia</groupId>
-            <artifactId>leia-refresher</artifactId>
+            <artifactId>korg</artifactId>
+            <groupId>com.grookage.apps</groupId>
+            <version>${korg.version}</version>
         </dependency>
 
         <dependency>

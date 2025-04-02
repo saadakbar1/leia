@@ -16,13 +16,13 @@
 
 package com.grookage.leia.core.retrieval;
 
+import com.grookage.korg.exceptions.KorgErrorCode;
+import com.grookage.korg.exceptions.KorgException;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaRegistry;
 import com.grookage.leia.models.utils.LeiaUtils;
-import com.grookage.leia.provider.exceptions.RefresherErrorCode;
-import com.grookage.leia.provider.exceptions.RefresherException;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
@@ -51,6 +51,9 @@ class RepositoryRefresherTest {
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
+                .orgId("testOrg")
+                .type("default")
+                .tenantId("tenantId")
                 .build()).orElse(null);
         Assertions.assertNotNull(schema);
     }
@@ -60,20 +63,20 @@ class RepositoryRefresherTest {
         final var supplier = Mockito.mock(RepositorySupplier.class);
         Mockito.doReturn(null).when(supplier).get();
         val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
-        final var exception = Assertions.assertThrows(RefresherException.class,
+        final var exception = Assertions.assertThrows(KorgException.class,
                 repositoryRefresher::start);
         Assertions.assertNotNull(exception);
-        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+        Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 
     @Test
     void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
         final var supplier = Mockito.mock(RepositorySupplier.class);
-        Mockito.doThrow(RefresherException.error(RefresherErrorCode.REFRESH_FAILED)).when(supplier).get();
+        Mockito.doThrow(KorgException.error(KorgErrorCode.REFRESH_FAILED)).when(supplier).get();
         val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
-        final var exception = Assertions.assertThrows(RefresherException.class,
+        final var exception = Assertions.assertThrows(KorgException.class,
                 repositoryRefresher::start);
         Assertions.assertNotNull(exception);
-        Assertions.assertEquals(RefresherErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+        Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
     }
 }

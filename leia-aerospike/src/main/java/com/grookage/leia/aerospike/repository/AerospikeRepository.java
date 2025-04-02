@@ -3,23 +3,20 @@ package com.grookage.leia.aerospike.repository;
 import com.grookage.leia.aerospike.client.AerospikeConfig;
 import com.grookage.leia.aerospike.client.AerospikeManager;
 import com.grookage.leia.aerospike.storage.AerospikeRecord;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
-import com.grookage.leia.repository.AbstractSchemaRepository;
-import lombok.EqualsAndHashCode;
+import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
-public class AerospikeRepository extends AbstractSchemaRepository {
+public class AerospikeRepository implements SchemaRepository {
 
     private final AerospikeManager aerospikeManager;
 
@@ -31,13 +28,8 @@ public class AerospikeRepository extends AbstractSchemaRepository {
     private AerospikeRecord toStorageRecord(SchemaDetails schemaDetails) {
         return AerospikeRecord.builder()
                 .data(MapperUtils.mapper().writeValueAsBytes(schemaDetails))
-                .histories(schemaDetails.getHistories())
                 .schemaState(schemaDetails.getSchemaState())
-                .version(schemaDetails.getVersion())
-                .description(schemaDetails.getDescription())
-                .namespace(schemaDetails.getNamespace())
-                .schemaName(schemaDetails.getSchemaName())
-                .schemaType(schemaDetails.getSchemaType())
+                .schemaKey(schemaDetails.getSchemaKey())
                 .build();
     }
 
@@ -46,19 +38,25 @@ public class AerospikeRepository extends AbstractSchemaRepository {
         return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
     }
 
+
     @Override
-    public boolean createdRecordExists(String namespace, String schemaName) {
-        return aerospikeManager.exists(namespace, schemaName, SchemaState.CREATED.name());
+    public boolean createdRecordExists(SchemaKey schemaKey) {
+        return aerospikeManager.exists(
+                schemaKey.getOrgId(),
+                schemaKey.getNamespace(),
+                schemaKey.getSchemaName(),
+                SchemaState.CREATED.name()
+        );
     }
 
     @Override
     public void create(SchemaDetails configDetails) {
-        aerospikeManager.create(toStorageRecord(configDetails));
+        aerospikeManager.save(toStorageRecord(configDetails));
     }
 
     @Override
     public void update(SchemaDetails configDetails) {
-        aerospikeManager.update(toStorageRecord(configDetails));
+        aerospikeManager.save(toStorageRecord(configDetails));
     }
 
     @Override
@@ -68,11 +66,8 @@ public class AerospikeRepository extends AbstractSchemaRepository {
     }
 
     @Override
-    public List<SchemaDetails> getSchemas(Set<String> namespaces,
-                                          Set<String> schemaNames,
-                                          Set<SchemaState> schemaStates) {
-        return aerospikeManager.getRecords(namespaces, schemaNames,
-                        schemaStates.stream().map(Enum::name).collect(Collectors.toSet()))
+    public List<SchemaDetails> getSchemas(SearchRequest searchRequest) {
+        return aerospikeManager.getRecords(searchRequest)
                 .stream().map(this::toConfigDetails).toList();
     }
 }

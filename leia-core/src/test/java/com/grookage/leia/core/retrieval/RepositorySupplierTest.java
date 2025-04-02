@@ -17,6 +17,7 @@
 package com.grookage.leia.core.retrieval;
 
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.repository.SchemaRepository;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
-import java.util.Set;
 
 class RepositorySupplierTest {
 
@@ -37,7 +37,7 @@ class RepositorySupplierTest {
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         final var repository = Mockito.mock(SchemaRepository.class);
         final var supplier = new RepositorySupplier(() -> repository);
-        Mockito.when(repository.getSchemas(Set.of(), Set.of(), Set.of()))
+        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
                 .thenReturn(List.of(schemaDetails));
         final var registry = supplier.get();
         Assertions.assertFalse(registry.getSchemas().isEmpty());
@@ -45,6 +45,9 @@ class RepositorySupplierTest {
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("V1234")
+                .orgId("testOrg")
+                .type("default")
+                .tenantId("tenantId")
                 .build()).orElse(null);
         Assertions.assertNotNull(schema);
     }

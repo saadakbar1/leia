@@ -14,8 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 public class CharacterAttribute extends SchemaAttribute {
     public CharacterAttribute(final String name,
-                         final boolean optional,
-                         final Set<QualifierInfo> qualifiers) {
+                              final boolean optional,
+                              final Set<QualifierInfo> qualifiers) {
         super(DataType.CHARACTER, name, optional, qualifiers);
     }
 

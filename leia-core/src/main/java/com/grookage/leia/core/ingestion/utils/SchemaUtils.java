@@ -26,9 +26,7 @@ public class SchemaUtils {
 
     public SchemaDetails toSchemaDetails(final CreateSchemaRequest createSchemaRequest) {
         return SchemaDetails.builder()
-                .namespace(createSchemaRequest.getNamespace())
-                .schemaName(createSchemaRequest.getSchemaName())
-                .version(createSchemaRequest.getVersionId())
+                .schemaKey(createSchemaRequest.getSchemaKey())
                 .schemaState(SchemaState.CREATED)
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())

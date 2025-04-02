@@ -36,6 +36,8 @@ public class LeiaMessageEntity {
 
     @NotEmpty
     private String signature;
+    @NotEmpty
+    private String backendName;
     @NotNull
     @Valid
     private LeiaMessage messageEnvelope;

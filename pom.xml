@@ -36,7 +36,6 @@
         <module>leia-repository</module>
         <module>leia-elastic</module>
         <module>leia-dropwizard-es</module>
-        <module>leia-refresher</module>
         <module>leia-schema-validator</module>
         <module>leia-client</module>
         <module>leia-client-dropwizard</module>

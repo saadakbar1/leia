@@ -86,11 +86,6 @@
             </dependency>
             <dependency>
                 <groupId>com.grookage.leia</groupId>
-                <artifactId>leia-refresher</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.grookage.leia</groupId>
                 <artifactId>leia-schema-validator</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -3,7 +3,10 @@
     "schemaKey": {
       "namespace": "testNamespace",
       "schemaName": "testSchema",
-      "version": "V1234"
+      "version": "V1234",
+      "orgId" : "testOrg",
+      "type" : "default",
+      "tenantId" : "tenantId"
     },
     "message": {
       "attr": "attr1"

@@ -16,16 +16,17 @@
 
 package com.grookage.leia.client.refresher;
 
+import com.grookage.korg.refresher.HttpKorgRefresher;
 import com.grookage.leia.models.schema.SchemaDetails;
-import com.grookage.leia.provider.refresher.HttpLeiaRefresher;
 import lombok.Builder;
 
 import java.util.List;
 
-public class LeiaClientRefresher extends HttpLeiaRefresher<List<SchemaDetails>> {
+public class LeiaClientRefresher extends HttpKorgRefresher<List<SchemaDetails>> {
 
     @Builder
-    public LeiaClientRefresher(LeiaClientSupplier supplier, int refreshTimeInSeconds,
+    public LeiaClientRefresher(LeiaClientSupplier supplier,
+                               int refreshTimeInSeconds,
                                boolean periodicRefresh) {
         super(supplier, refreshTimeInSeconds, periodicRefresh);
     }

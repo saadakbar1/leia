@@ -10,4 +10,6 @@ public class AerospikeStorageConstants {
     public static final String NAMESPACE_BIN = "namespace";
     public static final String SCHEMA_BIN = "schemaName";
     public static final String SCHEMA_STATE_BIN = "schemaState";
+    public static final String ORG_BIN = "org";
+    public static final String TENANT_BIN = "tenant";
 }

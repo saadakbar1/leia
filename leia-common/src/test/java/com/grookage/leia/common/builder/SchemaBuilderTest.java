@@ -29,8 +29,8 @@ class SchemaBuilderTest {
         Assertions.assertNotNull(schemaCreateRequest);
         Assertions.assertEquals(7, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
-        Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
-        Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
+        Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaKey().getSchemaName());
+        Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getSchemaKey().getNamespace());
         Assertions.assertEquals(TestRecord.DESCRIPTION, schemaCreateRequest.getDescription());
         Assertions.assertEquals(SchemaType.JSON, schemaCreateRequest.getSchemaType());
         Assertions.assertEquals(SchemaValidationType.MATCHING, schemaCreateRequest.getValidationType());
@@ -244,13 +244,19 @@ class SchemaBuilderTest {
             namespace = TestRecord.NAMESPACE,
             version = TestRecord.VERSION,
             description = TestRecord.DESCRIPTION,
-            type = SchemaType.JSON,
+            schemaType = SchemaType.JSON,
             validation = SchemaValidationType.MATCHING,
+            orgId = TestRecord.ORG,
+            tenantId = TestRecord.TENANT,
+            type = TestRecord.TYPE,
             tags = {"foxtrot", "audit"}
     )
     static class TestRecord {
         static final String NAME = "TEST_RECORD";
         static final String NAMESPACE = "test";
+        static final String ORG = "testOrg";
+        static final String TENANT = "tenantId";
+        static final String TYPE = "default";
         static final String VERSION = "v1";
         static final String DESCRIPTION = "Test Record";
 

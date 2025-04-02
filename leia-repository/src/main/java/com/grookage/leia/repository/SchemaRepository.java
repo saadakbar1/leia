@@ -16,17 +16,16 @@
 
 package com.grookage.leia.repository;
 
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.engine.SchemaState;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface SchemaRepository {
 
-    boolean createdRecordExists(String namespace, String schemaName);
+    boolean createdRecordExists(final SchemaKey schemaKey);
 
     void create(final SchemaDetails schema);
 
@@ -34,7 +33,5 @@ public interface SchemaRepository {
 
     Optional<SchemaDetails> get(final SchemaKey schemaKey);
 
-    List<SchemaDetails> getSchemas(final Set<String> namespaces,
-                                   final Set<String> schemaNames,
-                                   final Set<SchemaState> schemaStates);
+    List<SchemaDetails> getSchemas(final SearchRequest searchRequest);
 }
