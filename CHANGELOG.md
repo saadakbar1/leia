@@ -2,8 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.1-RC23-SNAPSHOT]
+## [0.0.1-RC24]
+- Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
 
+## [0.0.1-RC23]
 - Removed leia-refresher and replaced it with [korg](github.com/grookage/korg)
 - Fixed an AS client bug for expression evaluation - [MR](https://github.com/grookage/leia/pull/35)
 - Added orgId and tenant to schemaKey and has removed random flattened out structures, but instead maintaining storageRecord separately from application model.
