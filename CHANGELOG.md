@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.1-RC23]
+## [0.0.1-RC23-SNAPSHOT]
 
 - Removed leia-refresher and replaced it with [korg](github.com/grookage/korg)
 - Fixed an AS client bug for expression evaluation - [MR](https://github.com/grookage/leia/pull/35)
