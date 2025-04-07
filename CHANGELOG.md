@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.1-RC24]
+## [0.0.1-RC25]
 - Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
 - Exposes Schema Index via Elastic Config
 
