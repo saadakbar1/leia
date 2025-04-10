@@ -50,7 +50,7 @@ public class CreateSchemaProcessor extends SchemaProcessor {
         final var recordExists = getRepositorySupplier().get()
                 .recordExists(createSchemaRequest.getSchemaKey());
         if (recordExists) {
-            log.error("Stored Schema already present against schemaKey:{}. Please try updating them instead",
+            log.error("Stored Schema already present against schemaKey:{}",
                     createSchemaRequest.getSchemaKey());
             throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
         }

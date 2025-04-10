@@ -56,12 +56,12 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
                     schemaKey.getSchemaName());
             throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var userAlreadyModified = storedSchema.getHistories().stream()
+        final var modifiedByApprover = storedSchema.getHistories().stream()
                 .filter(schemaHistoryItem -> schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.CREATE_SCHEMA)
                                              || schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.UPDATE_SCHEMA))
                 .anyMatch(schemaHistoryItem -> schemaHistoryItem.getConfigUpdaterId()
                         .equalsIgnoreCase(ContextUtils.getUserId(context)));
-        if (userAlreadyModified) {
+        if (modifiedByApprover) {
             log.error("User:{} cannot approve the schema:{} because they have either created or updated it",
                     ContextUtils.getUser(context), schemaKey.getReferenceId());
             throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_APPROVAL_UNAUTHORIZED);
