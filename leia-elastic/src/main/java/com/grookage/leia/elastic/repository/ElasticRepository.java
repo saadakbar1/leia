@@ -24,12 +24,12 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
+import co.elastic.clients.elasticsearch.core.ExistsRequest;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -73,7 +73,7 @@ public class ElasticRepository implements SchemaRepository {
     @SneakyThrows
     private void initialize() {
         final var indexExists = client.indices()
-                .exists(ExistsRequest.of(s -> s.index(schemaIndex)))
+                .exists(co.elastic.clients.elasticsearch.indices.ExistsRequest.of(s -> s.index(schemaIndex)))
                 .value();
         if (!indexExists) {
             final var registryInitialized = client.indices().create(CreateIndexRequest.of(idx -> idx.index(schemaIndex)
@@ -146,6 +146,13 @@ public class ElasticRepository implements SchemaRepository {
                 StoredElasticRecord.class
         );
         return !searchResponse.hits().hits().isEmpty();
+    }
+
+    @SneakyThrows
+    @Override
+    public boolean recordExists(SchemaKey schemaKey) {
+        return client.exists(ExistsRequest.of(request -> request.index(schemaIndex).id(schemaKey.getReferenceId())))
+                .value();
     }
 
     @Override
