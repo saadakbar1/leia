@@ -114,7 +114,7 @@ public class AerospikeManager {
         augmentExpressions(AerospikeStorageConstants.SCHEMA_BIN, searchRequest.getSchemaNames(), searchableExpressions);
         augmentExpressions(AerospikeStorageConstants.SCHEMA_STATE_BIN, searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet()),
                 searchableExpressions);
-        augmentExpressions(AerospikeStorageConstants.ORG_BIN, searchRequest.getOrgs(), searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.ORG_BIN, searchRequest.getOrgIds(), searchableExpressions);
         augmentExpressions(AerospikeStorageConstants.TENANT_BIN, searchRequest.getTenants(), searchableExpressions);
         if (!searchableExpressions.isEmpty()) {
             if (searchableExpressions.size() == 1) {

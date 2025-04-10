@@ -22,6 +22,7 @@ import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch.core.ExistsRequest;
@@ -191,27 +192,37 @@ public class ElasticRepository implements SchemaRepository {
     @Override
     @SneakyThrows
     public List<SchemaDetails> getSchemas(final com.grookage.leia.models.request.SearchRequest searchRequest) {
-        final var orgQuery = searchRequest.getOrgs().isEmpty() ?
-                MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(ORG).terms(t -> t.value(getFieldValues(searchRequest.getOrgs()))))._toQuery();
-        final var tenantQuery = searchRequest.getTenants().isEmpty() ?
-                MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(TENANT).terms(t -> t.value(getFieldValues(searchRequest.getTenants()))))._toQuery();
-        final var namespaceQuery = searchRequest.getNamespaces().isEmpty() ?
-                MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(NAMESPACE).terms(t -> t.value(getFieldValues(searchRequest.getNamespaces()))
-                ))._toQuery();
-        final var schemaNameQuery = searchRequest.getSchemaNames().isEmpty() ?
-                MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(SCHEMA_NAME).terms(t -> t.value(getFieldValues(searchRequest.getSchemaNames()))
-                ))._toQuery();
-        final var stateQuery = searchRequest.getStates().isEmpty() ?
-                MatchAllQuery.of(q -> q)._toQuery() :
-                TermsQuery.of(q -> q.field(SCHEMA_STATE)
-                        .terms(t -> t.value(getFieldValues(searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet())))))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(
-                orgQuery, namespaceQuery, tenantQuery, schemaNameQuery, stateQuery))
-        )._toQuery();
+        final var filters = new ArrayList<Query>();
+        if (!searchRequest.getOrgIds().isEmpty()) {
+            filters.add(TermsQuery.of(q -> q.field(ORG)
+                    .terms(t -> t.value(getFieldValues(searchRequest.getOrgIds()))
+                    ))._toQuery());
+        }
+        if (!searchRequest.getNamespaces().isEmpty()) {
+            filters.add(TermsQuery.of(q -> q.field(NAMESPACE)
+                    .terms(t -> t.value(getFieldValues(searchRequest.getNamespaces()))
+                    ))._toQuery());
+        }
+        if (!searchRequest.getTenants().isEmpty()) {
+            filters.add(TermsQuery.of(q -> q.field(TENANT)
+                    .terms(t -> t.value(getFieldValues(searchRequest.getTenants()))
+                    ))._toQuery());
+        }
+        if (!searchRequest.getSchemaNames().isEmpty()) {
+            filters.add(TermsQuery.of(q -> q.field(SCHEMA_NAME)
+                    .terms(t -> t.value(getFieldValues(searchRequest.getSchemaNames()))
+                    ))._toQuery());
+        }
+        if (!searchRequest.getStates().isEmpty()) {
+            filters.add(TermsQuery.of(q -> q.field(SCHEMA_STATE)
+                    .terms(t -> t.value(getFieldValues(searchRequest.getStates().stream()
+                            .map(Enum::name)
+                            .collect(Collectors.toSet())))
+                    ))._toQuery());
+        }
+        final var searchQuery = filters.isEmpty()
+                ? MatchAllQuery.of(q -> q)._toQuery()
+                : BoolQuery.of(q -> q.must(filters))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)
