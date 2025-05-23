@@ -23,9 +23,7 @@ import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch.core.ExistsRequest;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -39,12 +37,16 @@ import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.elastic.storage.StoredElasticRecord;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -127,33 +129,6 @@ public class ElasticRepository implements SchemaRepository {
                 .histories(storedElasticRecord.getHistories())
                 .tags(storedElasticRecord.getTags())
                 .build();
-    }
-
-    @Override
-    @SneakyThrows
-    public boolean createdRecordExists(SchemaKey schemaKey) {
-        final var orgQuery = TermQuery.of(p -> p.field(ORG).value(getFieldValue(schemaKey.getOrgId())))._toQuery();
-        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(getFieldValue(schemaKey.getNamespace())))._toQuery();
-        final var tenantQuery = TermQuery.of(p -> p.field(TENANT).value(getFieldValue(schemaKey.getTenantId())))._toQuery();
-        final var schemaQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(getFieldValue(schemaKey.getSchemaName())))._toQuery();
-        final var schemaStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(getFieldValue(SchemaState.CREATED.name())))._toQuery();
-        final var searchQuery = BoolQuery.of(q -> q.must(List.of(orgQuery, namespaceQuery, tenantQuery, schemaQuery, schemaStateQuery
-        )))._toQuery();
-        final var searchResponse = client.search(SearchRequest.of(s -> s.query(searchQuery)
-                        .requestCache(true)
-                        .index(List.of(schemaIndex))
-                        .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
-                        .timeout(elasticConfig.getTimeout())),
-                StoredElasticRecord.class
-        );
-        return !searchResponse.hits().hits().isEmpty();
-    }
-
-    @SneakyThrows
-    @Override
-    public boolean recordExists(SchemaKey schemaKey) {
-        return client.exists(ExistsRequest.of(request -> request.index(schemaIndex).id(schemaKey.getReferenceId())))
-                .value();
     }
 
     @Override

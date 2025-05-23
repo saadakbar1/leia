@@ -6,7 +6,6 @@ import com.grookage.leia.aerospike.storage.AerospikeRecord;
 import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
@@ -36,23 +35,6 @@ public class AerospikeRepository implements SchemaRepository {
     @SneakyThrows
     private SchemaDetails toSchemaDetails(AerospikeRecord aerospikeRecord) {
         return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
-    }
-
-
-    @Override
-    public boolean createdRecordExists(SchemaKey schemaKey) {
-        return aerospikeManager.exists(
-                schemaKey.getOrgId(),
-                schemaKey.getNamespace(),
-                schemaKey.getTenantId(),
-                schemaKey.getSchemaName(),
-                SchemaState.CREATED.name()
-        );
-    }
-
-    @Override
-    public boolean recordExists(SchemaKey schemaKey) {
-        return aerospikeManager.exists(schemaKey.getReferenceId());
     }
 
     @Override
