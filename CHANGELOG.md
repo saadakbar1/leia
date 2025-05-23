@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 - Added validation to prevent schema creation when it already exists
 - Added missing validation checks in SchemaRetriever during matching SchemaDetails
 - Renamed `orgs` to `orgId` in SearchRequest & LeiaClientRequest for consistency
-- Removed unused `createdRecordExists` method in repository layer and corresponding implementations in ES & AS 
+- Removed unused `createdRecordExists` method in repository layer and corresponding implementations in ES & AS
+- Removed equals and hashCode methods from `SchemaHistoryItem` class for maintaining histories of same type in SchemaDetails
 
 ## [0.0.1-RC25]
 - Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
