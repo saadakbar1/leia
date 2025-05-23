@@ -18,14 +18,19 @@ package com.grookage.leia.core.ingestion.processors;
 
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.exception.LeiaException;
+import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
+import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.Collections;
+import java.util.List;
 
 class CreateSchemaProcessorTest extends SchemaProcessorTest {
 
@@ -47,8 +52,10 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
                 CreateSchemaRequest.class
         );
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
-        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
+
+        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+                .thenReturn(Collections.emptyList());
+
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
@@ -70,8 +77,22 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("EMAIL", "testEmail");
         schemaContext.addContext("USER_ID", "testUserId");
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
-        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
+
+        SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
+        SchemaDetails existingSchema = new SchemaDetails();
+        existingSchema.setSchemaKey(SchemaKey.builder()
+                .orgId(schemaKey.getOrgId())
+                .namespace(schemaKey.getNamespace())
+                .tenantId(schemaKey.getTenantId())
+                .schemaName(schemaKey.getSchemaName())
+                .type(schemaKey.getType())
+                .version("random")
+                .build());
+        existingSchema.setSchemaState(SchemaState.CREATED);
+
+        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+               .thenReturn(List.of(existingSchema));
+
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 
@@ -88,7 +109,14 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("EMAIL", "testEmail");
         schemaContext.addContext("USER_ID", "testUserId");
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
+
+        SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
+        SchemaDetails existingSchema = new SchemaDetails();
+        existingSchema.setSchemaKey(schemaKey);  // Same key as the request
+
+        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+               .thenReturn(List.of(existingSchema));
+
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 }

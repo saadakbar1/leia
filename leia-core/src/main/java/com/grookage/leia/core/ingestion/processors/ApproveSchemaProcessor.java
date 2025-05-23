@@ -56,19 +56,27 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
                     schemaKey.getSchemaName());
             throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
-        final var modifiedByApprover = storedSchema.getHistories().stream()
-                .filter(schemaHistoryItem -> schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.CREATE_SCHEMA)
-                                             || schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.UPDATE_SCHEMA))
-                .anyMatch(schemaHistoryItem -> schemaHistoryItem.getConfigUpdaterId()
-                        .equalsIgnoreCase(ContextUtils.getUserId(context)));
-        if (modifiedByApprover) {
-            log.error("User:{} cannot approve the schema:{} because they have either created or updated it",
-                    ContextUtils.getUser(context), schemaKey.getReferenceId());
-            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_APPROVAL_UNAUTHORIZED);
-        }
+        validateSchemaApproval(context, storedSchema);
         addHistory(context, storedSchema);
         storedSchema.setSchemaState(SchemaState.APPROVED);
         getRepositorySupplier().get().update(storedSchema);
         context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
+    }
+
+    private void validateSchemaApproval(SchemaContext context, SchemaDetails storedSchema) {
+        final var schemaKey = storedSchema.getSchemaKey();
+        final String currentUserId = ContextUtils.getUserId(context);
+
+        // Check if current user has previously created or updated this schema
+        final var isCreatorOrUpdater = storedSchema.getHistories().stream()
+                .filter(history -> history.getSchemaEvent() == SchemaEvent.CREATE_SCHEMA ||
+                                   history.getSchemaEvent() == SchemaEvent.UPDATE_SCHEMA)
+                .anyMatch(history -> history.getConfigUpdaterId().equalsIgnoreCase(currentUserId));
+
+        if (isCreatorOrUpdater) {
+            log.error("User '{}' cannot approve schema '{}' because they previously created or updated it",
+                    ContextUtils.getUser(context), schemaKey.getReferenceId());
+            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_APPROVAL_UNAUTHORIZED);
+        }
     }
 }
