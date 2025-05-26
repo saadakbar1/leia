@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC26]
 
-- Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
 - SchemaDetails: Use set for tags
 - LeiaMessageProduceClient: Append schema tags for multiplexed messages
 - TagBasedNameResolver: Bug Fix: Transform backend name to uppercase before comparison
+- Added approver validation to prevent self-approval for schemas 
+- Added validation to prevent schema creation when it already exists
+- Added missing validation checks in SchemaRetriever during matching SchemaDetails
+- Renamed `orgs` to `orgId` in SearchRequest & LeiaClientRequest for consistency
+- Removed unused `createdRecordExists` method in repository layer and corresponding implementations in ES & AS
+- Removed equals and hashCode methods from `SchemaHistoryItem` class for maintaining histories of same type in SchemaDetails
 
 ## [0.0.1-RC25]
 

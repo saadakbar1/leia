@@ -17,6 +17,7 @@
 package com.grookage.leia.core.ingestion.processors;
 
 import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
+import com.grookage.leia.core.ingestion.utils.SchemaUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -55,6 +56,7 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
                     schemaKey.getSchemaName());
             throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
         }
+        SchemaUtils.validateSchemaApproval(context, storedSchema);
         addHistory(context, storedSchema);
         storedSchema.setSchemaState(SchemaState.APPROVED);
         getRepositorySupplier().get().update(storedSchema);

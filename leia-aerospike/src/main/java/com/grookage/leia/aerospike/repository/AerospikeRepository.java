@@ -6,7 +6,6 @@ import com.grookage.leia.aerospike.storage.AerospikeRecord;
 import com.grookage.leia.models.request.SearchRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
-import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.utils.MapperUtils;
 import com.grookage.leia.repository.SchemaRepository;
 import lombok.Getter;
@@ -34,40 +33,29 @@ public class AerospikeRepository implements SchemaRepository {
     }
 
     @SneakyThrows
-    private SchemaDetails toConfigDetails(AerospikeRecord aerospikeRecord) {
+    private SchemaDetails toSchemaDetails(AerospikeRecord aerospikeRecord) {
         return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
     }
 
-
     @Override
-    public boolean createdRecordExists(SchemaKey schemaKey) {
-        return aerospikeManager.exists(
-                schemaKey.getOrgId(),
-                schemaKey.getNamespace(),
-                schemaKey.getSchemaName(),
-                SchemaState.CREATED.name()
-        );
+    public void create(SchemaDetails schemaDetails) {
+        aerospikeManager.save(toStorageRecord(schemaDetails));
     }
 
     @Override
-    public void create(SchemaDetails configDetails) {
-        aerospikeManager.save(toStorageRecord(configDetails));
-    }
-
-    @Override
-    public void update(SchemaDetails configDetails) {
-        aerospikeManager.save(toStorageRecord(configDetails));
+    public void update(SchemaDetails schemaDetails) {
+        aerospikeManager.save(toStorageRecord(schemaDetails));
     }
 
     @Override
     public Optional<SchemaDetails> get(SchemaKey schemaKey) {
         return aerospikeManager.getRecord(schemaKey.getReferenceId())
-                .map(this::toConfigDetails);
+                .map(this::toSchemaDetails);
     }
 
     @Override
     public List<SchemaDetails> getSchemas(SearchRequest searchRequest) {
         return aerospikeManager.getRecords(searchRequest)
-                .stream().map(this::toConfigDetails).toList();
+                .stream().map(this::toSchemaDetails).toList();
     }
 }
