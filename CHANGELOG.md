@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC26]
+
+- SchemaDetails: Use set for tags
+- LeiaMessageProduceClient: Append schema tags for multiplexed messages
+- TagBasedNameResolver: Bug Fix: Transform backend name to uppercase before comparison
 - Added approver validation to prevent self-approval for schemas 
 - Added validation to prevent schema creation when it already exists
 - Added missing validation checks in SchemaRetriever during matching SchemaDetails
@@ -11,10 +15,12 @@ All notable changes to this project will be documented in this file.
 - Removed equals and hashCode methods from `SchemaHistoryItem` class for maintaining histories of same type in SchemaDetails
 
 ## [0.0.1-RC25]
+
 - Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
 - Exposes Schema Index via Elastic Config
 
 ## [0.0.1-RC23]
+
 - Removed leia-refresher and replaced it with [korg](github.com/grookage/korg)
 - Fixed an AS client bug for expression evaluation - [MR](https://github.com/grookage/leia/pull/35)
 - Added orgId and tenant to schemaKey and has removed random flattened out structures, but instead maintaining storageRecord separately from application model.
