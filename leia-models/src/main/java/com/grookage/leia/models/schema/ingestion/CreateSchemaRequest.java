@@ -42,8 +42,6 @@ import java.util.Set;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateSchemaRequest {
-    @Builder.Default
-    Set<String> tags = new HashSet<>();
     @NotNull
     @Valid
     private SchemaKey schemaKey;
@@ -56,4 +54,6 @@ public class CreateSchemaRequest {
     @Builder.Default
     private Set<TransformationTarget> transformationTargets = Set.of();
     private JsonNode data;
+    @Builder.Default
+    Set<String> tags = new HashSet<>();
 }

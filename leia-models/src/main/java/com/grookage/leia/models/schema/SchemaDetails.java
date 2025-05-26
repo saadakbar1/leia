@@ -41,6 +41,9 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
+    @NotNull
+    @Valid
+    private SchemaKey schemaKey;
     String description;
     @NotNull
     SchemaState schemaState;
@@ -55,9 +58,6 @@ public class SchemaDetails {
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
     Set<String> tags = new HashSet<>();
-    @NotNull
-    @Valid
-    private SchemaKey schemaKey;
 
     @JsonIgnore
     public String getReferenceId() {
