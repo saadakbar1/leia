@@ -54,7 +54,7 @@
 
         <dropwizard.version>2.1.10</dropwizard.version>
         <awaitility.version>4.1.1</awaitility.version>
-        <appform.json-rules.version>1.0.12</appform.json-rules.version>
+        <appform.json-rules.version>1.0.17</appform.json-rules.version>
 
         <korg.version>0.0.1-RC2</korg.version>
     </properties>

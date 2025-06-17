@@ -1,12 +1,25 @@
 package com.grookage.leia.common.builder;
 
 import com.grookage.leia.common.LeiaTestUtils;
-import com.grookage.leia.common.stubs.*;
+import com.grookage.leia.common.stubs.NestedStub;
+import com.grookage.leia.common.stubs.RecordStub;
+import com.grookage.leia.common.stubs.TestEnum;
+import com.grookage.leia.common.stubs.TestGenericStub;
+import com.grookage.leia.common.stubs.TestObjectStub;
+import com.grookage.leia.common.stubs.TestParameterizedStub;
+import com.grookage.leia.common.stubs.TestRawCollectionStub;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.annotations.attribute.Optional;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
 import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.qualifiers.EncryptedQualifier;
 import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.schema.SchemaType;
@@ -42,6 +55,12 @@ class SchemaBuilderTest {
     void testSchemaRequest_WithInvalidClass() {
         Assertions.assertTrue(SchemaBuilder.buildSchemaRequest(null).isEmpty());
         Assertions.assertTrue(SchemaBuilder.buildSchemaRequest(TestObject.class).isEmpty());
+    }
+
+    @Test
+    void testSchemaRequest_WithInterface() {
+        final var attributes = SchemaBuilder.getSchemaAttributes(TestQueue.class);
+        Assertions.assertNotNull(attributes);
     }
 
     @Test
@@ -274,5 +293,20 @@ class SchemaBuilderTest {
 
     static class TestObject {
         String name;
+    }
+
+    static interface Queue {
+        String name();
+    }
+
+    enum TestQueue {
+        QUEUE_ONE("1"),
+        QUEUE_TWO("2");
+
+        private final String value;
+
+        TestQueue(String value) {
+            this.value = value;
+        }
     }
 }

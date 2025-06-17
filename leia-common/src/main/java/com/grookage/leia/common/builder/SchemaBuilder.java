@@ -77,6 +77,23 @@ public class SchemaBuilder {
     }
 
     public Set<SchemaAttribute> getSchemaAttributes(final Class<?> klass) {
+        // Special handling for Enum classes: capture enum constants and their fields as ObjectAttributes
+        if (klass.isEnum()) {
+            Set<SchemaAttribute> enumConstantAttributes = Arrays.stream(klass.getEnumConstants())
+                .map(constant -> {
+                    Set<SchemaAttribute> fields = Arrays.stream(klass.getDeclaredFields())
+                        .filter(f -> !f.isSynthetic() && !Modifier.isStatic(f.getModifiers()))
+                        .map(f -> {
+                            f.setAccessible(true);
+                            // Use the field type for schemaAttribute
+                            return schemaAttribute(f.getType(), f.getName(), Set.of(), false);
+                        })
+                        .collect(Collectors.toSet());
+                    return new ObjectAttribute(constant.toString(), false, Set.of(), fields);
+                })
+                .collect(Collectors.toSet());
+            return enumConstantAttributes;
+        }
         return FieldUtils.getAllFields(klass)
                 .stream()
                 .map(field -> schemaAttribute(field, new TypeVariableContext()))
@@ -204,6 +221,7 @@ public class SchemaBuilder {
         }
 
         if (klass.isEnum()) {
+            // For enum fields inside classes, use EnumAttribute as before
             return new EnumAttribute(name, optional, qualifiers, BuilderUtils.getEnumValues(klass));
         }
 
@@ -247,3 +265,4 @@ public class SchemaBuilder {
         return new ObjectAttribute(name, optional, qualifiers, schemaAttributes);
     }
 }
+

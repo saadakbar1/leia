@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC27]
+- Added missing enum values validation in `SchemaValidationUtils`
+
 ## [0.0.1-RC26]
 
 - SchemaDetails: Use set for tags
