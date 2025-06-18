@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC27]
+
+- `TagBasedNameResolver`: Bug Fix: Use the tags from LeiaMessage to arrive at backends without any contextual eligibility
+
 ## [0.0.1-RC26]
 
 - SchemaDetails: Use set for tags

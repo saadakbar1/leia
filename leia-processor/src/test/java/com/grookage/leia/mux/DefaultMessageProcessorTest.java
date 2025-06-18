@@ -37,7 +37,7 @@ class DefaultMessageProcessorTest {
     @Test
     @SneakyThrows
     void testHttpMessageProcessor() {
-        final var resolver = new TagBasedNameResolver(() -> Set.of("BACKEND1"));
+        final var resolver = new TagBasedNameResolver();
         final var httpExecutor = Mockito.mock(MessageExecutor.class);
         final var executorFactory = new MessageExecutorFactory() {
             @Override
@@ -59,7 +59,7 @@ class DefaultMessageProcessorTest {
             }
         };
         Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages));
-        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2",
+        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
                 "importance-mild::extreme")));
         final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override
