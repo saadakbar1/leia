@@ -10,6 +10,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia HTTP Processor</name>
     <artifactId>leia-http-processor</artifactId>
 
     <properties>

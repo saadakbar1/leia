@@ -25,6 +25,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Core</name>
     <artifactId>leia-core</artifactId>
 
     <dependencies>

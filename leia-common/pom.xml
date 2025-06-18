@@ -27,6 +27,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Common</name>
     <artifactId>leia-common</artifactId>
 
     <properties>

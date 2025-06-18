@@ -25,6 +25,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Dropwizard</name>
     <artifactId>leia-dropwizard</artifactId>
 
     <properties>

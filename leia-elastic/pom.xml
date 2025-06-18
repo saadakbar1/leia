@@ -26,6 +26,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Elastic</name>
     <artifactId>leia-elastic</artifactId>
 
     <properties>

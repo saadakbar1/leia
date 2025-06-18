@@ -25,6 +25,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Models</name>
     <artifactId>leia-models</artifactId>
 
     <properties>

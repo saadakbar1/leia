@@ -26,6 +26,7 @@
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Aerospike Dropwizard</name>
     <artifactId>leia-aerospike-dw</artifactId>
 
     <properties>

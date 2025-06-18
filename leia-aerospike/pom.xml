@@ -27,6 +27,7 @@
     </parent>
 
     <artifactId>leia-aerospike</artifactId>
+    <name>Leia Aerospike</name>
 
     <properties>
         <aerospike.version>9.0.1</aerospike.version>

@@ -27,7 +27,7 @@
 
     <artifactId>leia-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Leia Parent POM</name>
+    <name>Leia Parent</name>
 
     <description>
         Leia Parent POM
