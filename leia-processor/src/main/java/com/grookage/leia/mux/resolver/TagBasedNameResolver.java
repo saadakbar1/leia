@@ -22,9 +22,7 @@ import lombok.Data;
 
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -33,8 +31,6 @@ public class TagBasedNameResolver implements BackendNameResolver {
 
     private static final String BACKEND_TAG = "backend";
     private static final String TAG_SEPARATOR = "-";
-
-    private final Supplier<Set<String>> backends;
 
     @Override
     public Set<String> getEligibleBackends(LeiaMessage leiaMessage) {
@@ -47,16 +43,10 @@ public class TagBasedNameResolver implements BackendNameResolver {
         if (null == backendTag) {
             return Set.of();
         }
-        final Set<String> eligibleBackends = null == backends ? Set.of() :
-                Objects.requireNonNullElse(backends.get(), Set.<String>of()).stream().map(String::toUpperCase)
-                        .collect(Collectors.toSet());
-        final var configuredBackends = Arrays.stream(
+        return Arrays.stream(
                 backendTag.toUpperCase(Locale.ROOT)
                         .substring(backendTag.lastIndexOf(TAG_SEPARATOR) + 1)
                         .split("\\s*::\\s*"))
-                .collect(Collectors.toSet());
-        return eligibleBackends.stream()
-                .filter(configuredBackends::contains)
                 .collect(Collectors.toSet());
     }
 }

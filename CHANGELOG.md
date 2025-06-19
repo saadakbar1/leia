@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC27]
 - Added missing enum values validation in `SchemaValidationUtils`
+- `TagBasedNameResolver`: Bug Fix: Use the tags from LeiaMessage to arrive at backends without any contextual eligibility
 
 ## [0.0.1-RC26]
 

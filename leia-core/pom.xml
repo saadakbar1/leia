@@ -21,10 +21,11 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC26</version>
+        <version>0.0.1-RC27</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
+    <name>Leia Core</name>
     <artifactId>leia-core</artifactId>
 
     <dependencies>
