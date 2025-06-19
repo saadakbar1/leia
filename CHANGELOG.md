@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.0.0]
+- Added missing enum values validation in `SchemaValidationUtils`
+- Upgrading json-rules library for performance improvements
+
 
 ## [0.0.1-RC27]
 - Added missing enum values validation in `SchemaValidationUtils`
