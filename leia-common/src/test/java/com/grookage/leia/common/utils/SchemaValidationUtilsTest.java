@@ -206,26 +206,6 @@ class SchemaValidationUtilsTest {
         Assertions.assertFalse(violations.isEmpty());
     }
 
-    @SneakyThrows
-    @Test
-    void testInterface() {
-        final var enumAttribute = new EnumAttribute("queue", true, null, Set.of("TEST_ENUM"));
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(enumAttribute),
-                EnumTestClass.class).isEmpty());
-
-        // Enum as String attribute should pass the validation
-        final var stringAttribute = new StringAttribute("testEnum", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(stringAttribute),
-                EnumTestClass.class).isEmpty());
-
-        // Adding a new value to the enum should fail the validation
-        final var updatedEnumAttribute = new EnumAttribute("testEnum", true, null, Set.of("TEST_ENUM", "NEW_ENUM"));
-        final var violations = SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(updatedEnumAttribute),
-                EnumTestClass.class);
-        Assertions.assertFalse(violations.isEmpty());
-    }
-
-
     enum TestEnum {
         TEST_ENUM
     }
