@@ -56,9 +56,9 @@ class HttpMessageExecutorTest {
         Assertions.assertFalse(messages.isEmpty());
         final var entityMessages = HttpRequestUtils.toHttpEntity(messages, backend);
         stubFor(post(urlEqualTo("/ingest"))
-            .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
-            .willReturn(aResponse()
-                .withStatus(200)));
+                .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
+                .willReturn(aResponse()
+                        .withStatus(200)));
         final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
             @Override
             public Object getRequestData(LeiaHttpEntity leiaHttpEntity) {
@@ -68,11 +68,11 @@ class HttpMessageExecutorTest {
             @Override
             public Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig) {
                 return Optional.of(LeiaHttpEndPoint.builder()
-                    .host("127.0.0.1")
-                    .port(port)
-                    .secure(backendConfig.isSecure())
-                    .uri(backendConfig.getUri())
-                    .build());
+                        .host("127.0.0.1")
+                        .port(port)
+                        .secure(backendConfig.isSecure())
+                        .uri(backendConfig.getUri())
+                        .build());
             }
         };
         testableExecutor.send(messages);
