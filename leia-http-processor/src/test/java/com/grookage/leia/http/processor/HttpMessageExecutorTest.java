@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
 import com.grookage.leia.http.processor.config.HttpClientConfig;
 import com.grookage.leia.http.processor.config.LeiaHttpEndPoint;
+import com.grookage.leia.http.processor.request.LeiaHttpEntity;
 import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.ResourceHelper;
@@ -58,7 +59,12 @@ class HttpMessageExecutorTest {
                 .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
                 .willReturn(aResponse()
                         .withStatus(200)));
-        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+        final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+            @Override
+            public Object getRequestData(LeiaHttpEntity leiaHttpEntity) {
+                return leiaHttpEntity;
+            }
+
             @Override
             public Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig) {
                 return Optional.of(LeiaHttpEndPoint.builder()

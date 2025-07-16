@@ -1,6 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.0.1]
+- Added support for request data resolver in `HttpMessageExecutor`
+
 ## [1.0.0]
 - Added missing enum values validation in `SchemaValidationUtils`
 - Upgrading json-rules library for performance improvements
