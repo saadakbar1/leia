@@ -148,7 +148,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		return validator.validate(transformationTarget, messageRequest, schemaDetails);
 	}
 
-	@Deprecated(forRemoval = true, since = "1.1.1")
+	@Deprecated(forRemoval = true, since = "1.1.0")
 	public void processMessages(MessageRequest messageRequest,
 	                            MessageProcessor messageProcessor,
 	                            TargetValidator targetValidator) {
