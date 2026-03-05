@@ -20,4 +20,6 @@ public class MessageRequest {
 	private SchemaKey schemaKey;
 	@NotNull
 	private JsonNode message;
+	@NotEmpty
+	private String sourceId;
 }

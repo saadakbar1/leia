@@ -103,6 +103,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 						.schemaKey(transformationTarget.getSchemaKey())
 						.tags(tags)
 						.message(responseObject)
+						.sourceId(messageRequest.getSourceId())
 						.build()
 		);
 	}
@@ -126,6 +127,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 					.schemaKey(sourceSchemaDetails.getSchemaKey())
 					.message(messageRequest.getMessage())
 					.tags(sourceSchemaDetails.getTags())
+							.sourceId(messageRequest.getSourceId())
 					.build()
 			);
 		}

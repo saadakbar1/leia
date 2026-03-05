@@ -38,4 +38,6 @@ public class LeiaMessage {
 	private Set<String> tags = Set.of();
 	@NotNull
 	private JsonNode message;
+	@NotEmpty
+	private String sourceId;
 }
