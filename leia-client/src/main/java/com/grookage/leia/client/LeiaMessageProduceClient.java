@@ -127,7 +127,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 					.schemaKey(sourceSchemaDetails.getSchemaKey())
 					.message(messageRequest.getMessage())
 					.tags(sourceSchemaDetails.getTags())
-							.sourceId(messageRequest.getSourceId())
+					.sourceId(messageRequest.getSourceId())
 					.build()
 			);
 		}
