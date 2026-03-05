@@ -109,6 +109,7 @@ class LeiaMessageProduceClientTest {
 						.schemaKey(sourceSchema)
 						.message(mapper.valueToTree(testSchema))
 						.includeSource(true)
+						.sourceId("test-client")
 						.build(),
 				new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
 					@Override
@@ -145,6 +146,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(false)
+				.sourceId("test-client")
 				.build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
@@ -179,6 +181,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
+				.sourceId("test-client")
 				.build();
 		var messages = schemaClient.getMessages(messageRequest, null);
 		Assertions.assertNotNull(messages);
@@ -219,6 +222,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
+				.sourceId("test-client")
 				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
@@ -241,6 +245,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
+				.sourceId("test-client")
 				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
@@ -271,6 +276,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(false)
+				.sourceId("test-client")
 				.build();
 		final var httpExecutor = Mockito.mock(MessageExecutor.class);
 		Mockito.when(executorFactory.getExecutor("TRANSFORMATION_BACKEND")).thenReturn(Optional.of(httpExecutor));
