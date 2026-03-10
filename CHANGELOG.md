@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1]
+- `DefaultLeiaMessageValidator`- Bug fix: Fixed validation exception being thrown for optional attributes with null values
 ## [1.1.0]
 
 - Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of
