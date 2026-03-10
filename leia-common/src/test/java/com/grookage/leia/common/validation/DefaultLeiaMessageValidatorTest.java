@@ -20,7 +20,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultLeiaMessageValidatorTest {
-
   private DefaultLeiaMessageValidator validator;
   private static final SchemaKey SCHEMA_KEY = SchemaKey.builder()
       .namespace("testNamespace")
@@ -39,12 +38,12 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testValidJsonAgainstSchema() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "name": "John Doe",
-            "age": 30,
-            "isActive": true
-        }
-        """);
+				{
+				    "name": "John Doe",
+				    "age": 30,
+				    "isActive": true
+				}
+				""");
 
     final var schemaAttributes = Set.of(
         new StringAttribute("name", false, null),
@@ -65,13 +64,13 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testUnexpectedFieldInJson() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "name": "John Doe",
-            "age": 30,
-            "isActive": true,
-            "unexpectedField": "extra"
-        }
-        """);
+				{
+				    "name": "John Doe",
+				    "age": 30,
+				    "isActive": true,
+				    "unexpectedField": "extra"
+				}
+				""");
 
     final var schemaAttributes = Set.of(
         new StringAttribute("name", false, null),
@@ -95,10 +94,10 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testMissingRequiredField() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "name": "John Doe"
-        }
-        """);
+				{
+				    "name": "John Doe"
+				}
+				""");
 
     final var schemaAttributes = Set.of(
         new StringAttribute("name", false, null),
@@ -121,11 +120,11 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testTypeMismatch() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "name": "John Doe",
-            "age": "thirty"
-        }
-        """);
+				{
+				    "name": "John Doe",
+				    "age": "thirty"
+				}
+				""");
 
     final var schemaAttributes = Set.of(
         new StringAttribute("name", false, null),
@@ -142,20 +141,19 @@ class DefaultLeiaMessageValidatorTest {
 
     assertFalse(errors.isEmpty());
     assertEquals(1, errors.size());
-    assertEquals("Type mismatch for field: age. Expected: INTEGER, Found: STRING",
-        errors.get(0).message());
+    assertEquals("Type mismatch for field: age. Expected: INTEGER, Found: STRING", errors.get(0).message());
   }
 
   @Test
   void testNestedObjectValidation() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "user": {
-                "id": 1,
-                "username": "johndoe"
-            }
-        }
-        """);
+				{
+				    "user": {
+				        "id": 1,
+				        "username": "johndoe"
+				    }
+				}
+				""");
 
     final Set<SchemaAttribute> nestedAttributes = Set.of(
         new IntegerAttribute("id", false, null),
@@ -180,10 +178,10 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testArrayValidation() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "numbers": [1, 2, 3, 4]
-        }
-        """);
+				{
+				    "numbers": [1, 2, 3, 4]
+				}
+				""");
 
     final Set<SchemaAttribute> schemaAttributes = Set.of(
         new ArrayAttribute("numbers", false, null, new IntegerAttribute("element", false, null))
@@ -203,13 +201,13 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testMapValidation() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "attributes": {
-                "key1": "value1",
-                "key2": "value2"
-            }
-        }
-        """);
+				{
+				    "attributes": {
+				        "key1": "value1",
+				        "key2": "value2"
+				    }
+				}
+				""");
 
     final Set<SchemaAttribute> schemaAttributes = Set.of(
         new MapAttribute(
@@ -235,12 +233,12 @@ class DefaultLeiaMessageValidatorTest {
   @Test
   void testInvalidMapValueType() throws Exception {
     final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
-        {
-            "attributes": {
-                "key1": 100
-            }
-        }
-        """);
+				{
+				    "attributes": {
+				        "key1": 100
+				    }
+				}
+				""");
 
     final Set<SchemaAttribute> schemaAttributes = Set.of(
         new MapAttribute(
@@ -267,9 +265,8 @@ class DefaultLeiaMessageValidatorTest {
   @SneakyThrows
   @Test
   void testValidateNested() {
-    final var jsonNode = ResourceHelper.getObjectMapper()
-        .valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
-            NestedStub.class));
+    final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
+        NestedStub.class));
     final var schemaAttributes = SchemaBuilder.getSchemaAttributes(NestedStub.class);
     final var schemaDetails = SchemaDetails.builder()
         .schemaKey(SCHEMA_KEY)
@@ -284,9 +281,8 @@ class DefaultLeiaMessageValidatorTest {
   @SneakyThrows
   @Test
   void testValidateParameterizedStub() {
-    final var jsonNode = ResourceHelper.getObjectMapper()
-        .valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
-            TestParameterizedStub.class));
+    final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
+        TestParameterizedStub.class));
     final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
     final var schemaDetails = SchemaDetails.builder()
         .schemaKey(SCHEMA_KEY)
@@ -301,9 +297,8 @@ class DefaultLeiaMessageValidatorTest {
   @SneakyThrows
   @Test
   void testObjectValidation() {
-    final var jsonNode = ResourceHelper.getObjectMapper()
-        .valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
-            TestObjectStub.class));
+    final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
+        TestObjectStub.class));
     final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestObjectStub.class);
     final var schemaDetails = SchemaDetails.builder()
         .schemaKey(SCHEMA_KEY)
@@ -318,9 +313,8 @@ class DefaultLeiaMessageValidatorTest {
   @SneakyThrows
   @Test
   void testRawCollectionSchemaValidation() {
-    final var jsonNode = ResourceHelper.getObjectMapper()
-        .valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
-            TestRawCollectionStub.class));
+    final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
+        TestRawCollectionStub.class));
     final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRawCollectionStub.class);
     final var schemaDetails = SchemaDetails.builder()
         .schemaKey(SCHEMA_KEY)
