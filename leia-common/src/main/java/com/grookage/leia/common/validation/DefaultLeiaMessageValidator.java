@@ -94,12 +94,12 @@ public class DefaultLeiaMessageValidator implements LeiaMessageValidator {
 	                                            final SchemaAttribute attribute,
 	                                            final SchemaValidationType validationType,
 	                                            final String fieldPath) {
-		final List<ValidationError> validationErrors = new ArrayList<>();
-		final var fieldName = attribute.getName();
-		if(attribute.isOptional() && fieldNode.isNull()){
-			return validationErrors;
+		if(attribute.isOptional() && fieldNode.isNull()) {
+			return List.of();
 		}
 
+		final List<ValidationError> validationErrors = new ArrayList<>();
+		final var fieldName = attribute.getName();
 		if (!isMatchingType(fieldNode, attribute)) {
 			validationErrors.add(new ValidationError(
 					"Type mismatch for field: " + fieldName +
