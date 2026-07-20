@@ -30,7 +30,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -46,10 +49,19 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
 
 	@Builder
+	@Deprecated
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
 	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory,
+	                                  MessageExecutorFactory executorFactory) {
+		this(name, processingThresholdMs, backendNameResolver, executorFactory, null);
+	}
+
+	@Builder
+	protected DefaultMessageProcessor(String name,
+									  long processingThresholdMs,
+									  BackendNameResolver backendNameResolver,
+									  MessageExecutorFactory executorFactory,
 									  ExecutorService executorService) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
