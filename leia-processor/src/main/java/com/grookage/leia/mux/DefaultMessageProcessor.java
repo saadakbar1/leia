@@ -40,22 +40,20 @@ public class DefaultMessageProcessor implements MessageProcessor {
 
 	private final String name;
 	private final long processingThresholdMs;
-	private final int threadPoolSize;
 	private final BackendNameResolver backendNameResolver;
 	private final MessageExecutorFactory executorFactory;
 	private final ExecutorService executorService;
-	private final int DEFAULT_THREAD_POOL_SIZE =  ForkJoinPool.getCommonPoolParallelism();
+	private final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
 
 	@Builder
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
-									  int threadPoolSize,
 	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory) {
+	                                  MessageExecutorFactory executorFactory,
+									  ExecutorService executorService) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
-		this.threadPoolSize = threadPoolSize == 0 ? DEFAULT_THREAD_POOL_SIZE: threadPoolSize;
-		this.executorService = Executors.newFixedThreadPool(threadPoolSize);
+		this.executorService = executorService == null ? Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE): executorService;
 		this.name = name;
 		this.processingThresholdMs = processingThresholdMs;
 		this.backendNameResolver = backendNameResolver;
