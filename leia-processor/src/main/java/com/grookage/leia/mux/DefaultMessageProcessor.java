@@ -49,7 +49,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
 
 	@Builder
-	@Deprecated
+	@Deprecated(forRemoval = true, since = "1.1.0")
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
 	                                  BackendNameResolver backendNameResolver,
