@@ -57,7 +57,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		this(name, processingThresholdMs, backendNameResolver, executorFactory, null);
 	}
 
-	@Builder
+	@Builder(builderMethodName = "buildWithExecutorService", builderClassName = "WithExecutorBuilder")
 	protected DefaultMessageProcessor(String name,
 									  long processingThresholdMs,
 									  BackendNameResolver backendNameResolver,
