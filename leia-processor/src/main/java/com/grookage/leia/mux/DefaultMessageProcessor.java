@@ -63,7 +63,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		this.executorFactory = executorFactory;
 	}
 
-	@Deprecated(forRemoval = true, since = "1.1.0")
+	@Deprecated(forRemoval = true, since = "1.1.2")
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
 	                                  BackendNameResolver backendNameResolver,
