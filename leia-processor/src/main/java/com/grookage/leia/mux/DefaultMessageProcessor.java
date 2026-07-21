@@ -49,15 +49,6 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
 
 	@Builder
-	@Deprecated(forRemoval = true, since = "1.1.0")
-	protected DefaultMessageProcessor(String name,
-	                                  long processingThresholdMs,
-	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory) {
-		this(name, processingThresholdMs, backendNameResolver, executorFactory, null);
-	}
-
-	@Builder(builderMethodName = "buildWithExecutorService", builderClassName = "WithExecutorBuilder")
 	protected DefaultMessageProcessor(String name,
 									  long processingThresholdMs,
 									  BackendNameResolver backendNameResolver,
@@ -70,6 +61,14 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		this.processingThresholdMs = processingThresholdMs;
 		this.backendNameResolver = backendNameResolver;
 		this.executorFactory = executorFactory;
+	}
+
+	@Deprecated(forRemoval = true, since = "1.1.0")
+	protected DefaultMessageProcessor(String name,
+	                                  long processingThresholdMs,
+	                                  BackendNameResolver backendNameResolver,
+	                                  MessageExecutorFactory executorFactory) {
+		this(name, processingThresholdMs, backendNameResolver, executorFactory, null);
 	}
 
 	protected boolean validBackends(Set<String> backends) {
