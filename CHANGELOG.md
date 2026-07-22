@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2]
+
+- Added `SerdeLeiaMessageValidator` to validate transformed Leia message payloads by deserializing them
+  into client classes using the configured Jackson `ObjectMapper`.
+- Added MdcUtils to propagate MDC context across asynchronous message-processing threads.
 ## [1.1.1]
 - `DefaultLeiaMessageValidator`- Bug fix: Fixed validation exception being thrown for optional attributes with null values
 ## [1.1.0]
