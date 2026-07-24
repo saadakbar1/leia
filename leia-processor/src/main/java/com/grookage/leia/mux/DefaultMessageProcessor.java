@@ -25,9 +25,11 @@ import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.filter.BackendFilter;
 import com.grookage.leia.mux.resolver.BackendNameResolver;
+import com.grookage.leia.mux.util.MdcUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -63,7 +65,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		this.executorFactory = executorFactory;
 	}
 
-	@Deprecated(forRemoval = true, since = "1.1.2")
+	@Deprecated(forRemoval = true, since = "1.1.3")
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
 	                                  BackendNameResolver backendNameResolver,
@@ -111,10 +113,12 @@ public class DefaultMessageProcessor implements MessageProcessor {
 			log.debug("Haven't found any eligible executors with the set of messages {}", messages);
 			return;
 		}
+
+		final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
 		final var futures = CompletableFuture.allOf(
 				executorMapping.entrySet().stream()
 						.map(each -> CompletableFuture.runAsync(
-								() -> each.getKey().send(each.getValue()), executorService))
+								MdcUtils.decorateWithMdc(() -> each.getKey().send(each.getValue()), mdcContext), executorService))
 						.toArray(CompletableFuture[]::new));
 		try {
 			futures.get(getProcessingThresholdMs(), TimeUnit.MILLISECONDS);
