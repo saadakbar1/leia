@@ -33,6 +33,8 @@ import org.slf4j.MDC;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,18 +47,30 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final long processingThresholdMs;
 	private final BackendNameResolver backendNameResolver;
 	private final MessageExecutorFactory executorFactory;
+	private final ExecutorService executorService;
+	private final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
 
 	@Builder
 	protected DefaultMessageProcessor(String name,
-	                                  long processingThresholdMs,
-	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory) {
+									  long processingThresholdMs,
+									  BackendNameResolver backendNameResolver,
+									  MessageExecutorFactory executorFactory,
+									  ExecutorService executorService) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
+		this.executorService = executorService == null ? Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE): executorService;
 		this.name = name;
 		this.processingThresholdMs = processingThresholdMs;
 		this.backendNameResolver = backendNameResolver;
 		this.executorFactory = executorFactory;
+	}
+
+	@Deprecated(forRemoval = true, since = "1.1.2")
+	protected DefaultMessageProcessor(String name,
+	                                  long processingThresholdMs,
+	                                  BackendNameResolver backendNameResolver,
+	                                  MessageExecutorFactory executorFactory) {
+		this(name, processingThresholdMs, backendNameResolver, executorFactory, null);
 	}
 
 	protected boolean validBackends(Set<String> backends) {
@@ -99,12 +113,12 @@ public class DefaultMessageProcessor implements MessageProcessor {
 			log.debug("Haven't found any eligible executors with the set of messages {}", messages);
 			return;
 		}
-		
+
 		final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
 		final var futures = CompletableFuture.allOf(
 				executorMapping.entrySet().stream()
 						.map(each -> CompletableFuture.runAsync(
-								MdcUtils.decorateWithMdc(() -> each.getKey().send(each.getValue()), mdcContext)))
+								MdcUtils.decorateWithMdc(() -> each.getKey().send(each.getValue()), mdcContext), executorService))
 						.toArray(CompletableFuture[]::new));
 		try {
 			futures.get(getProcessingThresholdMs(), TimeUnit.MILLISECONDS);
