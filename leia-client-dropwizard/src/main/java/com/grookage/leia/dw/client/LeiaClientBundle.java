@@ -86,6 +86,10 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 		return new DefaultLeiaMessageValidator();
 	}
 
+	protected LeiaMessageValidator getMessageValidator(T configuration, Environment environment) {
+		return getMessageValidator(configuration);
+	}
+
 	@Override
 	public void run(T configuration, Environment environment) {
 		final var clientRequestSupplier = getClientRequestSupplier(configuration);
@@ -129,7 +133,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 					.mapper(environment.getObjectMapper())
 					.processorSupplier(getMessageProcessor(configuration))
 					.targetValidator(getTargetRetriever(configuration))
-					.leiaMessageValidator(getMessageValidator(configuration))
+					.leiaMessageValidator(getMessageValidator(configuration, environment))
 					.build();
 			environment.lifecycle().manage(new Managed() {
 				@Override

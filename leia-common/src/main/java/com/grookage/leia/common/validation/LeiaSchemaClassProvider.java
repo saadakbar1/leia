@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.validator;
+package com.grookage.leia.common.validation;
 
-import com.grookage.leia.common.validation.LeiaSchemaClassProvider;
 import com.grookage.leia.models.schema.SchemaKey;
 
-public interface LeiaSchemaValidator extends LeiaSchemaClassProvider {
+import java.util.Optional;
 
-	void start();
+public interface LeiaSchemaClassProvider {
 
-	void stop();
-
-	boolean valid(SchemaKey schemaKey);
-
+	Optional<Class<?>> getKlass(SchemaKey schemaKey);
 }
